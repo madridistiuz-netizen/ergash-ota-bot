@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264566")
+OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
 DATA_FILE = "data.json"
 
 DEFAULT_DATA = {
@@ -20,13 +20,13 @@ DEFAULT_DATA = {
         "address_ru": "г. Каттакурган, массив Казак овул",
         "address_uz": "Kattaqo'rg'on sh., Qozoq ovul massivi",
         "address_kz": "Каттақурғон қ., Қазақ овул массиві",
-        "phone1": "+998932264566",
+        "phone1": "+998932264567",
         "phone2": "+998933466277",
         "instagram": "@ergashotaclinis",
         "website": "https://ergash-ota-tm.uz/",
-        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: приём новых пациентов",
-        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: yangi bemorlar qabuli",
-        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: жаңа науқастар қабылдау",
+        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: В выходные дни новых пациентов принимает только приёмное отделение",
+        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: dam olish kuni yangi bemorlar qabul qilish uchun faqat qabul hona bemorlarni qabul qiladi",
+        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: Демалыс күндері жаңа науқастарды тек қабылдау бөлімі қабылдайды",
     },
     "doctor": {
         "name_ru": "Бердикул Эргашев Журакулович",
