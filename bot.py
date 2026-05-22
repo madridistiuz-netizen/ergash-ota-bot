@@ -24,9 +24,9 @@ DEFAULT_DATA = {
         "phone2": "+998933466277",
         "instagram": "@ergashotaclinis",
         "website": "https://ergash-ota-tm.uz/",
-        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: выходной день nНесмотря на это, пациенты, прибывшие в Воскресенье, принимаются. В этот день работают приёмное отделение и дежурные врачи. Пациенты регистрируются и размещаются. Для пациента, прибывшего в Воскресенье, этот день считается первым днём лечения.",
-        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: dam olish kuni yangi bemorlar qabul qilish uchun faqat qabul hona bemorlarni qabul qiladi",
-        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: Демалыс күндері жаңа науқастарды тек қабылдау бөлімі қабылдайды",
+        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: выходной день\nПациенты, прибывшие в Воскресенье, принимаются. В этот день работают приёмное отделение и дежурные врачи. Пациенты регистрируются и размещаются. Для пациента, прибывшего в Воскресенье, этот день считается первым днём лечения.",
+        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: dam olish kuni\nShunga qaramay, Yakshanba kuni kelgan bemorlar qabul qilinadi. Bu kuni qabulxona bo‘limi va yordamchi shifokorlar faoliyat yuritadi, bemorlar ro‘yxatga olinib joylashtiriladi. Yakshanba kuni kelgan bemor uchun ushbu sana davolanishning birinchi kuni hisoblanadi.",
+        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: Демалыс күндері\nСоған қарамастан, Жексенбі күні келген науқастар қабылданады. Бұл күні қабылдау бөлімі мен кезекші дәрігерлер жұмыс істейді. Науқастар тіркеліп, орналастырылады. Жексенбі күні келген науқас үшін бұл күн емнің алғашқы күні болып есептеледі",
     },
     "doctor": {
         "name_ru": "Бердикул Эргашев Журакулович",
