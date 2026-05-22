@@ -79,8 +79,18 @@ DEFAULT_DATA = {
         {"name": "М/VIP", "people": "2", "adult": "699 000", "child": "684 000"},
         {"name": "М/VIP", "people": "1", "adult": "760 000", "child": "745 000"},
     ],
-    "ward_photos": [],
-    "clinic_photos": [],
+    "clinic_history": {
+        "ru": "📖 *История клиники Эргаш-Ота*\n\nКлиника основана врачом высшей категории, академиком Бердикулом Эргашевым Журакуловичем.\n\nЗа годы работы клиника помогла тысячам пациентов из Узбекистана, Казахстана, Кыргызстана и других стран.\n\nСегодня клиника оснащена современным оборудованием: МРТ 1.5Т и 3Т, МСКТ 256 срезов, и многим другим.",
+        "uz": "📖 *Эргаш-Ота klinikasi tarixi*\n\nKlinika oliy toifali shifokor, akademik Berdiqul Ergashev Jo'raqulovich tomonidan tashkil etilgan.\n\nFaoliyat yillari davomida klinika O'zbekiston, Qozog'iston, Qirg'iziston va boshqa mamlakatlardan minglab bemorlarga yordam berdi.\n\nBugun klinika zamonaviy uskunalar bilan jihozlangan: МРТ 1.5Т va 3Т, МСКТ 256 qism va boshqalar.",
+        "kz": "📖 *Эргаш-Ота клиникасының тарихы*\n\nКлиника жоғары санатты дәрігер, академик Бердіқұл Ерғашев Жўрақұлович тарапынан құрылған.\n\nЖылдар бойы клиника мыңдаған науқастарға көмек берді.",
+    },
+    "clinic_certs": {
+        "ru": "📜 *Сертификаты и лицензии*\n\n✅ Лицензия на медицинскую деятельность\n✅ Сертификаты специалистов\n✅ Международные стандарты качества",
+        "uz": "📜 *Sertifikatlar va litsenziyalar*\n\n✅ Tibbiy faoliyat litsenziyasi\n✅ Mutaxassislar sertifikatlari\n✅ Xalqaro sifat standartlari",
+        "kz": "📜 *Сертификаттар мен лицензиялар*\n\n✅ Медициналық қызмет лицензиясы\n✅ Маман сертификаттары\n✅ Халықаралық сапа стандарттары",
+    },
+    "clinic_videos": [],
+    "cert_photos": [],
     "samarkand_photos": [],
     "bukhara_photos": [],
     "mrt_15": [
@@ -342,6 +352,32 @@ def rooms_keyboard(lang):
     ])
 
 
+def rooms_type_keyboard(lang, category):
+    back_cb = f"rooms_{category}"
+    labels = {
+        "ru": (
+            "👨‍👩‍👧 Для взрослых",
+            "👶 Для детей (5–10 лет)",
+            "⬅️ Назад"
+        ),
+        "uz": (
+            "👨‍👩‍👧 Kattalar uchun",
+            "👶 Bolalar uchun (5–10 yosh)",
+            "⬅️ Orqaga"
+        ),
+        "kz": (
+            "👨‍👩‍👧 Ересектер үшін",
+            "👶 Балалар үшін (5–10 жас)",
+            "⬅️ Артқа"
+        ),
+    }[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(labels[0], callback_data=f"rooms_{category}_adult")],
+        [InlineKeyboardButton(labels[1], callback_data=f"rooms_{category}_child")],
+        [InlineKeyboardButton(labels[2], callback_data="menu_rooms")],
+    ])
+
+
 def diagnostics_keyboard(lang):
     labels = {
         "ru": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
@@ -370,6 +406,21 @@ def mrt3t_groups_keyboard(lang):
         buttons.append([InlineKeyboardButton(f"📋 {group}", callback_data=f"mrt3t_{group}")])
     buttons.append([InlineKeyboardButton(back, callback_data="menu_diagnostics")])
     return InlineKeyboardMarkup(buttons)
+
+
+def clinic_submenu_keyboard(lang):
+    labels = {
+        "ru": ("📋 Общая информация", "🎥 Видео", "📜 Сертификаты", "📖 История клиники", "⬅️ Назад"),
+        "uz": ("📋 Umumiy ma'lumot", "🎥 Videolar", "📜 Sertifikatlar", "📖 Klinika tarixi", "⬅️ Orqaga"),
+        "kz": ("📋 Жалпы ақпарат", "🎥 Бейнелер", "📜 Сертификаттар", "📖 Клиника тарихы", "⬅️ Артқа"),
+    }[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(labels[0], callback_data="clinic_info")],
+        [InlineKeyboardButton(labels[1], callback_data="clinic_video")],
+        [InlineKeyboardButton(labels[2], callback_data="clinic_certs")],
+        [InlineKeyboardButton(labels[3], callback_data="clinic_history")],
+        [InlineKeyboardButton(labels[4], callback_data="back_main")],
+    ])
 
 
 def excursion_keyboard(lang):
@@ -441,8 +492,17 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=main_menu_keyboard(lang))
 
-    # ── Klinika haqida ──
+    # ── Klinika haqida — submenu ──
     elif data == "menu_clinic":
+        title = {
+            "ru": "🏥 *Клиника Эргаш-Ота*\n\nВыберите раздел:",
+            "uz": "🏥 *Эргаш-Ота klinikasi*\n\nBo'limni tanlang:",
+            "kz": "🏥 *Эргаш-Ота клиникасы*\n\nБөлімді таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=clinic_submenu_keyboard(lang))
+
+    elif data == "clinic_info":
         c = d["contacts"]
         addr = c[f"address_{lang}"]
         hours = c[f"work_hours_{lang}"]
@@ -452,11 +512,53 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": f"🏥 *Эргаш-Ота klinikasi*\n\n📍 {addr}\n📞 {c['phone1']}\n📞 {c['phone2']}\n🕐 {hours}\n📸 {c['instagram']}\n🌐 {c['website']}\n\n{inc}",
             "kz": f"🏥 *Эргаш-Ота клиникасы*\n\n📍 {addr}\n📞 {c['phone1']}\n📞 {c['phone2']}\n🕐 {hours}\n📸 {c['instagram']}\n🌐 {c['website']}\n\n{inc}",
         }[lang]
-        await query.edit_message_text(text, parse_mode="Markdown",
-                                      reply_markup=back_keyboard(lang))
-        # Klinika rasmlari
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_clinic")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
         if d.get("clinic_photos"):
             await send_photos(context, chat_id, d["clinic_photos"])
+
+    elif data == "clinic_video":
+        videos = d.get("clinic_videos", [])
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_clinic")]])
+        title = {
+            "ru": "🎥 *Видео о клинике:*",
+            "uz": "🎥 *Klinika videolari:*",
+            "kz": "🎥 *Клиника бейнелері:*",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=back)
+        if videos:
+            for vid in videos[:5]:
+                try:
+                    await context.bot.send_video(chat_id=chat_id, video=vid)
+                except Exception as e:
+                    logger.error(f"Video error: {e}")
+        else:
+            no_video = {
+                "ru": "🎥 Видео скоро будут добавлены!",
+                "uz": "🎥 Videolar tez orada qo'shiladi!",
+                "kz": "🎥 Бейнелер жақында қосылады!",
+            }[lang]
+            await context.bot.send_message(chat_id=chat_id, text=no_video)
+
+    elif data == "clinic_certs":
+        text = d.get("clinic_certs", {}).get(lang, "")
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_clinic")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+        if d.get("cert_photos"):
+            await send_photos(context, chat_id, d["cert_photos"])
+
+    elif data == "clinic_history":
+        text = d.get("clinic_history", {}).get(lang, "")
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_clinic")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
 
     # ── Shifokor ──
     elif data == "menu_doctor":
@@ -533,21 +635,57 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         await query.edit_message_text(title, reply_markup=rooms_keyboard(lang))
 
-    elif data in ("rooms_uz", "rooms_foreign"):
-        rooms = d["rooms_uz"] if data == "rooms_uz" else d["rooms_foreign"]
-        flag = "🇺🇿" if data == "rooms_uz" else "🌍"
-        header = {
-            "ru": f"{flag} Стоимость за 1 день / 1 человек:\n_(взрослые / дети до 10 лет)_\n\n",
-            "uz": f"{flag} 1 kun / 1 kishi narxi:\n_(kattalar / 10 yoshgacha bolalar)_\n\n",
-            "kz": f"{flag} 1 күн / 1 адам бағасы:\n_(ересектер / 10 жасқа дейін)_\n\n",
+    elif data == "rooms_uz":
+        title = {
+            "ru": "🇺🇿 Граждане Узбекистана\n\nВыберите тип:",
+            "uz": "🇺🇿 O'zbekiston fuqarolari\n\nTurini tanlang:",
+            "kz": "🇺🇿 Өзбекстан азаматтары\n\nТүрін таңдаңыз:",
         }[lang]
-        lines = []
-        for r in rooms:
-            lines.append(f"🛏 *{r['name']}* ({r['people']} кіші) — {r['adult']} / {r['child']} сум")
+        await query.edit_message_text(title, reply_markup=rooms_type_keyboard(lang, "uz"))
+
+    elif data == "rooms_foreign":
+        title = {
+            "ru": "🌍 Иностранные граждане\n\nВыберите тип:",
+            "uz": "🌍 Xorijiy fuqarolar\n\nTurini tanlang:",
+            "kz": "🌍 Шетел азаматтары\n\nТүрін таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, reply_markup=rooms_type_keyboard(lang, "foreign"))
+
+    elif data in ("rooms_uz_adult", "rooms_uz_child", "rooms_foreign_adult", "rooms_foreign_child"):
+        parts = data.split("_")
+        category = parts[1]  # uz yoki foreign
+        age_type = parts[2]  # adult yoki child
+        rooms = d["rooms_uz"] if category == "uz" else d["rooms_foreign"]
+        flag = "🇺🇿" if category == "uz" else "🌍"
+
+        if age_type == "adult":
+            header = {
+                "ru": f"{flag} 👨‍👩‍👧 *Стоимость для взрослых*\n_(за 1 день / 1 человек)_\n\n",
+                "uz": f"{flag} 👨‍👩‍👧 *Kattalar uchun narx*\n_(1 kun / 1 kishi)_\n\n",
+                "kz": f"{flag} 👨‍👩‍👧 *Ересектер үшін баға*\n_(1 күн / 1 адам)_\n\n",
+            }[lang]
+            lines = [f"🛏 *{r['name']}* ({r['people']} кіші) — {r['adult']} сум" for r in rooms]
+        else:
+            note = {
+                "ru": "⚠️ *Внимание:* Дети принимаются с 5 лет.\nДанные цены для детей до 10 лет.\n\n",
+                "uz": "⚠️ *Diqqat:* Bolalar 5 yoshdan qabul qilinadi.\nBu narxlar 10 yoshgacha bo'lgan bolalar uchun.\n\n",
+                "kz": "⚠️ *Назар аударыңыз:* Балалар 5 жастан қабылданады.\nБұл бағалар 10 жасқа дейінгі балалар үшін.\n\n",
+            }[lang]
+            header = {
+                "ru": f"{flag} 👶 *Стоимость для детей (5–10 лет)*\n_(за 1 день / 1 ребёнок)_\n\n{note}",
+                "uz": f"{flag} 👶 *Bolalar uchun narx (5–10 yosh)*\n_(1 kun / 1 bola)_\n\n{note}",
+                "kz": f"{flag} 👶 *Балалар үшін баға (5–10 жас)*\n_(1 күн / 1 бала)_\n\n{note}",
+            }[lang]
+            lines = [f"🛏 *{r['name']}* ({r['people']} кіші) — {r['child']} сум" for r in rooms]
+
         text = header + "\n".join(lines)
         if len(text) > 4000:
             text = text[:4000] + "..."
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data=f"rooms_{category}")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
 
     # ── Diagnostika ──
     elif data == "menu_diagnostics":
@@ -738,13 +876,33 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "doctor":
         d["doctor"]["photo_id"] = file_id
         await update.message.reply_text("✅ Shifokor rasmi saqlandi!")
-    elif waiting.startswith("staff_"):
+    elif waiting == "cert":
+        d["cert_photos"].append(file_id)
+        await update.message.reply_text(f"✅ Sertifikat rasmi qo'shildi! Jami: {len(d['cert_photos'])} ta")
         idx = int(waiting.split("_")[1])
         if idx < len(d["staff"]):
             d["staff"][idx]["photo_id"] = file_id
             await update.message.reply_text(f"✅ {d['staff'][idx]['name']} rasmi saqlandi!")
 
     save_data(d)
+    context.user_data["waiting_photo"] = None
+
+
+async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        return
+    waiting = context.user_data.get("waiting_photo")
+    if waiting != "video":
+        return
+    video = update.message.video
+    if not video:
+        return
+    file_id = video.file_id
+    d = load_data()
+    d["clinic_videos"].append(file_id)
+    save_data(d)
+    await update.message.reply_text(f"✅ Video qo'shildi! Jami: {len(d['clinic_videos'])} ta")
     context.user_data["waiting_photo"] = None
 
 
@@ -769,6 +927,7 @@ def main():
     app.add_handler(CommandHandler("admin_staff_add", admin_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
+    app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
