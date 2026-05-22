@@ -242,6 +242,38 @@ DEFAULT_DATA = {
         "uz": "🌅 Yakshanba kuni yangi bemorlarni qabul qilamiz!\n\n✅ Qabul va ro'yxatga olish\n✅ Dastlabki ko'rik\n✅ Birinchi kuniyoq davolash boshlanadi\n\n🕌 Bo'sh vaqtda — Samarqand va Buxoroga ekskursiya!\n\n📞 Bog'laning: {phone}",
         "kz": "🌅 Жексенбіде жаңа науқастарды қабылдаймыз!\n\n✅ Тіркеу және қабылдау\n✅ Алғашқы тексеру\n✅ Бірінші күні емдеу басталады\n\n📞 Байланысыңыз: {phone}",
     },
+    "guide": {
+        "arrival": {
+            "ru": "1️⃣ *Прибытие и регистрация*\n\nПервым делом подойдите на *ресепшн* в корпусе «Диагностика» (слева от входа или на 2-м этаже).\n\nПри себе иметь:\n• Паспорт\n• Справку об отрицательном анализе на COVID\n\nЧто происходит:\n✅ Заполнение расписки (образец на 2-м этаже)\n✅ 2 цветных фото для анкеты\n✅ Оплата проживания и процедур на кассе (1-й этаж, главный корпус, последний кабинет слева)\n✅ Временная регистрация — 150 000 сум (на 1 месяц)\n✅ Получение процедурной книжки, постельного белья, полотенец, клизмы-грелки\n✅ Вечером (~17:00) — приём у главного врача Бердикула Эргашева\n\n⚠️ Лечение начинается со следующего дня!",
+            "uz": "1️⃣ *Kelish va ro'yxatdan o'tish*\n\nAvval «Diagnostika» korpusidagi *resepshniga* boring (kirishdan chap tomonda yoki 2-qavatda).\n\nO'zingiz bilan oling:\n• Pasport\n• COVID bo'yicha salbiy tahlil ma'lumotnomasi\n\nNima bo'ladi:\n✅ Tilxat to'ldirish (namuna 2-qavatda)\n✅ 2 ta rangli foto\n✅ Kassada to'lov (1-qavat, asosiy korpus, chap tomondagi oxirgi xona)\n✅ Vaqtinchalik ro'yxatdan o'tish — 150 000 so'm (1 oyga)\n✅ Protsedura daftarcha, to'shaklar, sochiq, klizma-grелка olish\n✅ Kechqurun (~17:00) — bosh shifokor Berdiqul Ergashev qabuli\n\n⚠️ Davolash ertangi kundan boshlanadi!",
+            "kz": "1️⃣ *Келу және тіркелу*\n\nАлдымен «Диагностика» корпусындағы *ресепшнге* барыңыз.\n\nҚасыңызда болуы керек:\n• Паспорт\n• COVID бойынша теріс талдау анықтамасы\n\nНе болады:\n✅ Қолхат толтыру\n✅ 2 түрлі-түсті фото\n✅ Кассада төлем\n✅ Уақытша тіркелу — 150 000 сум (1 айға)\n✅ Процедуралық кітапша, төсек-орын, сүлгі алу\n✅ Кешке (~17:00) — бас дәрігер қабылдауы\n\n⚠️ Емдеу ертеңгі күннен басталады!",
+        },
+        "malham": {
+            "ru": "2️⃣ *Малхам — главная процедура*\n\nМалхам — чудодейственное снадобье, разработанное лично Бердикулом Эргашевым. Рецепт знает только он.\n\n📍 Место: главное здание, приёмный кабинет доктора\n🕐 Время для иностранцев: 10:00–12:00\n\nЧто взять с собой:\n• Процедурную книжку\n• Платок или салфетки\n• Пустую грелку\n\n📋 *Порядок:*\n1. Отдайте книжку медбрату у двери\n2. Заходят по 4 человека\n3. Доктор читает молитву, осматривает, выдаёт малхам\n4. Пьётся залпом! Можно заесть леденцом или куртом\n\n⏱ *Важно:*\n• Не пить за 1.5 часа ДО и 1.5 часа ПОСЛЕ\n• После приёма сразу идите в номер с грелкой\n• Грелку наполнить кипятком из бойлера\n• Лечь на правый бок (грелка на печень) на 1.5–2 часа",
+            "uz": "2️⃣ *Malham — asosiy protsedura*\n\nMalham — Berdiqul Ergashev tomonidan ishlab chiqilgan mo'jizali dori. Retseptni faqat u biladi.\n\n📍 Joy: asosiy bino, doktor qabul xonasi\n🕐 Xorijiylar uchun vaqt: 10:00–12:00\n\nO'zingiz bilan oling:\n• Protsedura daftarchasi\n• Ro'molcha yoki salfetkalar\n• Bo'sh grелка\n\n📋 *Tartib:*\n1. Daftarchani eshik oldidagi tibbiy xodimga bering\n2. 4 kishidan kiriladi\n3. Doktor duo o'qiydi, ko'rik o'tkazadi, malham beradi\n4. Bir yutkida ichiladi! Konfet yoki kurt bilan yeyish mumkin\n\n⏱ *Muhim:*\n• Oldin 1.5 soat va keyin 1.5 soat hech narsa ichmaslik\n• Ichgandan keyin darhol xonaga boring\n• Grелkani qaynagan suv bilan to'ldiring\n• O'ng yoningizda yoting (grелka jigar ustida) 1.5–2 soat",
+            "kz": "2️⃣ *Малхам — негізгі процедура*\n\nМалхам — Бердіқұл Ерғашев жасаған ғажайып дәрі.\n\n📍 Орын: бас ғимарат, дәрігер қабылдау бөлмесі\n🕐 Шетелдіктер үшін: 10:00–12:00\n\nАлып баруға:\n• Процедуралық кітапша\n• Орамал немесе сүлгі\n• Бос жылытқыш\n\n⏱ *Маңызды:*\n• Малхамнан 1.5 сағат бұрын және кейін ештеңе ішпеу\n• Қабылдаудан кейін бірден бөлмеге барыңыз\n• Оң жаққа жатыңыз (бауыр үстіне жылытқыш) 1.5–2 сағат",
+        },
+        "procedures": {
+            "ru": "3️⃣ *Процедуры и распорядок дня*\n\n🌅 *Утро:*\n• Клизма (кишечное промывание) — обязательно!\n  Возьмите: насадки, процедурную простынь\n• После клизмы — отдых в номере\n• Затем — Малхам (10:00–12:00)\n• После Малхама — грелка 1.5–2 часа\n\n☀️ *День:*\n• Массаж (кабинеты в 2 корпусах)\n  Возьмите: книжку, простынь, массажное масло\n• Аппаратная физиотерапия (ноги, живот, спина)\n• Растяжка\n• Тренажёрный зал\n• Аппаратная косметология\n• Укол в ухо\n• Анализы\n\n🍵 *Питание:*\n• Еда только в субботу вечером и воскресенье\n• Ежедневно: сок (1 банка/день) — покупается справа от столовой\n• Лечебные чаи — у санитарок в каждом корпусе\n\n⚠️ *Четверг* — короткий день (субботник)\n🎵 *Четверг и воскресенье* — музыкальный отдых после ужина (21:00)",
+            "uz": "3️⃣ *Protseduralar va kun tartibi*\n\n🌅 *Ertalab:*\n• Klizma (ichak yuvish) — majburiy!\n  Oling: nasadkalar, protsedura choyshab\n• Klizmadan keyin — xonada dam olish\n• Keyin — Malham (10:00–12:00)\n• Malhamdan keyin — grелka 1.5–2 soat\n\n☀️ *Kunduz:*\n• Massaj (2 korpusda xonalar)\n  Oling: daftarcha, choyshab, massaj yog'i\n• Apparat fizioterapiya (oyoqlar, qorin, orqa)\n• Cho'zilish\n• Sport zal\n• Apparat kosmetologiya\n• Quloqqa ukol\n• Tahlillar\n\n🍵 *Ovqatlanish:*\n• Ovqat faqat shanba kechqurun va yakshanba\n• Har kuni: sharbat (1 banka/kun) — oshxona o'ng tomonida\n• Shifobaxsh choylar — har korpusdagi sanitarkalarda\n\n⚠️ *Payshanba* — qisqa kun\n🎵 *Payshanba va yakshanba* — musiqali dam olish kechki ovqatdan keyin (21:00)",
+            "kz": "3️⃣ *Процедуралар және күн тәртібі*\n\n🌅 *Таңертең:*\n• Клизма — міндетті!\n• Малхам (10:00–12:00)\n• Малхамнан кейін — жылытқыш 1.5–2 сағат\n\n☀️ *Күндіз:*\n• Массаж\n• Аппараттық физиотерапия\n• Созылу\n• Спорт залы\n• Анализдер\n\n🍵 *Тамақтану:*\n• Тамақ тек сенбі кешінде және жексенбіде\n• Күнде: шырын (1 банка/күн)\n• Емдік шайлар — әр корпуста",
+        },
+        "infrastructure": {
+            "ru": "4️⃣ *Инфраструктура комплекса*\n\n🏢 *Корпуса:*\n• Главный корпус — касса, приём врача, Малхам\n• Корпус «Диагностика» — ресепшн, МРТ, МСКТ\n• Процедурные корпуса — клизма, массаж, физиотерапия\n\n🍽 *Питание:*\n• Столовая — еда в субботу вечером и воскресенье\n• Кафе — дополнительное питание\n• Сок — справа от столовой (первый раз: оплата банки + сок)\n\n🛒 *Магазин:*\n• Рядом с комплексом — продукты, чашки для чая\n\n📶 *WiFi* — доступен в корпусах\n\n👕 *Прачечная* — услуги стирки доступны\n\n⚖️ *Весы* — расположены в корпусах (уточнить у персонала)",
+            "uz": "4️⃣ *Kompleks infratuzilmasi*\n\n🏢 *Korpuslar:*\n• Asosiy korpus — kassa, doktor qabuli, Malham\n• «Diagnostika» korpusi — resepshn, МРТ, МСКТ\n• Protsedura korpuslari — klizma, massaj, fizioterapiya\n\n🍽 *Ovqatlanish:*\n• Oshxona — shanba kechqurun va yakshanba\n• Kafe — qo'shimcha ovqat\n• Sharbat — oshxona o'ng tomonida\n\n🛒 *Do'kon:*\n• Kompleks yonida — oziq-ovqat, choy piyolalari\n\n📶 *WiFi* — korpuslarda mavjud\n\n👕 *Kir yuvish* — xizmat mavjud\n\n⚖️ *Tarozilar* — korpuslarda joylashgan",
+            "kz": "4️⃣ *Кешен инфрақұрылымы*\n\n🏢 *Корпустар:*\n• Бас корпус — касса, дәрігер қабылдауы, Малхам\n• «Диагностика» корпусы — ресепшн, МРТ, МСКТ\n• Процедуралық корпустар — клизма, массаж\n\n🍽 *Тамақтану:*\n• Асхана — сенбі кешінде және жексенбіде\n• Кафе — қосымша тамақ\n• Шырын — асхананың оң жағында\n\n📶 *WiFi* — корпустарда қолжетімді\n\n👕 *Кір жуу* — қызмет бар",
+        },
+        "rules": {
+            "ru": "5️⃣ *Общие правила*\n\n👗 *Одежда:*\n• Удобная, свободная одежда\n• Для массажа — отдельный комплект (масло не отстирывается!)\n\n🚌 *Поездки в город:*\n• Разрешены, но соблюдайте режим процедур\n\n🕐 *Распорядок:*\n• Обеденный перерыв — примерно (время уточните на ресепшн)\n• Четверг — короткий день (субботник)\n• Музыкальный вечер: Четверг и Воскресенье в 21:00\n\n🛏 *Уборка номеров:*\n• Проводится персоналом\n\n⚠️ *Важно знать:*\nВ Узбекистане другой темп жизни — здесь всё примерно. Будьте терпеливы и наслаждайтесь процессом выздоровления! 🌿",
+            "uz": "5️⃣ *Umumiy qoidalar*\n\n👗 *Kiyim:*\n• Qulay, erkin kiyim\n• Massaj uchun — alohida to'plam (yog' ketmaydi!)\n\n🚌 *Shaharga chiqish:*\n• Ruxsat beriladi, lekin protsedura rejimini saqlang\n\n🕐 *Kun tartibi:*\n• Tushlik tanaffus — taxminan (resepshnga aniqlang)\n• Payshanba — qisqa kun\n• Musiqali kech: Payshanba va Yakshanba 21:00 da\n\n🛏 *Xona tozalash:*\n• Xodimlar tomonidan amalga oshiriladi\n\n⚠️ *Muhim:*\nO'zbekistonda hayot sur'ati boshqacha — sabr-toqatli bo'ling! 🌿",
+            "kz": "5️⃣ *Жалпы ережелер*\n\n👗 *Киім:*\n• Ыңғайлы, еркін киім\n• Массажға — бөлек киім жиынтығы\n\n🕐 *Күн тәртібі:*\n• Бейсенбі — қысқа күн\n• Музыкалық кеш: Бейсенбі және Жексенбі 21:00\n\n⚠️ *Маңызды:*\nӨзбекстанда өмір қарқыны басқаша — шыдамды болыңыз! 🌿",
+        },
+        "shopping": {
+            "ru": "6️⃣ *Что купить домой*\n\n🛍 Рекомендуем приобрести на территории комплекса:\n\n🌿 *Исырык (могильник)* — очищающее растение\n💊 *Чудо-мазь* — разработка клиники\n🍯 *Натуральный мёд* — местный, чистый\n🍵 *Лечебные чаи* — по назначению врача\n🫙 *Миндальное масло* — для массажа и ухода\n\n📍 Всё это можно найти на территории комплекса или у персонала.\n\n💡 Спросите у медперсонала — они подскажут где купить!",
+            "uz": "6️⃣ *Uyga nima sotib olish kerak*\n\n🛍 Kompleks hududida sotib olishni tavsiya qilamiz:\n\n🌿 *Isiriq* — tozalovchi o'simlik\n💊 *Mo'jizaviy malham* — klinika ishlanmasi\n🍯 *Tabiiy asal* — mahalliy, sof\n🍵 *Shifobaxsh choylar* — doktor tavsiyasiga ko'ra\n🫙 *Bodom yog'i* — massaj va parvarishlash uchun\n\n📍 Hammasini kompleks hududida yoki xodimlardan topish mumkin.\n\n💡 Tibbiy xodimlardan so'rang — ular qayerdan sotib olishni aytib berishadi!",
+            "kz": "6️⃣ *Үйге не сатып алу керек*\n\n🛍 Кешен аумағында сатып алуды ұсынамыз:\n\n🌿 *Ысырық* — тазартатын өсімдік\n💊 *Керемет жақпа май* — клиника өнімі\n🍯 *Табиғи бал* — жергілікті, таза\n🍵 *Емдік шайлар* — дәрігер тағайындауы бойынша\n🫙 *Бадам майы* — массажға\n\n💡 Медперсоналдан сұраңыз!",
+        },
+    },
 }
 
 
@@ -283,6 +315,7 @@ MENU_LABELS = {
         "staff":       "👥 Наша команда",
         "diseases":    "🩺 Список болезней",
         "wards":       "🏨 Палаты",
+        "guide":       "📖 Руководство пациента",
         "transfer":    "🚗 Трансфер",
         "excursion":   "🕌 Экскурсии",
         "weekend":     "🌅 Воскресенье",
@@ -296,6 +329,7 @@ MENU_LABELS = {
         "staff":       "👥 Jamoamiz",
         "diseases":    "🩺 Kasalliklar ro'yxati",
         "wards":       "🏨 Palatalar",
+        "guide":       "📖 Bemor uchun qo'llanma",
         "transfer":    "🚗 Kutib olish",
         "excursion":   "🕌 Ekskursiya",
         "weekend":     "🌅 Yakshanba",
@@ -309,6 +343,7 @@ MENU_LABELS = {
         "staff":       "👥 Біздің команда",
         "diseases":    "🩺 Аурулар тізімі",
         "wards":       "🏨 Палаталар",
+        "guide":       "📖 Науқас нұсқаулығы",
         "transfer":    "🚗 Трансфер",
         "excursion":   "🕌 Экскурсия",
         "weekend":     "🌅 Жексенбі",
@@ -327,6 +362,7 @@ def main_menu_keyboard(lang):
         [InlineKeyboardButton(labels["rooms"],       callback_data="menu_rooms")],
         [InlineKeyboardButton(labels["wards"],       callback_data="menu_wards")],
         [InlineKeyboardButton(labels["diagnostics"], callback_data="menu_diagnostics")],
+        [InlineKeyboardButton(labels["guide"],       callback_data="menu_guide")],
         [InlineKeyboardButton(labels["transfer"],    callback_data="menu_transfer"),
          InlineKeyboardButton(labels["excursion"],   callback_data="menu_excursion")],
         [InlineKeyboardButton(labels["weekend"],     callback_data="menu_weekend")],
@@ -406,6 +442,47 @@ def mrt3t_groups_keyboard(lang):
         buttons.append([InlineKeyboardButton(f"📋 {group}", callback_data=f"mrt3t_{group}")])
     buttons.append([InlineKeyboardButton(back, callback_data="menu_diagnostics")])
     return InlineKeyboardMarkup(buttons)
+
+
+def guide_keyboard(lang):
+    labels = {
+        "ru": (
+            "1️⃣ Прибытие и регистрация",
+            "2️⃣ Малхам",
+            "3️⃣ Процедуры и день",
+            "4️⃣ Инфраструктура",
+            "5️⃣ Правила поведения",
+            "6️⃣ Что купить домой",
+            "⬅️ Назад",
+        ),
+        "uz": (
+            "1️⃣ Kelish va ro'yxat",
+            "2️⃣ Malham",
+            "3️⃣ Protseduralar va kun",
+            "4️⃣ Infrastruktura",
+            "5️⃣ Qoidalar",
+            "6️⃣ Uyga nima olish",
+            "⬅️ Orqaga",
+        ),
+        "kz": (
+            "1️⃣ Келу және тіркелу",
+            "2️⃣ Малхам",
+            "3️⃣ Процедуралар және күн",
+            "4️⃣ Инфрақұрылым",
+            "5️⃣ Ережелер",
+            "6️⃣ Үйге не алу керек",
+            "⬅️ Артқа",
+        ),
+    }[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(labels[0], callback_data="guide_arrival")],
+        [InlineKeyboardButton(labels[1], callback_data="guide_malham")],
+        [InlineKeyboardButton(labels[2], callback_data="guide_procedures")],
+        [InlineKeyboardButton(labels[3], callback_data="guide_infrastructure")],
+        [InlineKeyboardButton(labels[4], callback_data="guide_rules")],
+        [InlineKeyboardButton(labels[5], callback_data="guide_shopping")],
+        [InlineKeyboardButton(labels[6], callback_data="back_main")],
+    ])
 
 
 def clinic_submenu_keyboard(lang):
@@ -491,6 +568,28 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=main_menu_keyboard(lang))
+
+    # ── Bemor qo'llanmasi ──
+    elif data == "menu_guide":
+        title = {
+            "ru": "📖 *Руководство пациента*\n\nВыберите раздел:",
+            "uz": "📖 *Bemor uchun qo'llanma*\n\nBo'limni tanlang:",
+            "kz": "📖 *Науқас нұсқаулығы*\n\nБөлімді таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=guide_keyboard(lang))
+
+    elif data.startswith("guide_"):
+        section = data.replace("guide_", "")
+        guide_data = d.get("guide", {}).get(section, {})
+        text = guide_data.get(lang, guide_data.get("ru", ""))
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_guide")]])
+        if text:
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+        else:
+            await query.edit_message_text("⏳ Скоро...", reply_markup=back)
 
     # ── Klinika haqida — submenu ──
     elif data == "menu_clinic":
