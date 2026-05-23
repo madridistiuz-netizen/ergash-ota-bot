@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
+OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264566")
 DATA_FILE = "data.json"
 
 DEFAULT_DATA = {
@@ -20,13 +20,13 @@ DEFAULT_DATA = {
         "address_ru": "г. Каттакурган, массив Казак овул",
         "address_uz": "Kattaqo'rg'on sh., Qozoq ovul massivi",
         "address_kz": "Каттақурғон қ., Қазақ овул массиві",
-        "phone1": "+998932264567",
+        "phone1": "+998932264566",
         "phone2": "+998933466277",
         "instagram": "@ergashotaclinis",
         "website": "https://ergash-ota-tm.uz/",
-        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: выходной день\nПациенты, прибывшие в Воскресенье, принимаются. В этот день работают приёмное отделение и дежурные врачи. Пациенты регистрируются и размещаются. Для пациента, прибывшего в Воскресенье, этот день считается первым днём лечения.",
-        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: dam olish kuni\nShunga qaramay, Yakshanba kuni kelgan bemorlar qabul qilinadi. Bu kuni qabulxona bo‘limi va yordamchi shifokorlar faoliyat yuritadi, bemorlar ro‘yxatga olinib joylashtiriladi. Yakshanba kuni kelgan bemor uchun ushbu sana davolanishning birinchi kuni hisoblanadi.",
-        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: Демалыс күндері\nСоған қарамастан, Жексенбі күні келген науқастар қабылданады. Бұл күні қабылдау бөлімі мен кезекші дәрігерлер жұмыс істейді. Науқастар тіркеліп, орналастырылады. Жексенбі күні келген науқас үшін бұл күн емнің алғашқы күні болып есептеледі",
+        "work_hours_ru": "Пн–Сб: 08:00–18:00\nВоскресенье: приём новых пациентов",
+        "work_hours_uz": "Du–Shan: 08:00–18:00\nYakshanba: yangi bemorlar qabuli",
+        "work_hours_kz": "Дс–Сб: 08:00–18:00\nЖексенбі: жаңа науқастар қабылдау",
     },
     "doctor": {
         "name_ru": "Бердикул Эргашев Журакулович",
@@ -316,6 +316,8 @@ MENU_LABELS = {
         "diseases":    "🩺 Список болезней",
         "wards":       "🏨 Палаты",
         "guide":       "📖 Руководство пациента",
+        "faq":         "❓ Частые вопросы",
+        "booking":     "📅 Записаться на приём",
         "transfer":    "🚗 Трансфер",
         "excursion":   "🕌 Экскурсии",
         "weekend":     "🌅 Воскресенье",
@@ -330,6 +332,8 @@ MENU_LABELS = {
         "diseases":    "🩺 Kasalliklar ro'yxati",
         "wards":       "🏨 Palatalar",
         "guide":       "📖 Bemor uchun qo'llanma",
+        "faq":         "❓ Ko'p so'raladigan savollar",
+        "booking":     "📅 Qabulga yozilish",
         "transfer":    "🚗 Kutib olish",
         "excursion":   "🕌 Ekskursiya",
         "weekend":     "🌅 Yakshanba",
@@ -344,6 +348,8 @@ MENU_LABELS = {
         "diseases":    "🩺 Аурулар тізімі",
         "wards":       "🏨 Палаталар",
         "guide":       "📖 Науқас нұсқаулығы",
+        "faq":         "❓ Жиі сұрақтар",
+        "booking":     "📅 Қабылдауға жазылу",
         "transfer":    "🚗 Трансфер",
         "excursion":   "🕌 Экскурсия",
         "weekend":     "🌅 Жексенбі",
@@ -363,6 +369,8 @@ def main_menu_keyboard(lang):
         [InlineKeyboardButton(labels["wards"],       callback_data="menu_wards")],
         [InlineKeyboardButton(labels["diagnostics"], callback_data="menu_diagnostics")],
         [InlineKeyboardButton(labels["guide"],       callback_data="menu_guide")],
+        [InlineKeyboardButton(labels["faq"],         callback_data="menu_faq")],
+        [InlineKeyboardButton(labels["booking"],     callback_data="menu_booking")],
         [InlineKeyboardButton(labels["transfer"],    callback_data="menu_transfer"),
          InlineKeyboardButton(labels["excursion"],   callback_data="menu_excursion")],
         [InlineKeyboardButton(labels["weekend"],     callback_data="menu_weekend")],
@@ -568,6 +576,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=main_menu_keyboard(lang))
+
+    # ── FAQ ──
+    elif data in ("menu_faq",) or data.startswith("faq_"):
+        await handle_faq_callbacks(query, context, data, lang)
+
+    # ── Booking ──
+    elif data in ("menu_booking", "book_confirm") or data.startswith("book_service_") or data.startswith("book_time_"):
+        await handle_booking_callbacks(query, context, data, lang, chat_id)
 
     # ── Bemor qo'llanmasi ──
     elif data == "menu_guide":
@@ -1005,14 +1021,299 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["waiting_photo"] = None
 
 
+
+# ─── FAQ DATA ─────────────────────────────────────────────────────────────────
+
+FAQ_DATA = {
+    "ru": [
+        ("⏱ Сколько дней нужно лечиться?", "Минимальный курс — *10 дней*. Оптимальный — *21 день*. Длительность определяет врач после осмотра."),
+        ("💰 Как формируется цена?", "Цена — за 1 день/1 человека. Включает: проживание, лечение, физиотерапию, УЗИ, анализы, МРТ 1.5Т или МСКТ (1 орган)."),
+        ("🧲 Как подготовиться к МРТ?", "Специальная подготовка не требуется. Снимите металлические предметы. При МРТ с контрастом — не есть 4–6 часов до процедуры."),
+        ("💊 Лечение без операции?", "Да. Клиника специализируется на *консервативном лечении* — без операций, с использованием натуральных методов и физиотерапии."),
+        ("🚻 Палаты мужские и женские?", "Да, палаты раздельные. Женщин и мужчин размещают в разных корпусах."),
+        ("🍽 Есть ли питание?", "Да. Питание входит в программу лечения. Столовая работает по расписанию. Во время лечения — специальная диета."),
+        ("📅 Как записаться?", "Запись не обязательна — принимаем без брони. Но лучше сообщить заранее для резервирования места."),
+        ("🕐 Режим работы?", "Пн–Сб: 08:00–18:00. Воскресенье: приём новых пациентов."),
+    ],
+    "uz": [
+        ("⏱ Necha kun davolanish kerak?", "Minimal kurs — *10 kun*. Optimal — *21 kun*. Muddatni shifokor ko'rikdan keyin belgilaydi."),
+        ("💰 Narx qanday shakllanadi?", "Narx — 1 kun/1 kishi uchun. Ichiga kiradi: turar joy, davolash, fizioterapiya, УЗИ, tahlillar, МРТ 1.5Т yoki МСКТ (1 organ)."),
+        ("🧲 МРТ ga qanday tayyorlanish kerak?", "Maxsus tayyorgarlik kerak emas. Metall buyumlarni yechib qo'ying. Kontrastli МРТ da — 4–6 soat oldin ovqat emas."),
+        ("💊 Operatsiyasiz davolanish bormi?", "Ha. Klinika *konservativ davolash* ga ixtisoslashgan — operatsiyasiz, tabiiy usullar va fizioterapiya bilan."),
+        ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli korpuslarda joylashadi."),
+        ("🍽 Ovqatlanish bormi?", "Ha. Ovqatlanish davolash dasturiga kiradi. Oshxona jadval bo'yicha ishlaydi. Davolash vaqtida — maxsus parhez."),
+        ("📅 Qanday yozilish kerak?", "Bron shart emas — bronsiz qabul qilamiz. Lekin joy band qilish uchun oldindan xabar berish yaxshiroq."),
+        ("🕐 Ish vaqti?", "Du–Shan: 08:00–18:00. Yakshanba: yangi bemorlar qabuli."),
+    ],
+    "kz": [
+        ("⏱ Қанша күн емделу керек?", "Минималды курс — *10 күн*. Оптималды — *21 күн*. Мерзімді дәрігер қарағаннан кейін белгілейді."),
+        ("💰 Баға қалай қалыптасады?", "Баға — 1 күн/1 адам үшін. Кіреді: тұру, емдеу, физиотерапия, УДЗ, анализдер, МРТ 1.5Т немесе МСКТ."),
+        ("🧲 МРТ-ге қалай дайындалу керек?", "Арнайы дайындық қажет емес. Металл заттарды шешіңіз."),
+        ("💊 Операциясыз емдеу бар ма?", "Иә. Клиника *консервативті емдеуге* маманданған — операциясыз, табиғи әдістермен."),
+        ("🚻 Ер/әйел палаталары?", "Иә, палаталар бөлек. Әйелдер мен ерлер әртүрлі корпустарда орналасады."),
+        ("🍽 Тамақтану бар ма?", "Иә. Тамақтану емдеу бағдарламасына кіреді."),
+        ("📅 Қалай жазылу керек?", "Бронь міндетті емес — бронсыз қабылдаймыз."),
+        ("🕐 Жұмыс уақыты?", "Дс–Сб: 08:00–18:00. Жексенбі: жаңа науқастар қабылдауы."),
+    ],
+}
+
+# ─── BOOKING SERVICES ─────────────────────────────────────────────────────────
+
+BOOKING_SERVICES = {
+    "ru": ["МРТ", "МСКТ", "УЗИ", "Консультация врача", "Стационарное лечение", "Маммография", "Лаборатория"],
+    "uz": ["МРТ", "МСКТ", "УЗИ", "Shifokor ko'rigi", "Statsionar davolanish", "Mammografiya", "Laboratoriya"],
+    "kz": ["МРТ", "МСКТ", "УДЗ", "Дәрігер кеңесі", "Стационарлық емдеу", "Маммография", "Зертхана"],
+}
+
+BOOKING_TIMES = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"]
+
+
+# ─── FAQ KEYBOARD ──────────────────────────────────────────────────────────────
+
+def faq_keyboard(lang):
+    faqs = FAQ_DATA.get(lang, FAQ_DATA["ru"])
+    buttons = []
+    for i, (q, _) in enumerate(faqs):
+        buttons.append([InlineKeyboardButton(q, callback_data=f"faq_{i}")])
+    back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+    buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
+    return InlineKeyboardMarkup(buttons)
+
+
+def booking_service_keyboard(lang):
+    services = BOOKING_SERVICES.get(lang, BOOKING_SERVICES["ru"])
+    buttons = []
+    for i, s in enumerate(services):
+        buttons.append([InlineKeyboardButton(s, callback_data=f"book_service_{i}")])
+    back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+    buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
+    return InlineKeyboardMarkup(buttons)
+
+
+def booking_time_keyboard(lang):
+    buttons = []
+    row = []
+    for i, t in enumerate(BOOKING_TIMES):
+        row.append(InlineKeyboardButton(t, callback_data=f"book_time_{t}"))
+        if len(row) == 4:
+            buttons.append(row)
+            row = []
+    if row:
+        buttons.append(row)
+    back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+    buttons.append([InlineKeyboardButton(back, callback_data="menu_booking")])
+    return InlineKeyboardMarkup(buttons)
+
+
+def confirm_keyboard(lang):
+    labels = {
+        "ru": ("✅ Подтвердить", "❌ Отменить"),
+        "uz": ("✅ Tasdiqlash", "❌ Bekor qilish"),
+        "kz": ("✅ Растау", "❌ Болдырмау"),
+    }[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(labels[0], callback_data="book_confirm")],
+        [InlineKeyboardButton(labels[1], callback_data="back_main")],
+    ])
+
+
+# ─── BOOKING HANDLER ──────────────────────────────────────────────────────────
+
+async def handle_booking_callbacks(query, context, data, lang, chat_id):
+    d = load_data()
+    phone = d["contacts"]["phone1"]
+
+    if data == "menu_booking":
+        context.user_data["booking"] = {}
+        context.user_data["lead_score"] = 0
+        title = {
+            "ru": "📅 *Запись на приём*\n\nВыберите нужную услугу:",
+            "uz": "📅 *Qabulga yozilish*\n\nKerakli xizmatni tanlang:",
+            "kz": "📅 *Қабылдауға жазылу*\n\nҚажетті қызметті таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=booking_service_keyboard(lang))
+
+    elif data.startswith("book_service_"):
+        idx = int(data.replace("book_service_", ""))
+        services = BOOKING_SERVICES.get(lang, BOOKING_SERVICES["ru"])
+        service = services[idx]
+        context.user_data.setdefault("booking", {})["service"] = service
+        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
+
+        title = {
+            "ru": f"✅ Услуга: *{service}*\n\nВыберите удобное время:",
+            "uz": f"✅ Xizmat: *{service}*\n\nQulay vaqtni tanlang:",
+            "kz": f"✅ Қызмет: *{service}*\n\nҚолайлы уақытты таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=booking_time_keyboard(lang))
+
+    elif data.startswith("book_time_"):
+        time = data.replace("book_time_", "")
+        context.user_data.setdefault("booking", {})["time"] = time
+        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
+
+        ask = {
+            "ru": f"✅ Время: *{time}*\n\n📝 Напишите ваше *имя*:",
+            "uz": f"✅ Vaqt: *{time}*\n\n📝 *Ismingizni* yozing:",
+            "kz": f"✅ Уақыт: *{time}*\n\n📝 *Атыңызды* жазыңыз:",
+        }[lang]
+        context.user_data["booking_step"] = "name"
+        await query.edit_message_text(ask, parse_mode="Markdown")
+
+    elif data == "book_confirm":
+        booking = context.user_data.get("booking", {})
+        score = context.user_data.get("lead_score", 0)
+        name = booking.get("name", "—")
+        phone_num = booking.get("phone", "—")
+        service = booking.get("service", "—")
+        time = booking.get("time", "—")
+
+        # Foydalanuvchiga tasdiqlash
+        success = {
+            "ru": f"🎉 *Вы записаны!*\n\n👤 Имя: {name}\n📞 Телефон: {phone_num}\n🏥 Услуга: {service}\n🕐 Время: {time}\n\nОператор свяжется с вами для подтверждения.\n📞 {phone}",
+            "uz": f"🎉 *Yozildingiz!*\n\n👤 Ism: {name}\n📞 Telefon: {phone_num}\n🏥 Xizmat: {service}\n🕐 Vaqt: {time}\n\nOperator tasdiqlash uchun siz bilan bog'lanadi.\n📞 {phone}",
+            "kz": f"🎉 *Жазылдыңыз!*\n\n👤 Аты: {name}\n📞 Телефон: {phone_num}\n🏥 Қызмет: {service}\n🕐 Уақыт: {time}\n\nОператор растау үшін сізбен байланысады.\n📞 {phone}",
+        }[lang]
+        await query.edit_message_text(success, parse_mode="Markdown",
+                                      reply_markup=back_keyboard(lang))
+
+        # Admin ga lid yuborish
+        user = query.from_user
+        username = f"@{user.username}" if user.username else "yo'q"
+        lid_text = (
+            f"🔥 *YANGI LID — {score}/4 ball*\n\n"
+            f"👤 Ism: {name}\n"
+            f"📞 Telefon: {phone_num}\n"
+            f"🏥 Xizmat: {service}\n"
+            f"🕐 Vaqt: {time}\n"
+            f"💬 Telegram: {username}\n"
+            f"🌐 Til: {lang.upper()}\n\n"
+            f"{'🟢 TAYYOR LID — QO\'NG\'IROQ QILING!' if score >= 3 else '🟡 Qisman lid'}"
+        )
+        try:
+            await context.bot.send_message(chat_id=ADMIN_ID, text=lid_text, parse_mode="Markdown")
+        except Exception as e:
+            logger.error(f"Admin lid xatosi: {e}")
+
+        # Bookingni tozalash
+        context.user_data["booking"] = {}
+        context.user_data["lead_score"] = 0
+        context.user_data["booking_step"] = None
+
+
+async def handle_faq_callbacks(query, context, data, lang):
+    faqs = FAQ_DATA.get(lang, FAQ_DATA["ru"])
+
+    if data == "menu_faq":
+        title = {
+            "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
+            "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
+            "kz": "❓ *Жиі қойылатын сұрақтар*\n\nСұрақты таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=faq_keyboard(lang))
+
+    elif data.startswith("faq_"):
+        idx = int(data.replace("faq_", ""))
+        if idx < len(faqs):
+            q, a = faqs[idx]
+            back = InlineKeyboardMarkup([
+                [InlineKeyboardButton(
+                    {"ru": "⬅️ К вопросам", "uz": "⬅️ Savollarga", "kz": "⬅️ Сұрақтарға"}[lang],
+                    callback_data="menu_faq")],
+                [InlineKeyboardButton(
+                    {"ru": "🏠 Главное меню", "uz": "🏠 Asosiy menyu", "kz": "🏠 Бас мәзір"}[lang],
+                    callback_data="back_main")],
+            ])
+            await query.edit_message_text(
+                f"❓ *{q}*\n\n{a}", parse_mode="Markdown", reply_markup=back)
+
+
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_lang(context)
-    text = {
-        "ru": "Используйте /start для начала",
-        "uz": "Boshlash uchun /start ni bosing",
-        "kz": "Бастау үшін /start пайдаланыңыз",
-    }.get(lang, "Use /start")
-    await update.message.reply_text(text)
+    step = context.user_data.get("booking_step")
+    text = update.message.text.strip() if update.message.text else ""
+
+    # Ovozli xabar filtri
+    if update.message.voice or update.message.audio:
+        msg = {
+            "ru": "📝 Для быстрого ответа напишите вопрос *текстом*. Голосовые сообщения обрабатываются дольше.",
+            "uz": "📝 Tezroq javob olish uchun savolingizni *matn* ko'rinishida yuboring.",
+            "kz": "📝 Жылдам жауап алу үшін сұрағыңызды *мәтін* түрінде жіберіңіз.",
+        }[lang]
+        await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+
+    # Booking flow — ism kiritish
+    if step == "name":
+        context.user_data.setdefault("booking", {})["name"] = text
+        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
+        context.user_data["booking_step"] = "phone"
+        ask = {
+            "ru": f"👤 Имя: *{text}*\n\n📞 Напишите ваш *номер телефона*:",
+            "uz": f"👤 Ism: *{text}*\n\n📞 *Telefon raqamingizni* yozing:",
+            "kz": f"👤 Аты: *{text}*\n\n📞 *Телефон нөміріңізді* жазыңыз:",
+        }[lang]
+        await update.message.reply_text(ask, parse_mode="Markdown")
+        return
+
+    # Booking flow — telefon kiritish
+    if step == "phone":
+        context.user_data.setdefault("booking", {})["phone"] = text
+        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
+        context.user_data["booking_step"] = None
+        booking = context.user_data.get("booking", {})
+
+        summary = {
+            "ru": (
+                f"📋 *Проверьте данные:*\n\n"
+                f"👤 Имя: {booking.get('name')}\n"
+                f"📞 Телефон: {text}\n"
+                f"🏥 Услуга: {booking.get('service')}\n"
+                f"🕐 Время: {booking.get('time')}\n\n"
+                f"Всё верно?"
+            ),
+            "uz": (
+                f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                f"👤 Ism: {booking.get('name')}\n"
+                f"📞 Telefon: {text}\n"
+                f"🏥 Xizmat: {booking.get('service')}\n"
+                f"🕐 Vaqt: {booking.get('time')}\n\n"
+                f"Hammasi to'g'rimi?"
+            ),
+            "kz": (
+                f"📋 *Деректерді тексеріңіз:*\n\n"
+                f"👤 Аты: {booking.get('name')}\n"
+                f"📞 Телефон: {text}\n"
+                f"🏥 Қызмет: {booking.get('service')}\n"
+                f"🕐 Уақыт: {booking.get('time')}\n\n"
+                f"Бәрі дұрыс па?"
+            ),
+        }[lang]
+        await update.message.reply_text(summary, parse_mode="Markdown",
+                                        reply_markup=confirm_keyboard(lang))
+        return
+
+    # Oddiy matn — menyuga yo'naltirish
+    greet_words = ["салам", "привет", "salom", "hi", "hello", "assalom", "здравствуй", "добрый"]
+    if any(w in text.lower() for w in greet_words):
+        msg = {
+            "ru": "👋 Здравствуйте! Выберите нужный раздел:",
+            "uz": "👋 Xush kelibsiz! Kerakli bo'limni tanlang:",
+            "kz": "👋 Сәлем! Қажетті бөлімді таңдаңыз:",
+        }[lang]
+        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
+        return
+
+    # Boshqa matnlar
+    msg = {
+        "ru": "Выберите раздел в меню 👇",
+        "uz": "Menyudan bo'lim tanlang 👇",
+        "kz": "Мәзірден бөлім таңдаңыз 👇",
+    }[lang]
+    await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -1027,6 +1328,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
+    app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
