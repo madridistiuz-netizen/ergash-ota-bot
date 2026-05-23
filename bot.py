@@ -23,7 +23,7 @@ DEFAULT_DATA = {
         "address_ru": "г. Каттакурган, массив Казак овул",
         "address_uz": "Kattaqo'rg'on sh., Qozoq ovul massivi",
         "address_kz": "Каттақурғон қ., Қазақ овул массиві",
-        "phone1": "+998932264566",
+        "phone1": "+998932264567",
         "phone2": "+998933466277",
         "instagram": "@ergashotaclinis",
         "website": "https://ergash-ota-tm.uz/",
@@ -679,8 +679,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
-    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika",
-                  "transfer_book", "transfer_price") or \
+    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
