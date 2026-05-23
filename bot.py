@@ -1182,6 +1182,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         # Admin ga lid yuborish
         user = query.from_user
         username = f"@{user.username}" if user.username else "yo'q"
+        ready = "🟢 TAYYOR LID — QO'NG'IROQ QILING!" if score >= 3 else "🟡 Qisman lid"
         lid_text = (
             f"🔥 *YANGI LID — {score}/4 ball*\n\n"
             f"👤 Ism: {name}\n"
@@ -1190,7 +1191,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
             f"🕐 Vaqt: {time}\n"
             f"💬 Telegram: {username}\n"
             f"🌐 Til: {lang.upper()}\n\n"
-            f"{'🟢 TAYYOR LID — QO\'NG\'IROQ QILING!' if score >= 3 else '🟡 Qisman lid'}"
+            f"{ready}"
         )
         try:
             await context.bot.send_message(chat_id=ADMIN_ID, text=lid_text, parse_mode="Markdown")
