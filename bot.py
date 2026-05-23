@@ -363,7 +363,16 @@ DEFAULT_DATA = {
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            saved = json.load(f)
+        # Yangi kalitlarni qo'shish (DEFAULT_DATA da bor, saved da yo'q)
+        updated = False
+        for key, val in DEFAULT_DATA.items():
+            if key not in saved:
+                saved[key] = val
+                updated = True
+        if updated:
+            save_data(saved)
+        return saved
     save_data(DEFAULT_DATA)
     return DEFAULT_DATA
 
@@ -1594,7 +1603,8 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                f"👥 Kishi: {booking.get('kishi')}\n"
                f"📞 Telefon: {booking.get('phone')}\n"
                f"💬 Telegram: {username}\n"
-               f"🌐 Til: {lang.upper()}\n\n"
+               f"🌐 Til: {lang.upper()}\n"
+               f"🔧 Type: {btype}\n\n"
                f"🟢 QO'NG'IROQ QILING!")
         await send_lid(context, TRANSFER_CHANNEL, lid)
         context.user_data["booking"] = {}
@@ -1950,4 +1960,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
