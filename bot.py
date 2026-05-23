@@ -15,6 +15,7 @@ ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
 STATSIONAR_CHANNEL = int(os.getenv("STATSIONAR_CHANNEL", "-1003991204638"))
 DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
+TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = "data.json"
 
 DEFAULT_DATA = {
@@ -315,9 +316,9 @@ DEFAULT_DATA = {
         "kz": "✅ Бағаға кіретін қызметтер:\n• Тұру\n• Емдеу\n• Физиотерапия және мануалды терапия\n• УДЗ, қан анализі, ЭКГ\n• МРТ 1.5Т немесе МСКТ (1 орган)\n\n➕ Қосымша:\nМРТ-3Т, МСКТ-256, Маммография, Криолиполиз",
     },
     "clinic_info_text": {
-        "uz": "🏥 *\"Ergash ota\" xususiy tibbiyot markazi*\n\nZamonaviy diagnostika va kompleks davolash markazi.\n\n📍 *Manzil:*\nKattaqo'rg'on shahri, Qozoq ovul massivi\n\n🕐 *Ish vaqti:*\nDu–Shan: 08:00 – 18:00\nYakshanba: Registratsiya bo'limi ishlaydi — yangi kelgan bemorlar qabul qilinadi va birinchi kun davolash boshlanadi\n\n📞 *Oldindan yozilish:*\n+998 93 226 45 67\n+998 93 346 62 77\n\n🔬 *Zamonaviy diagnostika:*\n• MRT 3 Tesla\n• Canon Aquilion MSKT 256 kesimli\n• NUESOFT MSKT 128 kesimli\n• Mammografiya\n• UZI diagnostikasi\n• Laboratoriya tekshiruvlari\n\n💆‍♂️ *Davolash va muolajalar:*\n• Fizioterapiya\n• Manual terapiya\n• Zarba-to'lqin terapiyasi\n• Umurtqa cho'zish muolajalari\n• Kriolipoliz\n\n🏨 *Qulay statsionar sharoit:*\n• Shinam xonalar\n• Kuzatuv va davolash\n• Individual yondashuv\n\n💎 *Davolanish paketiga kiradi:*\n✔ Turar joy\n✔ Davolash muolajalari\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG\n✔ MRT 1.5T yoki MSKT (1 organ)\n\n✅ *Bir joyning o'zida:*\nDiagnostika • Davolash • Reabilitatsiya • Statsionar kuzatuv\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Salomatligingiz — bizning ustuvor vazifamiz.\"_",
-        "ru": "🏥 *Частный медицинский центр \"Эргаш ота\"*\n\nСовременный центр диагностики и комплексного лечения.\n\n📍 *Адрес:*\nг. Каттакурган, массив Казак овул\n\n🕐 *Режим работы:*\nПн–Сб: 08:00 – 18:00\nВоскресенье: работает регистратура — принимаем новых пациентов, лечение начинается в первый же день\n\n📞 *Запись на приём:*\n+998 93 226 45 67\n+998 93 346 62 77\n\n🔬 *Современная диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 срезов\n• NUESOFT МСКТ 128 срезов\n• Маммография\n• УЗИ диагностика\n• Лабораторные исследования\n\n💆‍♂️ *Лечение и процедуры:*\n• Физиотерапия\n• Мануальная терапия\n• Ударно-волновая терапия\n• Вытяжение позвоночника\n• Криолиполиз\n\n🏨 *Комфортный стационар:*\n• Уютные номера\n• Наблюдение и лечение\n• Индивидуальный подход\n\n💎 *В стоимость лечения входит:*\n✔ Проживание\n✔ Лечебные процедуры\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ (1 орган)\n\n✅ *Всё в одном месте:*\nДиагностика • Лечение • Реабилитация • Стационарное наблюдение\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Ваше здоровье — наша главная задача.\"_",
-        "kz": "🏥 *\"Эргаш ота\" жеке медициналық орталығы*\n\nЗаманауи диагностика және кешенді емдеу орталығы.\n\n📍 *Мекенжай:*\nКаттақурғон қаласы, Қазақ овул массиві\n\n🕐 *Жұмыс уақыты:*\nДс–Сб: 08:00 – 18:00\nЖексенбі: тіркеу бөлімі жұмыс істейді — жаңа науқастар қабылданады\n\n📞 *Жазылу:*\n+998 93 226 45 67\n+998 93 346 62 77\n\n🔬 *Заманауи диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 кесінді\n• NUESOFT МСКТ 128 кесінді\n• Маммография\n• УДЗ диагностикасы\n• Зертхана зерттеулері\n\n💆‍♂️ *Емдеу және процедуралар:*\n• Физиотерапия\n• Мануалды терапия\n• Соққы-толқын терапиясы\n• Омыртқаны созу\n• Криолиполиз\n\n💎 *Емдеу бағасына кіреді:*\n✔ Тұру\n✔ Емдеу процедуралары\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ\n✔ МРТ 1.5Т немесе МСКТ (1 орган)\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Денсаулығыңыз — біздің басты міндетіміз.\"_",
+        "uz": "🏥 *\"Ergash ota\" xususiy tibbiyot markazi*\n\nZamonaviy diagnostika va kompleks davolash markazi.\n\n📍 *Manzil:*\nKattaqo'rg'on shahri, Qozoq ovul massivi\n\n🕐 *Ish vaqti:*\nDu–Shan: 08:00 – 18:00\nYakshanba: Registratsiya bo'limi ishlaydi — yangi kelgan bemorlar qabul qilinadi va birinchi kun davolash boshlanadi\n\n📞 *Oldindan yozilish:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Zamonaviy diagnostika:*\n• MRT 3 Tesla\n• Canon Aquilion MSKT 256 kesimli\n• NUESOFT MSKT 128 kesimli\n• Mammografiya\n• UZI diagnostikasi\n• Laboratoriya tekshiruvlari\n\n💆‍♂️ *Davolash va muolajalar:*\n• Fizioterapiya\n• Manual terapiya\n• Zarba-to'lqin terapiyasi\n• Umurtqa cho'zish muolajalari\n• Kriolipoliz\n\n🏨 *Qulay statsionar sharoit:*\n• Shinam xonalar\n• Kuzatuv va davolash\n• Individual yondashuv\n\n💎 *Davolanish paketiga kiradi:*\n✔ Turar joy\n✔ Davolash muolajalari\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG\n✔ MRT 1.5T yoki MSKT (1 organ)\n\n✅ *Bir joyning o'zida:*\nDiagnostika • Davolash • Reabilitatsiya • Statsionar kuzatuv\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Salomatligingiz — bizning ustuvor vazifamiz.\"_",
+        "ru": "🏥 *Частный медицинский центр \"Эргаш ота\"*\n\nСовременный центр диагностики и комплексного лечения.\n\n📍 *Адрес:*\nг. Каттакурган, массив Казак овул\n\n🕐 *Режим работы:*\nПн–Сб: 08:00 – 18:00\nВоскресенье: работает регистратура — принимаем новых пациентов, лечение начинается в первый же день\n\n📞 *Запись на приём:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Современная диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 срезов\n• NUESOFT МСКТ 128 срезов\n• Маммография\n• УЗИ диагностика\n• Лабораторные исследования\n\n💆‍♂️ *Лечение и процедуры:*\n• Физиотерапия\n• Мануальная терапия\n• Ударно-волновая терапия\n• Вытяжение позвоночника\n• Криолиполиз\n\n🏨 *Комфортный стационар:*\n• Уютные номера\n• Наблюдение и лечение\n• Индивидуальный подход\n\n💎 *В стоимость лечения входит:*\n✔ Проживание\n✔ Лечебные процедуры\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ (1 орган)\n\n✅ *Всё в одном месте:*\nДиагностика • Лечение • Реабилитация • Стационарное наблюдение\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Ваше здоровье — наша главная задача.\"_",
+        "kz": "🏥 *\"Эргаш ота\" жеке медициналық орталығы*\n\nЗаманауи диагностика және кешенді емдеу орталығы.\n\n📍 *Мекенжай:*\nКаттақурғон қаласы, Қазақ овул массиві\n\n🕐 *Жұмыс уақыты:*\nДс–Сб: 08:00 – 18:00\nЖексенбі: тіркеу бөлімі жұмыс істейді — жаңа науқастар қабылданады\n\n📞 *Жазылу:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Заманауи диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 кесінді\n• NUESOFT МСКТ 128 кесінді\n• Маммография\n• УДЗ диагностикасы\n• Зертхана зерттеулері\n\n💆‍♂️ *Емдеу және процедуралар:*\n• Физиотерапия\n• Мануалды терапия\n• Соққы-толқын терапиясы\n• Омыртқаны созу\n• Криолиполиз\n\n💎 *Емдеу бағасына кіреді:*\n✔ Тұру\n✔ Емдеу процедуралары\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ\n✔ МРТ 1.5Т немесе МСКТ (1 орган)\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Денсаулығыңыз — біздің басты міндетіміз.\"_",
     },
     "weekend": {
         "ru": "🌅 В воскресенье мы работаем для новых пациентов!\n\n✅ Приём и регистрация\n✅ Первичный осмотр\n✅ Начало лечения в первый же день\n\n🕌 А в свободное время — экскурсии в Самарканд и Бухару!\n\n📞 Свяжитесь с нами: {phone}",
@@ -326,9 +327,9 @@ DEFAULT_DATA = {
     },
     "guide": {
         "arrival": {
-            "ru": "1️⃣ *Прибытие и регистрация*\n\nПервым делом подойдите на *ресепшн* в корпусе «Диагностика» (слева от входа или на 2-м этаже).\n\nПри себе иметь:\n• Паспорт\n\nЧто происходит:\n✅ Заполнение расписки (образец на 2-м этаже)\n✅ Оплата проживания и процедур на кассе (1-й этаж, главный корпус, последний кабинет слева)\n✅ Временная регистрация — 150 000 сум (на 1 месяц)\n✅ Получение процедурной книжки, постельного белья, полотенец, клизмы-грелки\n✅ Вечером (~17:00) — приём у главного врача Бердикула Эргашева\n\n⚠️ Лечение начинается со следующего дня!",
-            "uz": "1️⃣ *Kelish va ro'yxatdan o'tish*\n\nAvval «Diagnostika» korpusidagi *resepshniga* boring (kirishdan chap tomonda yoki 2-qavatda).\n\nO'zingiz bilan oling:\n• Pasport\\n\nNima bo'ladi:\n✅ Tilxat to'ldirish (namuna 2-qavatda)\n✅ Kassada to'lov (1-qavat, asosiy korpus, chap tomondagi oxirgi xona)\n✅ Vaqtinchalik ro'yxatdan o'tish — 150 000 so'm (1 oyga)\n✅ Protsedura daftarcha, to'shaklar, sochiq, klizma-grелка olish\n✅ Kechqurun (~17:00) — bosh shifokor Berdiqul Ergashev qabuli\n\n⚠️ Davolash ertangi kundan boshlanadi!",
-            "kz": "1️⃣ *Келу және тіркелу*\n\nАлдымен «Диагностика» корпусындағы *ресепшнге* барыңыз.\n\nҚасыңызда болуы керек:\n• Паспорт\n\nНе болады:\n✅ Қолхат толтыру\n✅ Кассада төлем\n✅ Уақытша тіркелу — 150 000 сум (1 айға)\n✅ Процедуралық кітапша, төсек-орын, сүлгі алу\n✅ Кешке (~17:00) — бас дәрігер қабылдауы\n\n⚠️ Емдеу ертеңгі күннен басталады!",
+            "ru": "1️⃣ *Прибытие и регистрация*\n\nПервым делом подойдите на *ресепшн* в корпусе «Диагностика» (слева от входа или на 2-м этаже).\n\nПри себе иметь:\n• Паспорт\n• Справку об отрицательном анализе на COVID\n\nЧто происходит:\n✅ Заполнение расписки (образец на 2-м этаже)\n✅ 2 цветных фото для анкеты\n✅ Оплата проживания и процедур на кассе (1-й этаж, главный корпус, последний кабинет слева)\n✅ Временная регистрация — 150 000 сум (на 1 месяц)\n✅ Получение процедурной книжки, постельного белья, полотенец, клизмы-грелки\n✅ Вечером (~17:00) — приём у главного врача Бердикула Эргашева\n\n⚠️ Лечение начинается со следующего дня!",
+            "uz": "1️⃣ *Kelish va ro'yxatdan o'tish*\n\nAvval «Diagnostika» korpusidagi *resepshniga* boring (kirishdan chap tomonda yoki 2-qavatda).\n\nO'zingiz bilan oling:\n• Pasport\n• COVID bo'yicha salbiy tahlil ma'lumotnomasi\n\nNima bo'ladi:\n✅ Tilxat to'ldirish (namuna 2-qavatda)\n✅ 2 ta rangli foto\n✅ Kassada to'lov (1-qavat, asosiy korpus, chap tomondagi oxirgi xona)\n✅ Vaqtinchalik ro'yxatdan o'tish — 150 000 so'm (1 oyga)\n✅ Protsedura daftarcha, to'shaklar, sochiq, klizma-grелка olish\n✅ Kechqurun (~17:00) — bosh shifokor Berdiqul Ergashev qabuli\n\n⚠️ Davolash ertangi kundan boshlanadi!",
+            "kz": "1️⃣ *Келу және тіркелу*\n\nАлдымен «Диагностика» корпусындағы *ресепшнге* барыңыз.\n\nҚасыңызда болуы керек:\n• Паспорт\n• COVID бойынша теріс талдау анықтамасы\n\nНе болады:\n✅ Қолхат толтыру\n✅ 2 түрлі-түсті фото\n✅ Кассада төлем\n✅ Уақытша тіркелу — 150 000 сум (1 айға)\n✅ Процедуралық кітапша, төсек-орын, сүлгі алу\n✅ Кешке (~17:00) — бас дәрігер қабылдауы\n\n⚠️ Емдеу ертеңгі күннен басталады!",
         },
         "malham": {
             "ru": "2️⃣ *Малхам — главная процедура*\n\nМалхам — чудодейственное снадобье, разработанное лично Бердикулом Эргашевым. Рецепт знает только он.\n\n📍 Место: главное здание, приёмный кабинет доктора\n🕐 Время для иностранцев: 10:00–12:00\n\nЧто взять с собой:\n• Процедурную книжку\n• Платок или салфетки\n• Пустую грелку\n\n📋 *Порядок:*\n1. Отдайте книжку медбрату у двери\n2. Заходят по 4 человека\n3. Доктор читает молитву, осматривает, выдаёт малхам\n4. Пьётся залпом! Можно заесть леденцом или куртом\n\n⏱ *Важно:*\n• Не пить за 1.5 часа ДО и 1.5 часа ПОСЛЕ\n• После приёма сразу идите в номер с грелкой\n• Грелку наполнить кипятком из бойлера\n• Лечь на правый бок (грелка на печень) на 1.5–2 часа",
@@ -393,15 +394,11 @@ MENU_LABELS = {
         "clinic":      "🏥 О клинике",
         "rooms":       "🛏 Стоимость номеров",
         "diagnostics": "🧲 Диагностика",
-        "doctor":      "👨‍⚕️ Главный врач",
-        "staff":       "👥 Наша команда",
-        "diseases":    "🩺 Список болезней",
         "wards":       "🏨 Палаты",
         "guide":       "📖 Руководство пациента",
         "faq":         "❓ Частые вопросы",
         "booking":     "📅 Записаться на приём",
-        "transfer":    "🚗 Трансфер",
-        "excursion":   "🕌 Экскурсии",
+        "transfer":    "🚗 Добраться до клиники",
         "weekend":     "🌅 Воскресенье",
         "operator":    "📞 Оператор",
     },
@@ -409,15 +406,11 @@ MENU_LABELS = {
         "clinic":      "🏥 Klinika haqida",
         "rooms":       "🛏 Xonalar narxi",
         "diagnostics": "🧲 Diagnostika",
-        "doctor":      "👨‍⚕️ Bosh shifokor",
-        "staff":       "👥 Jamoamiz",
-        "diseases":    "🩺 Kasalliklar ro'yxati",
         "wards":       "🏨 Palatalar",
         "guide":       "📖 Bemor uchun qo'llanma",
         "faq":         "❓ Ko'p so'raladigan savollar",
         "booking":     "📅 Qabulga yozilish",
-        "transfer":    "🚗 Kutib olish",
-        "excursion":   "🕌 Ekskursiya",
+        "transfer":    "🚗 Klinikaga yetib olish",
         "weekend":     "🌅 Yakshanba",
         "operator":    "📞 Operator",
     },
@@ -425,15 +418,11 @@ MENU_LABELS = {
         "clinic":      "🏥 Клиника туралы",
         "rooms":       "🛏 Бөлмелер бағасы",
         "diagnostics": "🧲 Диагностика",
-        "doctor":      "👨‍⚕️ Бас дәрігер",
-        "staff":       "👥 Біздің команда",
-        "diseases":    "🩺 Аурулар тізімі",
         "wards":       "🏨 Палаталар",
         "guide":       "📖 Науқас нұсқаулығы",
         "faq":         "❓ Жиі сұрақтар",
         "booking":     "📅 Қабылдауға жазылу",
-        "transfer":    "🚗 Трансфер",
-        "excursion":   "🕌 Экскурсия",
+        "transfer":    "🚗 Клиникаға жету",
         "weekend":     "🌅 Жексенбі",
         "operator":    "📞 Оператор",
     },
@@ -443,18 +432,14 @@ MENU_LABELS = {
 def main_menu_keyboard(lang):
     labels = MENU_LABELS[lang]
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton(labels["clinic"],      callback_data="menu_clinic"),
-         InlineKeyboardButton(labels["doctor"],      callback_data="menu_doctor")],
-        [InlineKeyboardButton(labels["staff"],       callback_data="menu_staff"),
-         InlineKeyboardButton(labels["diseases"],    callback_data="menu_diseases")],
+        [InlineKeyboardButton(labels["clinic"],      callback_data="menu_clinic")],
         [InlineKeyboardButton(labels["rooms"],       callback_data="menu_rooms")],
         [InlineKeyboardButton(labels["wards"],       callback_data="menu_wards")],
         [InlineKeyboardButton(labels["diagnostics"], callback_data="menu_diagnostics")],
         [InlineKeyboardButton(labels["guide"],       callback_data="menu_guide")],
         [InlineKeyboardButton(labels["faq"],         callback_data="menu_faq")],
         [InlineKeyboardButton(labels["booking"],     callback_data="menu_booking")],
-        [InlineKeyboardButton(labels["transfer"],    callback_data="menu_transfer"),
-         InlineKeyboardButton(labels["excursion"],   callback_data="menu_excursion")],
+        [InlineKeyboardButton(labels["transfer"],    callback_data="menu_transfer")],
         [InlineKeyboardButton(labels["weekend"],     callback_data="menu_weekend")],
         [InlineKeyboardButton(labels["operator"],    callback_data="menu_operator")],
     ])
@@ -577,16 +562,46 @@ def guide_keyboard(lang):
 
 def clinic_submenu_keyboard(lang):
     labels = {
-        "ru": ("📋 Общая информация", "🎥 Видео", "📜 Сертификаты", "📖 История клиники", "⬅️ Назад"),
-        "uz": ("📋 Umumiy ma'lumot", "🎥 Videolar", "📜 Sertifikatlar", "📖 Klinika tarixi", "⬅️ Orqaga"),
-        "kz": ("📋 Жалпы ақпарат", "🎥 Бейнелер", "📜 Сертификаттар", "📖 Клиника тарихы", "⬅️ Артқа"),
+        "ru": (
+            "📋 Общая информация",
+            "👨‍⚕️ Главный врач",
+            "👥 Наша команда",
+            "🩺 Список болезней",
+            "🎥 Видео",
+            "📜 Сертификаты",
+            "📖 История клиники",
+            "⬅️ Назад"
+        ),
+        "uz": (
+            "📋 Umumiy ma'lumot",
+            "👨‍⚕️ Bosh shifokor",
+            "👥 Jamoamiz",
+            "🩺 Kasalliklar ro'yxati",
+            "🎥 Videolar",
+            "📜 Sertifikatlar",
+            "📖 Klinika tarixi",
+            "⬅️ Orqaga"
+        ),
+        "kz": (
+            "📋 Жалпы ақпарат",
+            "👨‍⚕️ Бас дәрігер",
+            "👥 Біздің команда",
+            "🩺 Аурулар тізімі",
+            "🎥 Бейнелер",
+            "📜 Сертификаттар",
+            "📖 Клиника тарихы",
+            "⬅️ Артқа"
+        ),
     }[lang]
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="clinic_info")],
-        [InlineKeyboardButton(labels[1], callback_data="clinic_video")],
-        [InlineKeyboardButton(labels[2], callback_data="clinic_certs")],
-        [InlineKeyboardButton(labels[3], callback_data="clinic_history")],
-        [InlineKeyboardButton(labels[4], callback_data="back_main")],
+        [InlineKeyboardButton(labels[1], callback_data="menu_doctor"),
+         InlineKeyboardButton(labels[2], callback_data="menu_staff")],
+        [InlineKeyboardButton(labels[3], callback_data="menu_diseases")],
+        [InlineKeyboardButton(labels[4], callback_data="clinic_video")],
+        [InlineKeyboardButton(labels[5], callback_data="clinic_certs")],
+        [InlineKeyboardButton(labels[6], callback_data="clinic_history")],
+        [InlineKeyboardButton(labels[7], callback_data="back_main")],
     ])
 
 
@@ -664,9 +679,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
-    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika") or \
-         data.startswith("book_service_") or data.startswith("book_time_") or \
-         data.startswith("diag_book_"):
+    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika",
+                  "transfer_book", "transfer_price") or \
+         data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
     # ── Bemor qo'llanmasi ──
@@ -1017,10 +1032,59 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         title = {"ru": "🔬 *Лаборатория — цены:*", "uz": "🔬 *Laboratoriya — narxlar:*", "kz": "🔬 *Зертхана — бағалар:*"}[lang]
         await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
 
-    # ── Transfer ──
+    # ── Klinikaga yetib olish ──
     elif data == "menu_transfer":
-        text = d["transfer"][lang].format(phone=phone)
-        await query.edit_message_text(text, reply_markup=back_keyboard(lang))
+        title = {
+            "ru": (
+                "🚗 *Как добраться до клиники*\n\n"
+                "📍 *Адрес:*\nг. Каттакурган, массив Казак овул\n\n"
+                "Наши надёжные водители встретят вас *во всех регионах Узбекистана* и комфортно доставят в клинику.\n\n"
+                "⚠️ *ВАЖНО:*\nЗаказ трансфера необходимо оформить *за 2–3 дня до приезда*.\n\n"
+                "Выберите действие:"
+            ),
+            "uz": (
+                "🚗 *Klinikaga yetib olish*\n\n"
+                "📍 *Manzil:*\nKattaqo'rg'on shahri, Qozoq ovul massivi\n\n"
+                "Bizning ishonchli haydovchilarimiz *O'zbekistonning barcha hududlarida* sizni kutib olib klinikaga olib keladi.\n\n"
+                "⚠️ *MUHIM:*\nTransferni *kelishdan 2–3 kun oldin* buyurtma qilish kerak.\n\n"
+                "Kerakli bo'limni tanlang:"
+            ),
+            "kz": (
+                "🚗 *Клиникаға жету*\n\n"
+                "📍 *Мекенжай:*\nКаттақурғон қаласы, Қазақ овул массиві\n\n"
+                "Біздің сенімді жүргізушілеріміз *Өзбекстанның барлық аймақтарында* сізді қарсы алып клиникаға жеткізеді.\n\n"
+                "⚠️ *МАҢЫЗДЫ:*\nТрансферді *келуден 2–3 күн бұрын* тапсырыс беру керек.\n\n"
+                "Бөлімді таңдаңыз:"
+            ),
+        }[lang]
+        book_label = {"ru": "📞 Заказать трансфер", "uz": "📞 Transfer buyurtma qilish", "kz": "📞 Трансфер тапсырыс"}[lang]
+        price_label = {"ru": "💰 Стоимость трансфера", "uz": "💰 Transfer narxlari", "kz": "💰 Трансфер бағасы"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(book_label, callback_data="transfer_book")],
+            [InlineKeyboardButton(price_label, callback_data="transfer_price")],
+            [InlineKeyboardButton(back_label, callback_data="back_main")],
+        ])
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "transfer_price":
+        d = load_data()
+        text = d["transfer"][lang].format(phone=d["contacts"]["phone1"])
+        back = InlineKeyboardMarkup([[InlineKeyboardButton(
+            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+            callback_data="menu_transfer")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+
+    elif data == "transfer_book":
+        context.user_data["booking"] = {}
+        context.user_data["booking_type"] = "transfer"
+        context.user_data["booking_step"] = "transfer_from"
+        ask = {
+            "ru": "🚗 *Заказ трансфера*\n\n📍 Шаг 1/4\nНапишите *откуда вас встретить:*\n_(город, вокзал или аэропорт)_",
+            "uz": "🚗 *Transfer buyurtmasi*\n\n📍 1/4 qadam\n*Qayerdan kutib olinsin:*\n_(shahar, vokzal yoki aeroport)_",
+            "kz": "🚗 *Трансфер тапсырысы*\n\n📍 1/4 қадам\n*Қайдан қарсы алынсын:*\n_(қала, вокзал немесе әуежай)_",
+        }[lang]
+        await query.edit_message_text(ask, parse_mode="Markdown")
 
     # ── Ekskursiya ──
     elif data == "menu_excursion":
@@ -1029,32 +1093,103 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": "🕌 Yo'nalishni tanlang:",
             "kz": "🕌 Бағытты таңдаңыз:",
         }[lang]
-        await query.edit_message_text(title, reply_markup=excursion_keyboard(lang))
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🏛 Samarqand", callback_data="excursion_samarkand")],
+            [InlineKeyboardButton("🕌 Buxoro", callback_data="excursion_bukhara")],
+            [InlineKeyboardButton(back_label, callback_data="menu_weekend")],
+        ])
+        await query.edit_message_text(title, reply_markup=kb)
 
-    elif data == "excursion_samarkand":
+    elif data in ("excursion_samarkand", "excursion_bukhara"):
+        city = "samarkand" if data == "excursion_samarkand" else "bukhara"
+        city_name = {"samarkand": {"ru": "Самарканд", "uz": "Samarqand", "kz": "Самарқанд"},
+                     "bukhara": {"ru": "Бухара", "uz": "Buxoro", "kz": "Бұхара"}}[city][lang]
+        price_1 = "150 000" if city == "samarkand" else "200 000"
+        price_salon = "500 000" if city == "samarkand" else "800 000"
+        places = {
+            "samarkand": {"ru": "Регистан, Шахи-Зинда, Гур-Эмир, Биби-Ханум, обсерватория Улугбека",
+                          "uz": "Registon, Shahi-Zinda, Gur-Amir, Bibixonim, Ulug'bek rasadxonasi",
+                          "kz": "Регистан, Шахи-Зинда, Гур-Эмир, Биби-Ханум"},
+            "bukhara": {"ru": "Арк, Боло-Хауз, Пои-Калон, Мавзолей Саманидов, Чор-Минор",
+                        "uz": "Ark, Bolo-Xovuz, Poi-Kalon, Somoniylar maqbarasi, Chor-Minor",
+                        "kz": "Арк, Боло-Хауз, Пои-Калон, Саманидтер кесенесі"},
+        }[city][lang]
         text = {
-            "ru": f"🏛 *Самарканд*\n\n• 1 человек — 150 000 сум\n• Салон (группа) — 500 000 сум\n\n🗺 Маршрут:\n• Площадь Регистан\n• Шахи-Зинда\n• Мавзолей Тамерлана (Гур-Эмир)\n• Мечеть Биби-Ханум\n• Обсерватория Улугбека\n\n📞 Запись: {phone}",
-            "uz": f"🏛 *Samarqand*\n\n• 1 kishi — 150 000 so'm\n• Salon (guruh) — 500 000 so'm\n\n🗺 Marshrut:\n• Registon maydoni\n• Shahi-Zinda\n• Temur maqbarasi (Gur-Amir)\n• Bibixonim masjidi\n• Ulug'bek rasadxonasi\n\n📞 Buyurtma: {phone}",
-            "kz": f"🏛 *Самарқанд*\n\n• 1 адам — 150 000 сум\n• Салон (топ) — 500 000 сум\n\n📞 Тіркелу: {phone}",
-        }[lang].format(phone=phone)
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
-        if d.get("samarkand_photos"):
-            await send_photos(context, chat_id, d["samarkand_photos"])
+            "ru": f"🏛 *{city_name}*\n\n💰 1 человек — {price_1} сум\n👥 Салон (группа) — {price_salon} сум\n\n🗺 *Маршрут:*\n{places}\n\n📅 Только по воскресеньям",
+            "uz": f"🏛 *{city_name}*\n\n💰 1 kishi — {price_1} so'm\n👥 Salon (guruh) — {price_salon} so'm\n\n🗺 *Marshrut:*\n{places}\n\n📅 Faqat yakshanbа kunlari",
+            "kz": f"🏛 *{city_name}*\n\n💰 1 адам — {price_1} сум\n👥 Салон (топ) — {price_salon} сум\n\n🗺 *Маршрут:*\n{places}\n\n📅 Тек жексенбі күндері",
+        }[lang]
+        book_label = {"ru": "📝 Записаться", "uz": "📝 Yozilish", "kz": "📝 Жазылу"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(book_label, callback_data=f"excursion_book_{city}")],
+            [InlineKeyboardButton(back_label, callback_data="menu_excursion")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        photos_key = "samarkand_photos" if city == "samarkand" else "bukhara_photos"
+        if d.get(photos_key):
+            await send_photos(context, chat_id, d[photos_key])
 
-    elif data == "excursion_bukhara":
-        text = {
-            "ru": f"🕌 *Бухара*\n\n• 1 человек — 200 000 сум\n• Салон (группа) — 800 000 сум\n\n🗺 Маршрут:\n• Арк (крепость)\n• Боло-Хауз\n• Пои-Калон\n• Мавзолей Саманидов\n• Чор-Минор\n\n📞 Запись: {phone}",
-            "uz": f"🕌 *Buxoro*\n\n• 1 kishi — 200 000 so'm\n• Salon (guruh) — 800 000 so'm\n\n🗺 Marshrut:\n• Ark (qal'a)\n• Bolo-Xovuz\n• Poi-Kalon\n• Somoniylar maqbarasi\n• Chor-Minor\n\n📞 Buyurtma: {phone}",
-            "kz": f"🕌 *Бұхара*\n\n• 1 адам — 200 000 сум\n• Салон (топ) — 800 000 сум\n\n📞 Тіркелу: {phone}",
-        }[lang].format(phone=phone)
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
-        if d.get("bukhara_photos"):
-            await send_photos(context, chat_id, d["bukhara_photos"])
+    elif data.startswith("excursion_book_"):
+        city = data.replace("excursion_book_", "")
+        city_name = {"samarkand": {"ru": "Самарканд", "uz": "Samarqand", "kz": "Самарқанд"},
+                     "bukhara": {"ru": "Бухара", "uz": "Buxoro", "kz": "Бұхара"}}[city][lang]
+        context.user_data["booking"] = {"city": city_name}
+        context.user_data["booking_type"] = "excursion"
+        context.user_data["booking_step"] = "excursion_sana"
+        ask = {
+            "ru": f"🕌 *Экскурсия в {city_name}*\n\n📅 Шаг 1/3\nНапишите *желаемую дату:*\n_(только по воскресеньям)_",
+            "uz": f"🕌 *{city_name} ekskursiyasi*\n\n📅 1/3 qadam\n*Qaysi sana* bo'lishini yozing:\n_(faqat yakshanba kunlari)_",
+            "kz": f"🕌 *{city_name} экскурсиясы*\n\n📅 1/3 қадам\n*Қандай күнге* деп жазыңыз:\n_(тек жексенбі күндері)_",
+        }[lang]
+        await query.edit_message_text(ask, parse_mode="Markdown")
 
     # ── Yakshanba ──
     elif data == "menu_weekend":
-        text = d["weekend"][lang].format(phone=phone)
-        await query.edit_message_text(text, reply_markup=back_keyboard(lang))
+        text = {
+            "ru": (
+                "🌅 *Воскресенье в клинике Эргаш-Ота*\n\n"
+                "Воскресенье — день отдыха, но мы всегда рады новым пациентам!\n\n"
+                "✅ *В воскресенье:*\n"
+                "• Работает регистратура\n"
+                "• Принимаем новых пациентов\n"
+                "• Осмотр дежурным врачом\n"
+                "• Начало лечения в первый же день\n\n"
+                "🕌 *А в свободное время — экскурсии!*\n"
+                "Посетите древние города Самарканд и Бухару.\n"
+                "Наш сопровождающий лично проведёт вас по историческим местам."
+            ),
+            "uz": (
+                "🌅 *Yakshanba — Ergash-Ota klinikasida*\n\n"
+                "Yakshanba dam olish kuni, lekin biz yangi bemorlarni doimo kutib olamiz!\n\n"
+                "✅ *Yakshanba kuni:*\n"
+                "• Registratsiya bo'limi ishlaydi\n"
+                "• Yangi bemorlar qabul qilinadi\n"
+                "• Navbatchi vrach ko'rigidan o'tiladi\n"
+                "• Birinchi kuni davolash boshlanadi\n\n"
+                "🕌 *Bo'sh vaqtda — ekskursiya!*\n"
+                "Qadimiy Samarqand va Buxoroni ziyorat qiling.\n"
+                "Hamrohimiz sizi tarixiy joylarda shaxsan olib yuradi."
+            ),
+            "kz": (
+                "🌅 *Жексенбі — Эргаш-Ота клиникасында*\n\n"
+                "✅ *Жексенбіде:*\n"
+                "• Тіркеу бөлімі жұмыс істейді\n"
+                "• Жаңа науқастар қабылданады\n"
+                "• Кезекші дәрігер қарайды\n"
+                "• Бірінші күні емдеу басталады\n\n"
+                "🕌 *Бос уақытта — экскурсия!*\n"
+                "Ежелгі Самарқанд пен Бұхараны аралаңыз."
+            ),
+        }[lang]
+        excursion_label = {"ru": "🕌 Записаться на экскурсию", "uz": "🕌 Ekskursiyaga yozilish", "kz": "🕌 Экскурсияға жазылу"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(excursion_label, callback_data="menu_excursion")],
+            [InlineKeyboardButton(back_label, callback_data="back_main")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Operator ──
     elif data == "menu_operator":
@@ -1442,6 +1577,56 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         context.user_data["booking_step"] = None
         context.user_data["booking_type"] = None
 
+    elif btype == "transfer":
+        booking = context.user_data.get("booking", {})
+        user = query.from_user
+        username = f"@{user.username}" if user.username else "—"
+        d = load_data()
+        phone = d["contacts"]["phone1"]
+        success = {
+            "ru": f"🎉 *Заявка принята!*\n\n📍 Откуда: {booking.get('from')}\n📅 Дата: {booking.get('sana')}\n👥 Человек: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nОператор свяжется с вами.\n📞 {phone}",
+            "uz": f"🎉 *Ariza qabul qilindi!*\n\n📍 Qayerdan: {booking.get('from')}\n📅 Sana: {booking.get('sana')}\n👥 Kishi: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+            "kz": f"🎉 *Өтінім қабылданды!*\n\n📍 Қайдан: {booking.get('from')}\n📅 Күні: {booking.get('sana')}\n👥 Адам: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nОператор байланысады.\n📞 {phone}",
+        }[lang]
+        await query.edit_message_text(success, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        lid = (f"🚗 *TRANSFER LID*\n\n"
+               f"📍 Qayerdan: {booking.get('from')}\n"
+               f"📅 Sana: {booking.get('sana')}\n"
+               f"👥 Kishi: {booking.get('kishi')}\n"
+               f"📞 Telefon: {booking.get('phone')}\n"
+               f"💬 Telegram: {username}\n"
+               f"🌐 Til: {lang.upper()}\n\n"
+               f"🟢 QO'NG'IROQ QILING!")
+        await send_lid(context, TRANSFER_CHANNEL, lid)
+        context.user_data["booking"] = {}
+        context.user_data["booking_step"] = None
+        context.user_data["booking_type"] = None
+
+    elif btype == "excursion":
+        booking = context.user_data.get("booking", {})
+        user = query.from_user
+        username = f"@{user.username}" if user.username else "—"
+        d = load_data()
+        phone = d["contacts"]["phone1"]
+        success = {
+            "ru": f"🎉 *Заявка принята!*\n\n🕌 {booking.get('city')}\n📅 Дата: {booking.get('sana')}\n👥 Человек: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nОператор свяжется с вами.\n📞 {phone}",
+            "uz": f"🎉 *Ariza qabul qilindi!*\n\n🕌 {booking.get('city')}\n📅 Sana: {booking.get('sana')}\n👥 Kishi: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+            "kz": f"🎉 *Өтінім қабылданды!*\n\n🕌 {booking.get('city')}\n📅 Күні: {booking.get('sana')}\n👥 Адам: {booking.get('kishi')}\n📞 {booking.get('phone')}\n\nОператор байланысады.\n📞 {phone}",
+        }[lang]
+        await query.edit_message_text(success, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        lid = (f"🕌 *EKSKURSIYA LID*\n\n"
+               f"🏛 Yo'nalish: {booking.get('city')}\n"
+               f"📅 Sana: {booking.get('sana')}\n"
+               f"👥 Kishi: {booking.get('kishi')}\n"
+               f"📞 Telefon: {booking.get('phone')}\n"
+               f"💬 Telegram: {username}\n"
+               f"🌐 Til: {lang.upper()}\n\n"
+               f"🟢 QO'NG'IROQ QILING!")
+        await send_lid(context, TRANSFER_CHANNEL, lid)
+        context.user_data["booking"] = {}
+        context.user_data["booking_step"] = None
+        context.user_data["booking_type"] = None
+
 
 
 
@@ -1488,6 +1673,115 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         await update.message.reply_text(msg, parse_mode="Markdown")
         return
+
+    # ── TRANSFER FLOW ──
+    if btype == "transfer" and step:
+        if step == "transfer_from":
+            context.user_data.setdefault("booking", {})["from"] = text
+            context.user_data["booking_step"] = "transfer_sana"
+            ask = {
+                "ru": f"📍 *Откуда:* {text}\n\n📅 Шаг 2/4\nНапишите *дату приезда:*",
+                "uz": f"📍 *Qayerdan:* {text}\n\n📅 2/4 qadam\n*Kelish sanasini* yozing:",
+                "kz": f"📍 *Қайдан:* {text}\n\n📅 2/4 қадам\n*Келу күнін* жазыңыз:",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "transfer_sana":
+            context.user_data.setdefault("booking", {})["sana"] = text
+            context.user_data["booking_step"] = "transfer_kishi"
+            ask = {
+                "ru": f"📅 *Дата:* {text}\n\n👥 Шаг 3/4\nСколько *человек?*",
+                "uz": f"📅 *Sana:* {text}\n\n👥 3/4 qadam\nNecha *kishi?*",
+                "kz": f"📅 *Күні:* {text}\n\n👥 3/4 қадам\nНеше *адам?*",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "transfer_kishi":
+            context.user_data.setdefault("booking", {})["kishi"] = text
+            context.user_data["booking_step"] = "transfer_phone"
+            ask = {
+                "ru": f"👥 *{text} чел.*\n\n📞 Шаг 4/4\nНапишите *номер телефона:*",
+                "uz": f"👥 *{text} kishi*\n\n📞 4/4 qadam\n*Telefon raqamingizni* yozing:",
+                "kz": f"👥 *{text} адам*\n\n📞 4/4 қадам\n*Телефон нөміріңізді* жазыңыз:",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "transfer_phone":
+            context.user_data.setdefault("booking", {})["phone"] = text
+            context.user_data["booking_step"] = None
+            booking = context.user_data.get("booking", {})
+            summary = {
+                "ru": (f"📋 *Проверьте данные:*\n\n"
+                       f"📍 Откуда: {booking.get('from')}\n"
+                       f"📅 Дата: {booking.get('sana')}\n"
+                       f"👥 Человек: {booking.get('kishi')}\n"
+                       f"📞 Телефон: {text}\n\nВсё верно?"),
+                "uz": (f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                       f"📍 Qayerdan: {booking.get('from')}\n"
+                       f"📅 Sana: {booking.get('sana')}\n"
+                       f"👥 Kishi: {booking.get('kishi')}\n"
+                       f"📞 Telefon: {text}\n\nHammasi to'g'rimi?"),
+                "kz": (f"📋 *Деректерді тексеріңіз:*\n\n"
+                       f"📍 Қайдан: {booking.get('from')}\n"
+                       f"📅 Күні: {booking.get('sana')}\n"
+                       f"👥 Адам: {booking.get('kishi')}\n"
+                       f"📞 Телефон: {text}\n\nБәрі дұрыс па?"),
+            }[lang]
+            await update.message.reply_text(summary, parse_mode="Markdown",
+                                            reply_markup=confirm_keyboard(lang))
+            return
+
+    # ── EXCURSION FLOW ──
+    if btype == "excursion" and step:
+        if step == "excursion_sana":
+            context.user_data.setdefault("booking", {})["sana"] = text
+            context.user_data["booking_step"] = "excursion_kishi"
+            ask = {
+                "ru": f"📅 *Дата:* {text}\n\n👥 Шаг 2/3\nСколько *человек?*",
+                "uz": f"📅 *Sana:* {text}\n\n👥 2/3 qadam\nNecha *kishi?*",
+                "kz": f"📅 *Күні:* {text}\n\n👥 2/3 қадам\nНеше *адам?*",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "excursion_kishi":
+            context.user_data.setdefault("booking", {})["kishi"] = text
+            context.user_data["booking_step"] = "excursion_phone"
+            ask = {
+                "ru": f"👥 *{text} чел.*\n\n📞 Шаг 3/3\nНапишите *номер телефона:*",
+                "uz": f"👥 *{text} kishi*\n\n📞 3/3 qadam\n*Telefon raqamingizni* yozing:",
+                "kz": f"👥 *{text} адам*\n\n📞 3/3 қадам\n*Телефон нөміріңізді* жазыңыз:",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "excursion_phone":
+            context.user_data.setdefault("booking", {})["phone"] = text
+            context.user_data["booking_step"] = None
+            booking = context.user_data.get("booking", {})
+            summary = {
+                "ru": (f"📋 *Проверьте данные:*\n\n"
+                       f"🕌 Направление: {booking.get('city')}\n"
+                       f"📅 Дата: {booking.get('sana')}\n"
+                       f"👥 Человек: {booking.get('kishi')}\n"
+                       f"📞 Телефон: {text}\n\nВсё верно?"),
+                "uz": (f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                       f"🕌 Yo'nalish: {booking.get('city')}\n"
+                       f"📅 Sana: {booking.get('sana')}\n"
+                       f"👥 Kishi: {booking.get('kishi')}\n"
+                       f"📞 Telefon: {text}\n\nHammasi to'g'rimi?"),
+                "kz": (f"📋 *Деректерді тексеріңіз:*\n\n"
+                       f"🕌 Бағыт: {booking.get('city')}\n"
+                       f"📅 Күні: {booking.get('sana')}\n"
+                       f"👥 Адам: {booking.get('kishi')}\n"
+                       f"📞 Телефон: {text}\n\nБәрі дұрыс па?"),
+            }[lang]
+            await update.message.reply_text(summary, parse_mode="Markdown",
+                                            reply_markup=confirm_keyboard(lang))
+            return
 
     # ── STATSIONAR FLOW ──
     if btype == "statsionar" and step:
