@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264566")
+STATSIONAR_CHANNEL = int(os.getenv("STATSIONAR_CHANNEL", "-1003991204638"))
+DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 DATA_FILE = "data.json"
 
 DEFAULT_DATA = {
@@ -20,7 +22,7 @@ DEFAULT_DATA = {
         "address_ru": "г. Каттакурган, массив Казак овул",
         "address_uz": "Kattaqo'rg'on sh., Qozoq ovul massivi",
         "address_kz": "Каттақурғон қ., Қазақ овул массиві",
-        "phone1": "+998932264567",
+        "phone1": "+998932264566",
         "phone2": "+998933466277",
         "instagram": "@ergashotaclinis",
         "website": "https://ergash-ota-tm.uz/",
@@ -662,7 +664,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
-    elif data in ("menu_booking", "book_confirm") or data.startswith("book_service_") or data.startswith("book_time_"):
+    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika") or \
+         data.startswith("book_service_") or data.startswith("book_time_") or \
+         data.startswith("diag_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
     # ── Bemor qo'llanmasi ──
@@ -1263,14 +1267,11 @@ FAQ_DATA = {
 
 # ─── BOOKING SERVICES ─────────────────────────────────────────────────────────
 
-BOOKING_SERVICES = {
-    "ru": ["МРТ", "МСКТ", "УЗИ", "Консультация врача", "Стационарное лечение", "Маммография", "Лаборатория"],
-    "uz": ["МРТ", "МСКТ", "УЗИ", "Shifokor ko'rigi", "Statsionar davolanish", "Mammografiya", "Laboratoriya"],
-    "kz": ["МРТ", "МСКТ", "УДЗ", "Дәрігер кеңесі", "Стационарлық емдеу", "Маммография", "Зертхана"],
+DIAG_SERVICES = {
+    "ru": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УЗИ", "🩺 Маммография", "🔬 Лаборатория"],
+    "uz": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УЗИ", "🩺 Mammografiya", "🔬 Laboratoriya"],
+    "kz": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УДЗ", "🩺 Маммография", "🔬 Зертхана"],
 }
-
-BOOKING_TIMES = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"]
-
 
 # ─── FAQ KEYBOARD ──────────────────────────────────────────────────────────────
 
@@ -1284,26 +1285,24 @@ def faq_keyboard(lang):
     return InlineKeyboardMarkup(buttons)
 
 
-def booking_service_keyboard(lang):
-    services = BOOKING_SERVICES.get(lang, BOOKING_SERVICES["ru"])
+def booking_type_keyboard(lang):
+    labels = {
+        "ru": ("🏥 Стационарное лечение", "🔬 Диагностика", "⬅️ Назад"),
+        "uz": ("🏥 Statsionar davolanish", "🔬 Diagnostika", "⬅️ Orqaga"),
+        "kz": ("🏥 Стационарлық емдеу", "🔬 Диагностика", "⬅️ Артқа"),
+    }[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(labels[0], callback_data="book_statsionar")],
+        [InlineKeyboardButton(labels[1], callback_data="book_diagnostika")],
+        [InlineKeyboardButton(labels[2], callback_data="back_main")],
+    ])
+
+
+def diag_service_keyboard(lang):
+    services = DIAG_SERVICES.get(lang, DIAG_SERVICES["ru"])
     buttons = []
     for i, s in enumerate(services):
-        buttons.append([InlineKeyboardButton(s, callback_data=f"book_service_{i}")])
-    back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-    buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
-    return InlineKeyboardMarkup(buttons)
-
-
-def booking_time_keyboard(lang):
-    buttons = []
-    row = []
-    for i, t in enumerate(BOOKING_TIMES):
-        row.append(InlineKeyboardButton(t, callback_data=f"book_time_{t}"))
-        if len(row) == 4:
-            buttons.append(row)
-            row = []
-    if row:
-        buttons.append(row)
+        buttons.append([InlineKeyboardButton(s, callback_data=f"diag_book_{i}")])
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
     buttons.append([InlineKeyboardButton(back, callback_data="menu_booking")])
     return InlineKeyboardMarkup(buttons)
@@ -1323,89 +1322,127 @@ def confirm_keyboard(lang):
 
 # ─── BOOKING HANDLER ──────────────────────────────────────────────────────────
 
+async def send_lid(context, channel_id, text):
+    try:
+        await context.bot.send_message(chat_id=channel_id, text=text, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"Lid yuborish xatosi: {e}")
+
+
 async def handle_booking_callbacks(query, context, data, lang, chat_id):
     d = load_data()
     phone = d["contacts"]["phone1"]
 
     if data == "menu_booking":
         context.user_data["booking"] = {}
-        context.user_data["lead_score"] = 0
+        context.user_data["booking_step"] = None
+        context.user_data["booking_type"] = None
         title = {
-            "ru": "📅 *Запись на приём*\n\nВыберите нужную услугу:",
-            "uz": "📅 *Qabulga yozilish*\n\nKerakli xizmatni tanlang:",
-            "kz": "📅 *Қабылдауға жазылу*\n\nҚажетті қызметті таңдаңыз:",
+            "ru": "📅 *Запись*\n\nВыберите тип:",
+            "uz": "📅 *Yozilish*\n\nTurini tanlang:",
+            "kz": "📅 *Жазылу*\n\nТүрін таңдаңыз:",
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=booking_service_keyboard(lang))
+                                      reply_markup=booking_type_keyboard(lang))
 
-    elif data.startswith("book_service_"):
-        idx = int(data.replace("book_service_", ""))
-        services = BOOKING_SERVICES.get(lang, BOOKING_SERVICES["ru"])
+    elif data == "book_statsionar":
+        context.user_data["booking"] = {}
+        context.user_data["booking_type"] = "statsionar"
+        context.user_data["booking_step"] = "name"
+        ask = {
+            "ru": "🏥 *Запись на стационарное лечение*\n\n📝 Шаг 1/5\nНапишите ваше *Имя и Фамилию*:",
+            "uz": "🏥 *Statsionar davolanishga yozilish*\n\n📝 1/5 qadam\n*Ism va Familiyangizni* yozing:",
+            "kz": "🏥 *Стационарлық емдеуге жазылу*\n\n📝 1/5 қадам\n*Аты-жөніңізді* жазыңыз:",
+        }[lang]
+        await query.edit_message_text(ask, parse_mode="Markdown")
+
+    elif data == "book_diagnostika":
+        context.user_data["booking"] = {}
+        context.user_data["booking_type"] = "diagnostika"
+        title = {
+            "ru": "🔬 *Запись на диагностику*\n\nВыберите вид обследования:",
+            "uz": "🔬 *Diagnostikaga yozilish*\n\nTekshiruv turini tanlang:",
+            "kz": "🔬 *Диагностикаға жазылу*\n\nТексеру түрін таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=diag_service_keyboard(lang))
+
+    elif data.startswith("diag_book_"):
+        idx = int(data.replace("diag_book_", ""))
+        services = DIAG_SERVICES.get(lang, DIAG_SERVICES["ru"])
         service = services[idx]
         context.user_data.setdefault("booking", {})["service"] = service
-        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
-
-        title = {
-            "ru": f"✅ Услуга: *{service}*\n\nВыберите удобное время:",
-            "uz": f"✅ Xizmat: *{service}*\n\nQulay vaqtni tanlang:",
-            "kz": f"✅ Қызмет: *{service}*\n\nҚолайлы уақытты таңдаңыз:",
-        }[lang]
-        await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=booking_time_keyboard(lang))
-
-    elif data.startswith("book_time_"):
-        time = data.replace("book_time_", "")
-        context.user_data.setdefault("booking", {})["time"] = time
-        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
-
-        ask = {
-            "ru": f"✅ Время: *{time}*\n\n📝 Напишите ваше *имя*:",
-            "uz": f"✅ Vaqt: *{time}*\n\n📝 *Ismingizni* yozing:",
-            "kz": f"✅ Уақыт: *{time}*\n\n📝 *Атыңызды* жазыңыз:",
-        }[lang]
         context.user_data["booking_step"] = "name"
+        ask = {
+            "ru": f"✅ Услуга: *{service}*\n\n📝 Шаг 1/3\nНапишите ваше *Имя и Фамилию*:",
+            "uz": f"✅ Xizmat: *{service}*\n\n📝 1/3 qadam\n*Ism va Familiyangizni* yozing:",
+            "kz": f"✅ Қызмет: *{service}*\n\n📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:",
+        }[lang]
         await query.edit_message_text(ask, parse_mode="Markdown")
 
     elif data == "book_confirm":
         booking = context.user_data.get("booking", {})
-        score = context.user_data.get("lead_score", 0)
-        name = booking.get("name", "—")
-        phone_num = booking.get("phone", "—")
-        service = booking.get("service", "—")
-        time = booking.get("time", "—")
-
-        # Foydalanuvchiga tasdiqlash
-        success = {
-            "ru": f"🎉 *Вы записаны!*\n\n👤 Имя: {name}\n📞 Телефон: {phone_num}\n🏥 Услуга: {service}\n🕐 Время: {time}\n\nОператор свяжется с вами для подтверждения.\n📞 {phone}",
-            "uz": f"🎉 *Yozildingiz!*\n\n👤 Ism: {name}\n📞 Telefon: {phone_num}\n🏥 Xizmat: {service}\n🕐 Vaqt: {time}\n\nOperator tasdiqlash uchun siz bilan bog'lanadi.\n📞 {phone}",
-            "kz": f"🎉 *Жазылдыңыз!*\n\n👤 Аты: {name}\n📞 Телефон: {phone_num}\n🏥 Қызмет: {service}\n🕐 Уақыт: {time}\n\nОператор растау үшін сізбен байланысады.\n📞 {phone}",
-        }[lang]
-        await query.edit_message_text(success, parse_mode="Markdown",
-                                      reply_markup=back_keyboard(lang))
-
-        # Admin ga lid yuborish
+        btype = context.user_data.get("booking_type", "statsionar")
         user = query.from_user
-        username = f"@{user.username}" if user.username else "yo'q"
-        ready = "🟢 TAYYOR LID — QO'NG'IROQ QILING!" if score >= 3 else "🟡 Qisman lid"
-        lid_text = (
-            f"🔥 *YANGI LID — {score}/4 ball*\n\n"
-            f"👤 Ism: {name}\n"
-            f"📞 Telefon: {phone_num}\n"
-            f"🏥 Xizmat: {service}\n"
-            f"🕐 Vaqt: {time}\n"
-            f"💬 Telegram: {username}\n"
-            f"🌐 Til: {lang.upper()}\n\n"
-            f"{ready}"
-        )
-        try:
-            await context.bot.send_message(chat_id=ADMIN_ID, text=lid_text, parse_mode="Markdown")
-        except Exception as e:
-            logger.error(f"Admin lid xatosi: {e}")
+        username = f"@{user.username}" if user.username else "—"
 
-        # Bookingni tozalash
+        if btype == "statsionar":
+            name = booking.get("name", "—")
+            sana = booking.get("sana", "—")
+            kishi = booking.get("kishi", "—")
+            phone_num = booking.get("phone", "—")
+            xona = booking.get("xona", "—")
+
+            success = {
+                "ru": f"🎉 *Заявка принята!*\n\n👤 {name}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n🛏 Номер: {xona}\n\nОператор свяжется с вами.\n📞 {phone}",
+                "uz": f"🎉 *Ariza qabul qilindi!*\n\n👤 {name}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n🛏 Xona: {xona}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                "kz": f"🎉 *Өтінім қабылданды!*\n\n👤 {name}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n🛏 Бөлме: {xona}\n\nОператор байланысады.\n📞 {phone}",
+            }[lang]
+            await query.edit_message_text(success, parse_mode="Markdown",
+                                          reply_markup=back_keyboard(lang))
+
+            lid = (
+                f"🏥 *STATSIONAR LID*\n\n"
+                f"👤 Ism: {name}\n"
+                f"📅 Kelish sanasi: {sana}\n"
+                f"👥 Kishi soni: {kishi}\n"
+                f"📞 Telefon: {phone_num}\n"
+                f"🛏 Xona turi: {xona}\n"
+                f"💬 Telegram: {username}\n"
+                f"🌐 Til: {lang.upper()}\n\n"
+                f"🟢 QO'NG'IROQ QILING!"
+            )
+            await send_lid(context, STATSIONAR_CHANNEL, lid)
+
+        else:  # diagnostika
+            name = booking.get("name", "—")
+            phone_num = booking.get("phone", "—")
+            service = booking.get("service", "—")
+
+            success = {
+                "ru": f"🎉 *Заявка принята!*\n\n👤 {name}\n🔬 Услуга: {service}\n📞 {phone_num}\n\nОператор свяжется с вами.\n📞 {phone}",
+                "uz": f"🎉 *Ariza qabul qilindi!*\n\n👤 {name}\n🔬 Xizmat: {service}\n📞 {phone_num}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                "kz": f"🎉 *Өтінім қабылданды!*\n\n👤 {name}\n🔬 Қызмет: {service}\n📞 {phone_num}\n\nОператор байланысады.\n📞 {phone}",
+            }[lang]
+            await query.edit_message_text(success, parse_mode="Markdown",
+                                          reply_markup=back_keyboard(lang))
+
+            lid = (
+                f"🔬 *DIAGNOSTIKA LID*\n\n"
+                f"👤 Ism: {name}\n"
+                f"🔬 Xizmat: {service}\n"
+                f"📞 Telefon: {phone_num}\n"
+                f"💬 Telegram: {username}\n"
+                f"🌐 Til: {lang.upper()}\n\n"
+                f"🟢 QO'NG'IROQ QILING!"
+            )
+            await send_lid(context, DIAGNOSTIKA_CHANNEL, lid)
+
         context.user_data["booking"] = {}
-        context.user_data["lead_score"] = 0
         context.user_data["booking_step"] = None
+        context.user_data["booking_type"] = None
+
+
 
 
 async def handle_faq_callbacks(query, context, data, lang):
@@ -1439,69 +1476,149 @@ async def handle_faq_callbacks(query, context, data, lang):
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_lang(context)
     step = context.user_data.get("booking_step")
+    btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
 
     # Ovozli xabar filtri
     if update.message.voice or update.message.audio:
         msg = {
-            "ru": "📝 Для быстрого ответа напишите вопрос *текстом*. Голосовые сообщения обрабатываются дольше.",
+            "ru": "📝 Для быстрого ответа напишите вопрос *текстом*.",
             "uz": "📝 Tezroq javob olish uchun savolingizni *matn* ko'rinishida yuboring.",
             "kz": "📝 Жылдам жауап алу үшін сұрағыңызды *мәтін* түрінде жіберіңіз.",
         }[lang]
         await update.message.reply_text(msg, parse_mode="Markdown")
         return
 
-    # Booking flow — ism kiritish
-    if step == "name":
-        context.user_data.setdefault("booking", {})["name"] = text
-        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
-        context.user_data["booking_step"] = "phone"
-        ask = {
-            "ru": f"👤 Имя: *{text}*\n\n📞 Напишите ваш *номер телефона*:",
-            "uz": f"👤 Ism: *{text}*\n\n📞 *Telefon raqamingizni* yozing:",
-            "kz": f"👤 Аты: *{text}*\n\n📞 *Телефон нөміріңізді* жазыңыз:",
-        }[lang]
-        await update.message.reply_text(ask, parse_mode="Markdown")
-        return
+    # ── STATSIONAR FLOW ──
+    if btype == "statsionar" and step:
 
-    # Booking flow — telefon kiritish
-    if step == "phone":
-        context.user_data.setdefault("booking", {})["phone"] = text
-        context.user_data["lead_score"] = context.user_data.get("lead_score", 0) + 1
-        context.user_data["booking_step"] = None
-        booking = context.user_data.get("booking", {})
+        if step == "name":
+            context.user_data.setdefault("booking", {})["name"] = text
+            context.user_data["booking_step"] = "sana"
+            ask = {
+                "ru": f"👤 *{text}*\n\n📅 Шаг 2/5\nНапишите *дату приезда*:\n_(например: 15 июня или 15.06)_",
+                "uz": f"👤 *{text}*\n\n📅 2/5 qadam\n*Kelish sanasini* yozing:\n_(masalan: 15 iyun yoki 15.06)_",
+                "kz": f"👤 *{text}*\n\n📅 2/5 қадам\n*Келу күнін* жазыңыз:\n_(мысалы: 15 маусым немесе 15.06)_",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
 
-        summary = {
-            "ru": (
-                f"📋 *Проверьте данные:*\n\n"
-                f"👤 Имя: {booking.get('name')}\n"
-                f"📞 Телефон: {text}\n"
-                f"🏥 Услуга: {booking.get('service')}\n"
-                f"🕐 Время: {booking.get('time')}\n\n"
-                f"Всё верно?"
-            ),
-            "uz": (
-                f"📋 *Ma'lumotlarni tekshiring:*\n\n"
-                f"👤 Ism: {booking.get('name')}\n"
-                f"📞 Telefon: {text}\n"
-                f"🏥 Xizmat: {booking.get('service')}\n"
-                f"🕐 Vaqt: {booking.get('time')}\n\n"
-                f"Hammasi to'g'rimi?"
-            ),
-            "kz": (
-                f"📋 *Деректерді тексеріңіз:*\n\n"
-                f"👤 Аты: {booking.get('name')}\n"
-                f"📞 Телефон: {text}\n"
-                f"🏥 Қызмет: {booking.get('service')}\n"
-                f"🕐 Уақыт: {booking.get('time')}\n\n"
-                f"Бәрі дұрыс па?"
-            ),
-        }[lang]
-        await update.message.reply_text(summary, parse_mode="Markdown",
-                                        reply_markup=confirm_keyboard(lang))
-        return
+        if step == "sana":
+            context.user_data.setdefault("booking", {})["sana"] = text
+            context.user_data["booking_step"] = "kishi"
+            ask = {
+                "ru": f"📅 *{text}*\n\n👥 Шаг 3/5\nСколько *человек* приедет?",
+                "uz": f"📅 *{text}*\n\n👥 3/5 qadam\nNecha *kishi* keladi?",
+                "kz": f"📅 *{text}*\n\n👥 3/5 қадам\nНеше *адам* келеді?",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
 
-    # Oddiy matn — menyuga yo'naltirish
+        if step == "kishi":
+            context.user_data.setdefault("booking", {})["kishi"] = text
+            context.user_data["booking_step"] = "phone"
+            ask = {
+                "ru": f"👥 *{text} чел.*\n\n📞 Шаг 4/5\nНапишите *номер телефона*:",
+                "uz": f"👥 *{text} kishi*\n\n📞 4/5 qadam\n*Telefon raqamingizni* yozing:",
+                "kz": f"👥 *{text} адам*\n\n📞 4/5 қадам\n*Телефон нөміріңізді* жазыңыз:",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "phone":
+            context.user_data.setdefault("booking", {})["phone"] = text
+            context.user_data["booking_step"] = "xona"
+            ask = {
+                "ru": f"📞 *{text}*\n\n🛏 Шаг 5/5\nКакой *тип номера* вас интересует?\n_(например: Люкс, VIP, Стандарт или напишите 'не знаю')_",
+                "uz": f"📞 *{text}*\n\n🛏 5/5 qadam\nQaysi *xona turi* qiziqtiradi?\n_(masalan: Lyuks, VIP, Standart yoki 'bilmayman' deb yozing)_",
+                "kz": f"📞 *{text}*\n\n🛏 5/5 қадам\nҚандай *бөлме түрі* қызықтырады?\n_(мысалы: Люкс, VIP немесе 'білмеймін' деп жазыңыз)_",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "xona":
+            context.user_data.setdefault("booking", {})["xona"] = text
+            context.user_data["booking_step"] = None
+            booking = context.user_data.get("booking", {})
+            summary = {
+                "ru": (
+                    f"📋 *Проверьте данные:*\n\n"
+                    f"👤 Имя: {booking.get('name')}\n"
+                    f"📅 Дата: {booking.get('sana')}\n"
+                    f"👥 Человек: {booking.get('kishi')}\n"
+                    f"📞 Телефон: {booking.get('phone')}\n"
+                    f"🛏 Номер: {text}\n\n"
+                    f"Всё верно?"
+                ),
+                "uz": (
+                    f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                    f"👤 Ism: {booking.get('name')}\n"
+                    f"📅 Sana: {booking.get('sana')}\n"
+                    f"👥 Kishi: {booking.get('kishi')}\n"
+                    f"📞 Telefon: {booking.get('phone')}\n"
+                    f"🛏 Xona: {text}\n\n"
+                    f"Hammasi to'g'rimi?"
+                ),
+                "kz": (
+                    f"📋 *Деректерді тексеріңіз:*\n\n"
+                    f"👤 Аты: {booking.get('name')}\n"
+                    f"📅 Күні: {booking.get('sana')}\n"
+                    f"👥 Адам: {booking.get('kishi')}\n"
+                    f"📞 Телефон: {booking.get('phone')}\n"
+                    f"🛏 Бөлме: {text}\n\n"
+                    f"Бәрі дұрыс па?"
+                ),
+            }[lang]
+            await update.message.reply_text(summary, parse_mode="Markdown",
+                                            reply_markup=confirm_keyboard(lang))
+            return
+
+    # ── DIAGNOSTIKA FLOW ──
+    if btype == "diagnostika" and step:
+
+        if step == "name":
+            context.user_data.setdefault("booking", {})["name"] = text
+            context.user_data["booking_step"] = "phone"
+            ask = {
+                "ru": f"👤 *{text}*\n\n📞 Шаг 2/3\nНапишите *номер телефона*:",
+                "uz": f"👤 *{text}*\n\n📞 2/3 qadam\n*Telefon raqamingizni* yozing:",
+                "kz": f"👤 *{text}*\n\n📞 2/3 қадам\n*Телефон нөміріңізді* жазыңыз:",
+            }[lang]
+            await update.message.reply_text(ask, parse_mode="Markdown")
+            return
+
+        if step == "phone":
+            context.user_data.setdefault("booking", {})["phone"] = text
+            context.user_data["booking_step"] = None
+            booking = context.user_data.get("booking", {})
+            summary = {
+                "ru": (
+                    f"📋 *Проверьте данные:*\n\n"
+                    f"👤 Имя: {booking.get('name')}\n"
+                    f"🔬 Услуга: {booking.get('service')}\n"
+                    f"📞 Телефон: {text}\n\n"
+                    f"Всё верно?"
+                ),
+                "uz": (
+                    f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                    f"👤 Ism: {booking.get('name')}\n"
+                    f"🔬 Xizmat: {booking.get('service')}\n"
+                    f"📞 Telefon: {text}\n\n"
+                    f"Hammasi to'g'rimi?"
+                ),
+                "kz": (
+                    f"📋 *Деректерді тексеріңіз:*\n\n"
+                    f"👤 Аты: {booking.get('name')}\n"
+                    f"🔬 Қызмет: {booking.get('service')}\n"
+                    f"📞 Телефон: {text}\n\n"
+                    f"Бәрі дұрыс па?"
+                ),
+            }[lang]
+            await update.message.reply_text(summary, parse_mode="Markdown",
+                                            reply_markup=confirm_keyboard(lang))
+            return
+
+    # Salomlashuvni kesish
     greet_words = ["салам", "привет", "salom", "hi", "hello", "assalom", "здравствуй", "добрый"]
     if any(w in text.lower() for w in greet_words):
         msg = {
@@ -1540,3 +1657,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
