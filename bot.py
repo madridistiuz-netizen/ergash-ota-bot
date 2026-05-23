@@ -843,9 +843,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await send_photos(context, chat_id, korpus["photos"])
 
     elif data.startswith("xona_"):
-        parts = data.split("_", 2)
-        korpus_id = parts[1]
-        xona_idx = int(parts[2])
+        # Format: xona_{korpus_id}_{idx}
+        # rsplit dan foydalanamiz — oxirgi _ dan ajratamiz
+        last_underscore = data.rfind("_")
+        korpus_id = data[5:last_underscore]  # "xona_" = 5 belgi
+        xona_idx = int(data[last_underscore + 1:])
         korpuslar = d.get("korpuslar", [])
         korpus = next((k for k in korpuslar if k["id"] == korpus_id), None)
         if not korpus or xona_idx >= len(korpus["xonalar"]):
@@ -1184,9 +1186,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Korpus topilmadi")
         return
     elif waiting.startswith("xona_"):
-        parts = waiting.split("_", 2)
-        korpus_id = parts[1]
-        xona_idx = int(parts[2])
+        last_underscore = waiting.rfind("_")
+        korpus_id = waiting[5:last_underscore]
+        xona_idx = int(waiting[last_underscore + 1:])
         korpuslar = d.get("korpuslar", [])
         for k in korpuslar:
             if k["id"] == korpus_id:
@@ -1541,3 +1543,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
