@@ -91,6 +91,81 @@ DEFAULT_DATA = {
     },
     "clinic_videos": [],
     "cert_photos": [],
+    "ward_photos": [],
+    "clinic_photos": [],
+    "korpuslar": [
+        {
+            "id": "m_yangi",
+            "name_uz": "M Yangi Korpus",
+            "name_ru": "Новый корпус М",
+            "emoji": "🏢",
+            "photos": [],
+            "xonalar": [
+                {"nom": "M/Urta miyona", "kishi": "3-5", "uz_adult": "313 000", "uz_child": "298 000", "foreign_adult": "313 000", "foreign_child": "298 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "4-6", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
+                {"nom": "M/Lyuks AB", "kishi": "2-3", "uz_adult": "465 000", "uz_child": "450 000", "foreign_adult": "465 000", "foreign_child": "450 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "3", "uz_adult": "385 000", "uz_child": "370 000", "foreign_adult": "385 000", "foreign_child": "370 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "2", "uz_adult": "495 000", "uz_child": "480 000", "foreign_adult": "495 000", "foreign_child": "480 000", "photos": []},
+                {"nom": "M/VIP", "kishi": "2", "uz_adult": "699 000", "uz_child": "684 000", "foreign_adult": "699 000", "foreign_child": "684 000", "photos": []},
+                {"nom": "M/VIP", "kishi": "1", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
+                {"nom": "M/Apartament", "kishi": "2", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
+            ]
+        },
+        {
+            "id": "umumiy_z",
+            "name_uz": "Umumiy + Z Korpus",
+            "name_ru": "Общий + Z корпус",
+            "emoji": "🏠",
+            "photos": [],
+            "xonalar": [
+                {"nom": "Umumiy", "kishi": "10", "uz_adult": "185 000", "uz_child": "172 000", "foreign_adult": "308 000", "foreign_child": "293 000", "photos": []},
+                {"nom": "Urta miyona", "kishi": "2-3", "uz_adult": "224 000", "uz_child": "209 000", "foreign_adult": "317 000", "foreign_child": "300 000", "photos": []},
+                {"nom": "Urta miyona", "kishi": "4-5", "uz_adult": "213 000", "uz_child": "198 000", "foreign_adult": "308 000", "foreign_child": "293 000", "photos": []},
+                {"nom": "Z/Urta miyona", "kishi": "2", "uz_adult": "269 000", "uz_child": "254 000", "foreign_adult": "354 000", "foreign_child": "339 000", "photos": []},
+                {"nom": "Z/Urta miyona", "kishi": "4-5", "uz_adult": "249 000", "uz_child": "234 000", "foreign_adult": "338 000", "foreign_child": "323 000", "photos": []},
+            ]
+        },
+        {
+            "id": "pol_lyuks",
+            "name_uz": "Pol/Lyuks + Lyuks Korpus",
+            "name_ru": "Пол/Люкс + Люкс корпус",
+            "emoji": "⭐",
+            "photos": [],
+            "xonalar": [
+                {"nom": "Pol/Lyuks", "kishi": "5-7", "uz_adult": "295 000", "uz_child": "280 000", "foreign_adult": "365 000", "foreign_child": "350 000", "photos": []},
+                {"nom": "Pol/Lyuks", "kishi": "4", "uz_adult": "314 000", "uz_child": "299 000", "foreign_adult": "385 000", "foreign_child": "370 000", "photos": []},
+                {"nom": "Lyuks", "kishi": "3", "uz_adult": "340 000", "uz_child": "325 000", "foreign_adult": "395 000", "foreign_child": "380 000", "photos": []},
+                {"nom": "Lyuks", "kishi": "2", "uz_adult": "410 000", "uz_child": "395 000", "foreign_adult": "410 000", "foreign_child": "395 000", "photos": []},
+            ]
+        },
+        {
+            "id": "d_diagnostika",
+            "name_uz": "D/Diagnostika Korpus",
+            "name_ru": "Корпус Д/Диагностика",
+            "emoji": "🔬",
+            "photos": [],
+            "xonalar": [
+                {"nom": "D/Urta miyona", "kishi": "3", "uz_adult": "243 000", "uz_child": "228 000", "foreign_adult": "317 000", "foreign_child": "300 000", "photos": []},
+                {"nom": "D/Lyuks", "kishi": "5", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
+                {"nom": "D/Lyuks", "kishi": "2", "uz_adult": "495 000", "uz_child": "480 000", "foreign_adult": "495 000", "foreign_child": "480 000", "photos": []},
+            ]
+        },
+        {
+            "id": "s_korpus",
+            "name_uz": "S Korpus",
+            "name_ru": "С корпус",
+            "emoji": "🏨",
+            "photos": [],
+            "xonalar": [
+                {"nom": "S/Lyuks", "kishi": "4", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
+            ]
+        },
+    ],
+    "xona_included": {
+        "uz": "✅ *Narxga kiradigan xizmatlar:*\n• Turar joy\n• Davolash\n• Fizioterapiya va manual terapiya\n• УЗИ, qon tahlili, EKG\n• МРТ 1.5Т yoki МСКТ (1 organ)\n\n⚠️ Bolalar 5 yoshdan qabul qilinadi\n\n➕ *Qo'shimcha (alohida to'lov):*\nМРТ-3Т, МСКТ-256, Mammografiya, Kriolipoliz, Cho'zilish, Zarba-to'lqin terapiyasi",
+        "ru": "✅ *В стоимость включено:*\n• Проживание\n• Лечение\n• Физиотерапия и мануальная терапия\n• УЗИ, анализ крови, ЭКГ\n• МРТ 1.5Т или МСКТ (1 орган)\n\n⚠️ Дети принимаются с 5 лет\n\n➕ *Дополнительно (отдельная оплата):*\nМРТ-3Т, МСКТ-256, Маммография, Криолиполиз, Растяжка, Ударно-волновая терапия",
+        "kz": "✅ *Бағаға кіреді:*\n• Тұру\n• Емдеу\n• Физиотерапия және мануалды терапия\n• УДЗ, қан анализі, ЭКГ\n• МРТ 1.5Т немесе МСКТ (1 орган)\n\n⚠️ Балалар 5 жастан қабылданады\n\n➕ *Қосымша (бөлек төлем):*\nМРТ-3Т, МСКТ-256, Маммография, Криолиполиз",
+    },
     "samarkand_photos": [],
     "bukhara_photos": [],
     "mrt_15": [
@@ -722,24 +797,116 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chunk += disease + "\n"
         await query.edit_message_text(chunk, parse_mode="Markdown", reply_markup=back_keyboard(lang))
 
-    # ── Palatalar ──
+    # ── Palatalar — Korpus tanlash ──
     elif data == "menu_wards":
+        korpuslar = d.get("korpuslar", [])
         title = {
-            "ru": "🏨 *Палаты клиники:*",
-            "uz": "🏨 *Klinika palatalari:*",
-            "kz": "🏨 *Клиника палаталары:*",
+            "ru": "🏨 *Корпуса клиники*\n\nВыберите корпус:",
+            "uz": "🏨 *Klinika korpuslari*\n\nKorpusni tanlang:",
+            "kz": "🏨 *Клиника корпустары*\n\nКорпусты таңдаңыз:",
         }[lang]
-        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=back_keyboard(lang))
-        photos = d.get("ward_photos", [])
-        if photos:
-            await send_photos(context, chat_id, photos)
-        else:
-            no_photo = {
-                "ru": "📸 Фото палат скоро будут добавлены!",
-                "uz": "📸 Palata rasmlari tez orada qo'shiladi!",
-                "kz": "📸 Палата суреттері жақында қосылады!",
-            }[lang]
-            await context.bot.send_message(chat_id=chat_id, text=no_photo)
+        buttons = []
+        for k in korpuslar:
+            name = k["name_uz"] if lang == "uz" else k["name_ru"]
+            buttons.append([InlineKeyboardButton(
+                f"{k['emoji']} {name}",
+                callback_data=f"korpus_{k['id']}")])
+        back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data.startswith("korpus_"):
+        korpus_id = data.replace("korpus_", "")
+        korpuslar = d.get("korpuslar", [])
+        korpus = next((k for k in korpuslar if k["id"] == korpus_id), None)
+        if not korpus:
+            await query.edit_message_text("❌ Topilmadi", reply_markup=back_keyboard(lang))
+            return
+        name = korpus["name_uz"] if lang == "uz" else korpus["name_ru"]
+        title = {
+            "ru": f"{korpus['emoji']} *{name}*\n\nВыберите тип номера:",
+            "uz": f"{korpus['emoji']} *{name}*\n\nXona turini tanlang:",
+            "kz": f"{korpus['emoji']} *{name}*\n\nБөлме түрін таңдаңыз:",
+        }[lang]
+        buttons = []
+        for i, xona in enumerate(korpus["xonalar"]):
+            buttons.append([InlineKeyboardButton(
+                f"🛏 {xona['nom']} ({xona['kishi']} kishi)",
+                callback_data=f"xona_{korpus_id}_{i}")])
+        back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        buttons.append([InlineKeyboardButton(back, callback_data="menu_wards")])
+        await query.edit_message_text(title, parse_mode="Markdown",
+                                      reply_markup=InlineKeyboardMarkup(buttons))
+        # Korpus rasmlari
+        if korpus.get("photos"):
+            await send_photos(context, chat_id, korpus["photos"])
+
+    elif data.startswith("xona_"):
+        parts = data.split("_", 2)
+        korpus_id = parts[1]
+        xona_idx = int(parts[2])
+        korpuslar = d.get("korpuslar", [])
+        korpus = next((k for k in korpuslar if k["id"] == korpus_id), None)
+        if not korpus or xona_idx >= len(korpus["xonalar"]):
+            await query.edit_message_text("❌ Topilmadi", reply_markup=back_keyboard(lang))
+            return
+        xona = korpus["xonalar"][xona_idx]
+        korpus_name = korpus["name_uz"] if lang == "uz" else korpus["name_ru"]
+        included = d.get("xona_included", {}).get(lang, "")
+
+        text = {
+            "ru": (
+                f"🛏 *{xona['nom']}*\n"
+                f"🏢 Корпус: {korpus_name}\n"
+                f"👥 Вместимость: {xona['kishi']} человек\n\n"
+                f"💰 *Стоимость за 1 день:*\n\n"
+                f"🇺🇿 Граждане Узбекистана:\n"
+                f"• Взрослые: {xona['uz_adult']} сум\n"
+                f"• Дети (5-10 лет): {xona['uz_child']} сум\n\n"
+                f"🌍 Иностранные граждане:\n"
+                f"• Взрослые: {xona['foreign_adult']} сум\n"
+                f"• Дети (5-10 лет): {xona['foreign_child']} сум\n\n"
+                f"{included}"
+            ),
+            "uz": (
+                f"🛏 *{xona['nom']}*\n"
+                f"🏢 Korpus: {korpus_name}\n"
+                f"👥 Sig'imi: {xona['kishi']} kishi\n\n"
+                f"💰 *1 kunlik narx:*\n\n"
+                f"🇺🇿 O'zbekiston fuqarolari:\n"
+                f"• Kattalar: {xona['uz_adult']} so'm\n"
+                f"• Bolalar (5-10 yosh): {xona['uz_child']} so'm\n\n"
+                f"🌍 Xorijiy fuqarolar:\n"
+                f"• Kattalar: {xona['foreign_adult']} so'm\n"
+                f"• Bolalar (5-10 yosh): {xona['foreign_child']} so'm\n\n"
+                f"{included}"
+            ),
+            "kz": (
+                f"🛏 *{xona['nom']}*\n"
+                f"🏢 Корпус: {korpus_name}\n"
+                f"👥 Сыйымдылық: {xona['kishi']} адам\n\n"
+                f"💰 *1 күндік баға:*\n\n"
+                f"🇺🇿 Өзбекстан азаматтары:\n"
+                f"• Ересектер: {xona['uz_adult']} сум\n"
+                f"• Балалар (5-10 жас): {xona['uz_child']} сум\n\n"
+                f"🌍 Шетел азаматтары:\n"
+                f"• Ересектер: {xona['foreign_adult']} сум\n"
+                f"• Балалар (5-10 жас): {xona['foreign_child']} сум\n\n"
+                f"{included}"
+            ),
+        }[lang]
+
+        book_label = {"ru": "📅 Записаться", "uz": "📅 Yozilish", "kz": "📅 Жазылу"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(book_label, callback_data="menu_booking")],
+            [InlineKeyboardButton(back_label, callback_data=f"korpus_{korpus_id}")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        # Xona rasmlari
+        if xona.get("photos"):
+            await send_photos(context, chat_id, xona["photos"])
 
     # ── Xonalar ──
     elif data == "menu_rooms":
@@ -911,20 +1078,30 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 📝 *Matn o'zgartirish:*
 `/admin contacts|phone1|+998901234567`
-`/admin contacts|address_ru|Новый адрес`
 `/admin transfer|ru|Yangi matn`
-`/admin excursion|uz|Yangi matn`
-`/admin doctor|name_ru|Yangi ism`
 
 📸 *Rasm qo'shish:*
-Rasmni menga yuboring, men file_id ni beraman
-Keyin: `/admin_photo clinic` yoki `/admin_photo ward` yoki `/admin_photo samarkand` yoki `/admin_photo bukhara` yoki `/admin_photo doctor`
+`/admin_photo clinic` — klinika rasmi
+`/admin_photo ward` — umumiy palata rasmi
+`/admin_photo samarkand` — Samarqand
+`/admin_photo bukhara` — Buxoro
+`/admin_photo doctor` — shifokor rasmi
+`/admin_photo cert` — sertifikat
+`/admin_photo video` — video
 
-👥 *Jamoa a'zosi qo'shish:*
-`/admin_staff_add Ism Familiya|Lavozim`
+🏢 *Korpus rasmi qo'shish:*
+`/admin_photo korpus_m_yangi`
+`/admin_photo korpus_umumiy_z`
+`/admin_photo korpus_pol_lyuks`
+`/admin_photo korpus_d_diagnostika`
+`/admin_photo korpus_s_korpus`
 
-📋 *Bo'limlar:*
-contacts, doctor, transfer, excursion, weekend, included"""
+🛏 *Xona rasmi qo'shish:*
+`/admin_photo xona_m_yangi_0` (0=birinchi xona)
+`/admin_photo xona_m_yangi_1` (1=ikkinchi xona)
+
+👥 *Jamoa qo'shish:*
+`/admin_staff_add Ism|Lavozim`"""
         await update.message.reply_text(help_text, parse_mode="Markdown")
         return
 
@@ -994,6 +1171,34 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "cert":
         d["cert_photos"].append(file_id)
         await update.message.reply_text(f"✅ Sertifikat rasmi qo'shildi! Jami: {len(d['cert_photos'])} ta")
+    elif waiting.startswith("korpus_"):
+        korpus_id = waiting.replace("korpus_", "")
+        korpuslar = d.get("korpuslar", [])
+        for k in korpuslar:
+            if k["id"] == korpus_id:
+                k["photos"].append(file_id)
+                save_data(d)
+                await update.message.reply_text(f"✅ {k['name_uz']} korpus rasmi qo'shildi! Jami: {len(k['photos'])} ta")
+                context.user_data["waiting_photo"] = None
+                return
+        await update.message.reply_text("❌ Korpus topilmadi")
+        return
+    elif waiting.startswith("xona_"):
+        parts = waiting.split("_", 2)
+        korpus_id = parts[1]
+        xona_idx = int(parts[2])
+        korpuslar = d.get("korpuslar", [])
+        for k in korpuslar:
+            if k["id"] == korpus_id:
+                if xona_idx < len(k["xonalar"]):
+                    k["xonalar"][xona_idx]["photos"].append(file_id)
+                    save_data(d)
+                    xona_nom = k["xonalar"][xona_idx]["nom"]
+                    await update.message.reply_text(f"✅ {xona_nom} xona rasmi qo'shildi!")
+                    context.user_data["waiting_photo"] = None
+                    return
+        await update.message.reply_text("❌ Xona topilmadi")
+        return
         idx = int(waiting.split("_")[1])
         if idx < len(d["staff"]):
             d["staff"][idx]["photo_id"] = file_id
