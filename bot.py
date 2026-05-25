@@ -932,9 +932,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "kz": f"{korpus['emoji']} *{name}*\n\nБөлме түрін таңдаңыз:",
         }[lang]
         buttons = []
+        kishi_w = {"ru": "чел.", "uz": "kishi", "kz": "адам"}[lang]
         for i, xona in enumerate(korpus["xonalar"]):
             buttons.append([InlineKeyboardButton(
-                f"🛏 {xona['nom']} ({xona['kishi']} kishi)",
+                f"🛏 {xona['nom']} ({xona['kishi']} {kishi_w})",
                 callback_data=f"xona_{korpus_id}_{i}")])
         back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         buttons.append([InlineKeyboardButton(back, callback_data="menu_wards")])
@@ -1044,13 +1045,16 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rooms = d["rooms_uz"] if category == "uz" else d["rooms_foreign"]
         flag = "🇺🇿" if category == "uz" else "🌍"
 
+        kishi_word = {"ru": "чел.", "uz": "kishi", "kz": "адам"}[lang]
+        narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
+
         if age_type == "adult":
             header = {
                 "ru": f"{flag} 👨‍👩‍👧 *Стоимость для взрослых*\n_(за 1 день / 1 человек)_\n\n",
                 "uz": f"{flag} 👨‍👩‍👧 *Kattalar uchun narx*\n_(1 kun / 1 kishi)_\n\n",
                 "kz": f"{flag} 👨‍👩‍👧 *Ересектер үшін баға*\n_(1 күн / 1 адам)_\n\n",
             }[lang]
-            lines = [f"🛏 *{r['name']}* ({r['people']} кіші) — {r['adult']} сум" for r in rooms]
+            lines = [f"🛏 *{r['name']}* ({r['people']} {kishi_word}) — {r['adult']} {narx_word}" for r in rooms]
         else:
             note = {
                 "ru": "⚠️ *Внимание:* Дети принимаются с 5 лет.\nДанные цены для детей до 10 лет.\n\n",
@@ -1062,7 +1066,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "uz": f"{flag} 👶 *Bolalar uchun narx (5–10 yosh)*\n_(1 kun / 1 bola)_\n\n{note}",
                 "kz": f"{flag} 👶 *Балалар үшін баға (5–10 жас)*\n_(1 күн / 1 бала)_\n\n{note}",
             }[lang]
-            lines = [f"🛏 *{r['name']}* ({r['people']} кіші) — {r['child']} сум" for r in rooms]
+            lines = [f"🛏 *{r['name']}* ({r['people']} {kishi_word}) — {r['child']} {narx_word}" for r in rooms]
 
         text = header + "\n".join(lines)
         if len(text) > 4000:
