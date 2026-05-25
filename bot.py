@@ -646,6 +646,21 @@ async def send_photos(context, chat_id, photo_ids, caption=""):
 # ─── HANDLERS ─────────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Foydalanuvchini saqlash
+    user = update.effective_user
+    d = load_data()
+    users = d.get("users", {})
+    user_id = str(user.id)
+    if user_id not in users:
+        users[user_id] = {
+            "id": user.id,
+            "name": user.full_name,
+            "username": f"@{user.username}" if user.username else "—",
+            "lang": "—",
+        }
+        d["users"] = users
+        save_data(d)
+
     await update.message.reply_text(
         "👋 Добро пожаловать / Xush kelibsiz / Қош келдіңіз!\n\n🌐 Выберите язык / Tilni tanlang / Тілді таңдаңыз:",
         reply_markup=lang_keyboard()
@@ -665,6 +680,18 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("lang_"):
         lang = data.split("_")[1]
         context.user_data["lang"] = lang
+        # User tilini saqlash
+        user = query.from_user
+        d2 = load_data()
+        users = d2.get("users", {})
+        uid = str(user.id)
+        if uid not in users:
+            users[uid] = {"id": user.id, "name": user.full_name,
+                         "username": f"@{user.username}" if user.username else "—", "lang": lang}
+        else:
+            users[uid]["lang"] = lang
+        d2["users"] = users
+        save_data(d2)
         welcome = {
             "ru": "🏥 Клиника *Эргаш-Ота* — Каттакурган\n\nВыберите раздел:",
             "uz": "🏥 *Эргаш-Ота* klinikasi — Kattaqo'rg'on\n\nBo'limni tanlang:",
@@ -1270,8 +1297,58 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = update.message.text.strip()
 
+    # ── Statistika ──
+    if text == "/stats":
+        d = load_data()
+        users = d.get("users", {})
+        total = len(users)
+        uz_count = sum(1 for u in users.values() if u.get("lang") == "uz")
+        ru_count = sum(1 for u in users.values() if u.get("lang") == "ru")
+        kz_count = sum(1 for u in users.values() if u.get("lang") == "kz")
+        await update.message.reply_text(
+            f"📊 *Bot statistikasi:*\n\n"
+            f"👥 Jami foydalanuvchilar: *{total}* ta\n\n"
+            f"🇺🇿 O'zbekcha: {uz_count} ta\n"
+            f"🇷🇺 Ruscha: {ru_count} ta\n"
+            f"🇰🇿 Qozoqcha: {kz_count} ta",
+            parse_mode="Markdown"
+        )
+        return
+
+    # ── Broadcast ──
+    if text.startswith("/broadcast "):
+        msg = text.replace("/broadcast ", "", 1)
+        d = load_data()
+        users = d.get("users", {})
+        total = len(users)
+        sent = 0
+        failed = 0
+        await update.message.reply_text(
+            f"📤 Xabar yuborilmoqda... ({total} ta foydalanuvchi)"
+        )
+        for uid in users.keys():
+            try:
+                await context.bot.send_message(
+                    chat_id=int(uid),
+                    text=msg,
+                    parse_mode="Markdown"
+                )
+                sent += 1
+            except Exception:
+                failed += 1
+        await update.message.reply_text(
+            f"✅ Yuborildi: {sent} ta\n❌ Xato: {failed} ta"
+        )
+        return
+
     if text == "/admin_help":
         help_text = """🔧 *Admin buyruqlari:*
+
+📊 *Statistika:*
+`/stats` — foydalanuvchilar soni
+
+📢 *Broadcast (hammaga xabar):*
+`/broadcast Assalomu alaykum! Yangi xizmat qo'shildi...`
 
 📝 *Matn o'zgartirish:*
 `/admin contacts|phone1|+998901234567`
@@ -2004,6 +2081,8 @@ def main():
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_staff_add", admin_handler))
+    app.add_handler(CommandHandler("stats", admin_handler))
+    app.add_handler(CommandHandler("broadcast", admin_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
