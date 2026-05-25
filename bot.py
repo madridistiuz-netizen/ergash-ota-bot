@@ -339,9 +339,9 @@ DEFAULT_DATA = {
             "video": "",
         },
         "arrival_step3": {
-            "ru": "🏨 *Шаг 3: Выбор номера и размещение*\n\n✔ Выбираете удобный номер\n✔ Оплачиваете на кассе\n✔ Принимаете слабительный препарат (кабинет 12)\n✔ Медсёстры размещают вас\n\n🕐 *Приём и размещение:* 08:00 – 18:00\n📍 *После 18:00:* пациенты принимаются дежурными врачами",
-            "uz": "🏨 *3-bosqich: Xona tanlash va joylashish*\n\n✔ O'zingizga qulay xonani tanlaysiz\n✔ Kassada to'lov qilasiz\n✔ 12-xonaga surgi giyohini ichasiz\n✔ Hamshiralar sizni joylashtiradi\n\n🕐 *Qabul va joylashish:* 08:00 – 18:00\n📍 *18:00 dan keyin kelgan bemorlar:* navbatchi vrachlar tomonidan qabul qilinadi",
-            "kz": "🏨 *3-кезең: Бөлме таңдау және орналасу*\n\n✔ Ыңғайлы бөлмені таңдайсыз\n✔ Кассада төлем жасайсыз\n✔ Іш жүргізетін дәрі қабылдайсыз (12-кабинет)\n✔ Медбикелер орналастырады\n\n🕐 *Қабылдау:* 08:00 – 18:00\n📍 *18:00 кейін:* кезекші дәрігерлер қабылдайды",
+            "ru": "🏨 *Шаг 3: Выбор номера и размещение*\n\nВы: находитесь на 1-м этаже приёмной\n\n✅ Выбираете удобный номер\n✅ Оплачиваете на кассе\n✅ Принимаете слабительный препарат (кабинет 12)\n✅ Медсёстры размещают вас\n\n🕐 *Приём и размещение:* 08:00 – 18:00\n📍 *После 18:00:* пациенты принимаются дежурными врачами",
+            "uz": "🏨 *3-bosqich: Xona tanlash va joylashish*\n\nSiz: Qabulxonaning 1- qafatidasiz\n\n✅ O'zingizga qulay xonani tanlaysiz\n✔ Kassada to'lov qilasiz\n✅ 12-xonaga surgi giyohini ichasiz\n✔ Hamshiralar sizni joylashtiradi\n\n🕐 *Qabul va joylashish:* 08:00 – 18:00\n📍 *18:00 dan keyin kelgan bemorlar:* navbatchi vrachlar tomonidan qabul qilinadi",
+            "kz": "🏨 *3-кезең: Бөлме таңдау және орналасу*\n\nСіз қабылдау бөлмесінің 1-қабатындасыз\n\n✅ Ыңғайлы бөлмені таңдайсыз\n✅ Кассада төлем жасайсыз\n✅ Іш жүргізетін дәрі қабылдайсыз (12-кабинет)\n✅ Медбикелер орналастырады\n\n🕐 *Қабылдау:* 08:00 – 18:00\n📍 *18:00 кейін:* кезекші дәрігерлер қабылдайды",
             "video": "",
         },
         "arrival": {
