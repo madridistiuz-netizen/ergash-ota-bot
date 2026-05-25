@@ -521,11 +521,11 @@ def rooms_type_keyboard(lang, category):
 def diagnostics_keyboard(lang):
     labels = {
         "ru": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ и другие", "🍂 Фиброскан", "🔬 Лаборатория", "⬅️ Назад"),
+               "📡 УЗИ и другие",  "🔬 Лаборатория", "🍂 Фиброскан", "⬅️ Назад"),
         "uz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ ва бошқалар", "🍂 Fibroscan tekshiruvi", "🔬 Laboratoriya", "⬅️ Orqaga"),
+               "📡 УЗИ ва бошқалар",  "🔬 Laboratoriya", "🍂 Fibroscan tekshiruvi", "⬅️ Orqaga"),
         "kz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УДЗ және басқа", "🍂 Фиброскан", "🔬 Зертхана", "⬅️ Артқа"),
+               "📡 УДЗ және басқа",  "🔬 Зертхана", "🍂 Фиброскан", "⬅️ Артқа"),
     }[lang]
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="diag_mrt15"),
@@ -551,7 +551,7 @@ def mrt3t_groups_keyboard(lang):
 def guide_keyboard(lang):
     labels = {
         "ru": (
-            "📋 Порядок размещения",
+            "1️⃣ Порядок размещения",
             "2️⃣ Малхам",
             "3️⃣ Процедуры и день",
             "4️⃣ Инфраструктура",
@@ -560,7 +560,7 @@ def guide_keyboard(lang):
             "⬅️ Назад",
         ),
         "uz": (
-            "📋 Joylashish tartibi",
+            "1️⃣ Joylashish tartibi",
             "2️⃣ Malham",
             "3️⃣ Protseduralar va kun",
             "4️⃣ Infrastruktura",
@@ -569,7 +569,7 @@ def guide_keyboard(lang):
             "⬅️ Orqaga",
         ),
         "kz": (
-            "📋 Орналасу тәртібі",
+            "1️⃣ Орналасу тәртібі",
             "2️⃣ Малхам",
             "3️⃣ Процедуралар және күн",
             "4️⃣ Инфрақұрылым",
