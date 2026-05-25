@@ -326,15 +326,35 @@ DEFAULT_DATA = {
         "kz": "🌅 Жексенбіде жаңа науқастарды қабылдаймыз!\n\n✅ Тіркеу және қабылдау\n✅ Алғашқы тексеру\n✅ Бірінші күні емдеу басталады\n\n📞 Байланысыңыз: {phone}",
     },
     "guide": {
+        "arrival_step1": {
+            "ru": "🏥 *Порядок размещения в клинике*\n\n1️⃣ *Шаг 1: Регистрация*\n\nОбратитесь в регистратуру с паспортом или удостоверением личности и пройдите регистрацию.\n\n📍 Регистратура находится на 2-м этаже приёмного корпуса.",
+            "uz": "🏥 *Klinikaga joylashish tartibi*\n\n1️⃣ *1-bosqich: Ro'yxatdan o'tish*\n\nPasport yoki ID karta bilan registraturaga murojaat qiling va ro'yxatdan o'ting.\n\n📍 Registratura qabulxonaning 2-qavatida joylashgan.",
+            "kz": "🏥 *Клиникаға орналасу тәртібі*\n\n1️⃣ *1-кезең: Тіркелу*\n\nПаспорт немесе жеке куәлікпен тіркеуге барыңыз.\n\n📍 Тіркеу бөлімі қабылдау корпусының 2-қабатында орналасқан.",
+            "video": "",
+        },
+        "arrival_step2": {
+            "ru": "❤️ *Шаг 2: Осмотр врача*\n\nСіз:\n✔ Проходите ЭКГ\n✔ Проходите осмотр врача\n\nПри необходимости назначаются:\n• МРТ\n• МСКТ\n• Лабораторные анализы\n\n📍 Вы находитесь в приёмном отделении на *2-м этаже*.",
+            "uz": "❤️ *2-bosqich: Shifokor ko'rigi*\n\nSiz:\n✔ EKG tekshiruvidan o'tasiz\n✔ Shifokor ko'rigidan o'tasiz\n\nZarurat bo'lsa:\n• MRT\n• MSKT\n• Laboratoriya tekshiruvlari tavsiya qilinadi\n\n📍 Siz qabulxonaning *2-qavatida*siz.",
+            "kz": "❤️ *2-кезең: Дәрігер қарауы*\n\nСіз:\n✔ ЭКГ тексерісінен өтесіз\n✔ Дәрігер қарауынан өтесіз\n\nҚажет болса:\n• МРТ\n• МСКТ\n• Зертхана анализдері\n\n📍 Сіз қабылдау бөлімінің *2-қабатынdasız*.",
+            "video": "",
+        },
+        "arrival_step3": {
+            "ru": "🏨 *Шаг 3: Выбор номера и размещение*\n\n✔ Выбираете удобный номер\n✔ Оплачиваете на кассе\n✔ Принимаете слабительный препарат (кабинет 12)\n✔ Медсёстры размещают вас\n\n🕐 *Приём и размещение:* 08:00 – 18:00\n📍 *После 18:00:* пациенты принимаются дежурными врачами",
+            "uz": "🏨 *3-bosqich: Xona tanlash va joylashish*\n\n✔ O'zingizga qulay xonani tanlaysiz\n✔ Kassada to'lov qilasiz\n✔ 12-xonaga surgi giyohini ichasiz\n✔ Hamshiralar sizni joylashtiradi\n\n🕐 *Qabul va joylashish:* 08:00 – 18:00\n📍 *18:00 dan keyin kelgan bemorlar:* navbatchi vrachlar tomonidan qabul qilinadi",
+            "kz": "🏨 *3-кезең: Бөлме таңдау және орналасу*\n\n✔ Ыңғайлы бөлмені таңдайсыз\n✔ Кассада төлем жасайсыз\n✔ Іш жүргізетін дәрі қабылдайсыз (12-кабинет)\n✔ Медбикелер орналастырады\n\n🕐 *Қабылдау:* 08:00 – 18:00\n📍 *18:00 кейін:* кезекші дәрігерлер қабылдайды",
+            "video": "",
+        },
         "arrival": {
-            "ru": "🏥 *Порядок размещения в клинике*\n\n1️⃣ *Регистрация*\nОбратитесь в регистратуру с паспортом или удостоверением личности и пройдите регистрацию.\n\n➡️ *Продолжить*\n\n❤️ *2-й этап: Осмотр врача*\nВы:\n✔ Проходите ЭКГ\n✔ Проходите осмотр врача\n\nПри необходимости назначаются:\n• МРТ\n• МСКТ\n• Лабораторные анализы\n\n➡️ *Далее*\n\n🏨 *3-й этап: Выбор номера и размещение*\n✔ Выбираете удобный номер\n✔ Оплачиваете на кассе\n✔ Принимаете слабительный препарат (кабинет 12)\n✔ Медсёстры размещают вас\n\n🕐 *Приём и размещение:* 08:00 – 18:00\n📍 *После 18:00:* пациенты принимаются дежурными врачами",
-            "uz": "🏥 *Klinikaga joylashish tartibi*\n\n1️⃣ *Ro'yxatdan o'tish*\nPasport yoki ID karta bilan registraturaga murojaat qiling va ro'yxatdan o'ting.\n\n➡️ *Davom etish*\n\n❤️ *2-bosqich: Shifokor ko'rigi*\nSiz:\n✔ EKG tekshiruvidan o'tasiz\n✔ Shifokor ko'rigidan o'tasiz\n\nZarurat bo'lsa:\n• MRT\n• MSKT\n• Laboratoriya tekshiruvlari tavsiya qilinadi\n\n➡️ *Keyingi*\n\n🏨 *3-bosqich: Xona tanlash va joylashish*\n✔ O'zingizga qulay xonani tanlaysiz\n✔ Kassada to'lov qilasiz\n✔ 12-xonaga surgi giyohini ichasiz\n✔ Hamshiralar sizni joylashtiradi\n\n🕐 *Qabul va joylashish:* 08:00 – 18:00\n📍 *18:00 dan keyin kelgan bemorlar:* navbatchi vrachlar tomonidan qabul qilinadi",
-            "kz": "🏥 *Клиникаға орналасу тәртібі*\n\n1️⃣ *Тіркелу*\nПаспорт немесе жеке куәлікпен тіркеуге барыңыз.\n\n➡️ *Жалғастыру*\n\n❤️ *2-кезең: Дәрігер қарауы*\nСіз:\n✔ ЭКГ тексерісінен өтесіз\n✔ Дәрігер қарауынан өтесіз\n\nҚажет болса:\n• МРТ\n• МСКТ\n• Зертхана анализдері\n\n➡️ *Келесі*\n\n🏨 *3-кезең: Бөлме таңдау және орналасу*\n✔ Ыңғайлы бөлмені таңдайсыз\n✔ Кассада төлем жасайсыз\n✔ Іш жүргізетін дәрі қабылдайсыз\n✔ Медбикелер орналастырады\n\n🕐 *Қабылдау:* 08:00 – 18:00\n📍 *18:00 кейін:* кезекші дәрігерлер қабылдайды",
+            "ru": "🏥 *Порядок размещения в клинике*\n\nВыберите шаг:",
+            "uz": "🏥 *Klinikaga joylashish tartibi*\n\nBosqichni tanlang:",
+            "kz": "🏥 *Клиникаға орналасу тәртібі*\n\nКезеңді таңдаңыз:",
+            "video": "",
         },
         "malham": {
             "ru": "2️⃣ *Малхам — главная процедура*\n\nМалхам — чудодейственное снадобье, разработанное лично Бердикулом Эргашевым. Рецепт знает только он.\n\n📍 Место: главное здание, приёмный кабинет доктора\n🕐 Время для иностранцев: 10:00–12:00\n\nЧто взять с собой:\n• Процедурную книжку\n• Платок или салфетки\n• Пустую грелку\n\n📋 *Порядок:*\n1. Отдайте книжку медбрату у двери\n2. Заходят по 4 человека\n3. Доктор читает молитву, осматривает, выдаёт малхам\n4. Пьётся залпом! Можно заесть леденцом или куртом\n\n⏱ *Важно:*\n• Не пить за 1.5 часа ДО и 1.5 часа ПОСЛЕ\n• После приёма сразу идите в номер с грелкой\n• Грелку наполнить кипятком из бойлера\n• Лечь на правый бок (грелка на печень) на 1.5–2 часа",
             "uz": "2️⃣ *Malham — asosiy protsedura*\n\nMalham — Berdiqul Ergashev tomonidan ishlab chiqilgan mo'jizali dori. Retseptni faqat u biladi.\n\n📍 Joy: asosiy bino, doktor qabul xonasi\n🕐 Xorijiylar uchun vaqt: 10:00–12:00\n\nO'zingiz bilan oling:\n• Protsedura daftarchasi\n• Ro'molcha yoki salfetkalar\n• Bo'sh grелка\n\n📋 *Tartib:*\n1. Daftarchani eshik oldidagi tibbiy xodimga bering\n2. 4 kishidan kiriladi\n3. Doktor duo o'qiydi, ko'rik o'tkazadi, malham beradi\n4. Bir yutkida ichiladi! Konfet yoki kurt bilan yeyish mumkin\n\n⏱ *Muhim:*\n• Oldin 1.5 soat va keyin 1.5 soat hech narsa ichmaslik\n• Ichgandan keyin darhol xonaga boring\n• Grелkani qaynagan suv bilan to'ldiring\n• O'ng yoningizda yoting (grелka jigar ustida) 1.5–2 soat",
             "kz": "2️⃣ *Малхам — негізгі процедура*\n\nМалхам — Бердіқұл Ерғашев жасаған ғажайып дәрі.\n\n📍 Орын: бас ғимарат, дәрігер қабылдау бөлмесі\n🕐 Шетелдіктер үшін: 10:00–12:00\n\nАлып баруға:\n• Процедуралық кітапша\n• Орамал немесе сүлгі\n• Бос жылытқыш\n\n⏱ *Маңызды:*\n• Малхамнан 1.5 сағат бұрын және кейін ештеңе ішпеу\n• Қабылдаудан кейін бірден бөлмеге барыңыз\n• Оң жаққа жатыңыз (бауыр үстіне жылытқыш) 1.5–2 сағат",
+            "video": "",
         },
         "procedures": {
             "ru": "3️⃣ *Процедуры и распорядок дня*\n\n🌅 *Утро:*\n• Клизма (кишечное промывание) — обязательно!\n  Возьмите: насадки, процедурную простынь\n• После клизмы — отдых в номере\n• Затем — Малхам (10:00–12:00)\n• После Малхама — грелка 1.5–2 часа\n\n☀️ *День:*\n• Массаж (кабинеты в 2 корпусах)\n  Возьмите: книжку, простынь, массажное масло\n• Аппаратная физиотерапия (ноги, живот, спина)\n• Растяжка\n• Тренажёрный зал\n• Аппаратная косметология\n• Укол в ухо\n• Анализы\n\n🍵 *Питание:*\n• Еда только в субботу вечером и воскресенье\n• Ежедневно: сок (1 банка/день) — покупается справа от столовой\n• Лечебные чаи — у санитарок в каждом корпусе\n\n⚠️ *Четверг* — короткий день (субботник)\n🎵 *Четверг и воскресенье* — музыкальный отдых после ужина (21:00)",
@@ -782,15 +802,79 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("guide_"):
         section = data.replace("guide_", "")
-        guide_data = d.get("guide", {}).get(section, {})
-        text = guide_data.get(lang, guide_data.get("ru", ""))
-        back = InlineKeyboardMarkup([[InlineKeyboardButton(
-            {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
-            callback_data="menu_guide")]])
-        if text:
-            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+        guide_data_all = d.get("guide", {})
+
+        # Arrival bosqichlari alohida
+        if section == "arrival":
+            step1 = guide_data_all.get("arrival_step1", {})
+            text = step1.get(lang, step1.get("ru", ""))
+            next_label = {"ru": "➡️ Далее (2/3)", "uz": "➡️ Keyingi (2/3)", "kz": "➡️ Келесі (2/3)"}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_arrival_step2")],
+                [InlineKeyboardButton(back_label, callback_data="menu_guide")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+            # Video
+            vid = step1.get("video", "")
+            if vid:
+                try:
+                    await context.bot.send_video(chat_id=chat_id, video=vid)
+                except Exception:
+                    pass
+
+        elif section == "arrival_step2":
+            step2 = guide_data_all.get("arrival_step2", {})
+            text = step2.get(lang, step2.get("ru", ""))
+            next_label = {"ru": "➡️ Далее (3/3)", "uz": "➡️ Keyingi (3/3)", "kz": "➡️ Келесі (3/3)"}[lang]
+            back_label = {"ru": "⬅️ Назад (1/3)", "uz": "⬅️ Orqaga (1/3)", "kz": "⬅️ Артқа (1/3)"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_arrival_step3")],
+                [InlineKeyboardButton(back_label, callback_data="guide_arrival")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+            vid = step2.get("video", "")
+            if vid:
+                try:
+                    await context.bot.send_video(chat_id=chat_id, video=vid)
+                except Exception:
+                    pass
+
+        elif section == "arrival_step3":
+            step3 = guide_data_all.get("arrival_step3", {})
+            text = step3.get(lang, step3.get("ru", ""))
+            guide_label = {"ru": "📖 К руководству", "uz": "📖 Qo'llanmaga", "kz": "📖 Нұсқаулыққа"}[lang]
+            back_label = {"ru": "⬅️ Назад (2/3)", "uz": "⬅️ Orqaga (2/3)", "kz": "⬅️ Артқа (2/3)"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(guide_label, callback_data="menu_guide")],
+                [InlineKeyboardButton(back_label, callback_data="guide_arrival_step2")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+            vid = step3.get("video", "")
+            if vid:
+                try:
+                    await context.bot.send_video(chat_id=chat_id, video=vid)
+                except Exception:
+                    pass
+
         else:
-            await query.edit_message_text("⏳ Скоро...", reply_markup=back)
+            # Boshqa bo'limlar
+            section_data = guide_data_all.get(section, {})
+            text = section_data.get(lang, section_data.get("ru", ""))
+            back = InlineKeyboardMarkup([[InlineKeyboardButton(
+                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+                callback_data="menu_guide")]])
+            if text:
+                await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+            else:
+                await query.edit_message_text("⏳ Скоро...", reply_markup=back)
+            # Video
+            vid = section_data.get("video", "")
+            if vid:
+                try:
+                    await context.bot.send_video(chat_id=chat_id, video=vid)
+                except Exception:
+                    pass
 
     # ── Klinika haqida — submenu ──
     elif data == "menu_clinic":
@@ -1345,41 +1429,46 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    if text.startswith("/admin_video "):
+        section = text.replace("/admin_video ", "").strip()
+        context.user_data["waiting_photo"] = f"guide_video_{section}"
+        await update.message.reply_text(
+            f"🎥 Tayyor! Endi *{section}* bo'limi uchun video yuboring:",
+            parse_mode="Markdown"
+        )
+        return
+
     if text == "/admin_help":
         help_text = """🔧 *Admin buyruqlari:*
 
 📊 *Statistika:*
 `/stats` — foydalanuvchilar soni
 
-📢 *Broadcast (hammaga xabar):*
-`/broadcast Assalomu alaykum! Yangi xizmat qo'shildi...`
-
-📝 *Matn o'zgartirish:*
-`/admin contacts|phone1|+998901234567`
-`/admin transfer|ru|Yangi matn`
+📢 *Broadcast:*
+`/broadcast Yangi xizmat qo'shildi!`
 
 📸 *Rasm qo'shish:*
 `/admin_photo clinic` — klinika rasmi
-`/admin_photo ward` — umumiy palata rasmi
 `/admin_photo samarkand` — Samarqand
 `/admin_photo bukhara` — Buxoro
 `/admin_photo doctor` — shifokor rasmi
 `/admin_photo cert` — sertifikat
-`/admin_photo video` — video
+`/admin_photo korpus_m_yangi` — korpus rasmi
+`/admin_photo xona_m_yangi_0` — xona rasmi
 
-🏢 *Korpus rasmi qo'shish:*
-`/admin_photo korpus_m_yangi`
-`/admin_photo korpus_umumiy_z`
-`/admin_photo korpus_pol_lyuks`
-`/admin_photo korpus_d_diagnostika`
-`/admin_photo korpus_s_korpus`
+🎥 *Video qo'shish (bo'limlarga):*
+`/admin_video arrival_step1` — 1-bosqich
+`/admin_video arrival_step2` — 2-bosqich
+`/admin_video arrival_step3` — 3-bosqich
+`/admin_video malham` — Malham
+`/admin_video procedures` — Protseduralar
+`/admin_video infrastructure` — Infrastruktura
+`/admin_video rules` — Qoidalar
+`/admin_video shopping` — Uyga nima olish
+`/admin_video clinic` — Klinika haqida
 
-🛏 *Xona rasmi qo'shish:*
-`/admin_photo xona_m_yangi_0` (0=birinchi xona)
-`/admin_photo xona_m_yangi_1` (1=ikkinchi xona)
-
-👥 *Jamoa qo'shish:*
-`/admin_staff_add Ism|Lavozim`"""
+📝 *Matn o'zgartirish:*
+`/admin contacts|phone1|+998901234567`"""
         await update.message.reply_text(help_text, parse_mode="Markdown")
         return
 
@@ -1491,17 +1580,28 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id != ADMIN_ID:
         return
     waiting = context.user_data.get("waiting_photo")
-    if waiting != "video":
+    if not waiting:
         return
     video = update.message.video
     if not video:
         return
     file_id = video.file_id
     d = load_data()
-    d["clinic_videos"].append(file_id)
-    save_data(d)
-    await update.message.reply_text(f"✅ Video qo'shildi! Jami: {len(d['clinic_videos'])} ta")
-    context.user_data["waiting_photo"] = None
+
+    if waiting == "video":
+        d["clinic_videos"].append(file_id)
+        save_data(d)
+        await update.message.reply_text(f"✅ Klinika video qo'shildi! Jami: {len(d['clinic_videos'])} ta")
+        context.user_data["waiting_photo"] = None
+    elif waiting.startswith("guide_video_"):
+        section = waiting.replace("guide_video_", "")
+        if "guide" in d and section in d["guide"]:
+            d["guide"][section]["video"] = file_id
+            save_data(d)
+            await update.message.reply_text(f"✅ '{section}' bo'limi videosi saqlandi!")
+        else:
+            await update.message.reply_text(f"❌ '{section}' topilmadi")
+        context.user_data["waiting_photo"] = None
 
 
 
@@ -2085,6 +2185,7 @@ def main():
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_staff_add", admin_handler))
+    app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
     app.add_handler(CommandHandler("broadcast", admin_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
