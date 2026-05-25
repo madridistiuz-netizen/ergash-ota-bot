@@ -477,17 +477,17 @@ def rooms_type_keyboard(lang, category):
     labels = {
         "ru": (
             "👨‍👩‍👧 Для взрослых",
-            "👶 Для детей (5–10 лет)",
+            "👶 Для детей (до 10 лет)",
             "⬅️ Назад"
         ),
         "uz": (
             "👨‍👩‍👧 Kattalar uchun",
-            "👶 Bolalar uchun (5–10 yosh)",
+            "👶 Bolalar uchun (10 yoshgacha)",
             "⬅️ Orqaga"
         ),
         "kz": (
             "👨‍👩‍👧 Ересектер үшін",
-            "👶 Балалар үшін (5–10 жас)",
+            "👶 Балалар үшін (10 жасқа дейін)",
             "⬅️ Артқа"
         ),
     }[lang]
