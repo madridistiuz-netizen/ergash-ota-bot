@@ -688,7 +688,58 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
-    elif data in ("menu_booking", "book_confirm", "book_statsionar", "book_diagnostika") or \
+    elif data == "book_confirm":
+        btype_now = context.user_data.get("booking_type", "statsionar")
+        if btype_now in ("transfer", "excursion"):
+            # Transfer va excursion confirm ni to'g'ridan-to'g'ri hal qilamiz
+            booking = context.user_data.get("booking", {})
+            user = query.from_user
+            username = f"@{user.username}" if user.username else "—"
+            phone = d["contacts"]["phone1"]
+
+            if btype_now == "transfer":
+                fr = booking.get("from", "—")
+                sana = booking.get("sana", "—")
+                kishi = booking.get("kishi", "—")
+                phone_num = booking.get("phone", "—")
+                success = {
+                    "ru": f"🎉 *Заявка принята!*\n\n📍 Откуда: {fr}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n\nОператор свяжется с вами.\n📞 {phone}",
+                    "uz": f"🎉 *Ariza qabul qilindi!*\n\n📍 Qayerdan: {fr}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                    "kz": f"🎉 *Өтінім қабылданды!*\n\n📍 Қайдан: {fr}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n\nОператор байланысады.\n📞 {phone}",
+                }[lang]
+                await query.edit_message_text(success, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+                lid = (f"🚗 *TRANSFER LID*\n\n"
+                       f"📍 Qayerdan: {fr}\n📅 Sana: {sana}\n"
+                       f"👥 Kishi: {kishi}\n📞 Telefon: {phone_num}\n"
+                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n\n"
+                       f"🟢 QO'NG'IROQ QILING!")
+                await send_lid(context, TRANSFER_CHANNEL, lid)
+
+            elif btype_now == "excursion":
+                city = booking.get("city", "—")
+                sana = booking.get("sana", "—")
+                kishi = booking.get("kishi", "—")
+                phone_num = booking.get("phone", "—")
+                success = {
+                    "ru": f"🎉 *Заявка принята!*\n\n🕌 {city}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n\nОператор свяжется с вами.\n📞 {phone}",
+                    "uz": f"🎉 *Ariza qabul qilindi!*\n\n🕌 {city}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                    "kz": f"🎉 *Өтінім қабылданды!*\n\n🕌 {city}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n\nОператор байланысады.\n📞 {phone}",
+                }[lang]
+                await query.edit_message_text(success, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+                lid = (f"🕌 *EKSKURSIYA LID*\n\n"
+                       f"🏛 Yo'nalish: {city}\n📅 Sana: {sana}\n"
+                       f"👥 Kishi: {kishi}\n📞 Telefon: {phone_num}\n"
+                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n\n"
+                       f"🟢 QO'NG'IROQ QILING!")
+                await send_lid(context, TRANSFER_CHANNEL, lid)
+
+            context.user_data["booking"] = {}
+            context.user_data["booking_step"] = None
+            context.user_data["booking_type"] = None
+        else:
+            await handle_booking_callbacks(query, context, data, lang, chat_id)
+
+    elif data in ("menu_booking", "book_statsionar", "book_diagnostika") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
@@ -1585,7 +1636,10 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         context.user_data["booking_step"] = None
         context.user_data["booking_type"] = None
 
-    elif btype == "transfer":
+    elif data == "book_confirm_transfer":
+        pass  # placeholder
+
+    # Transfer va excursion confirm — alohida handle qilinadi (unknown handler orqali keladi)
         booking = context.user_data.get("booking", {})
         user = query.from_user
         username = f"@{user.username}" if user.username else "—"
@@ -1960,5 +2014,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
