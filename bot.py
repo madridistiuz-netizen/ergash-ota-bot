@@ -333,9 +333,9 @@ DEFAULT_DATA = {
             "video": "",
         },
         "arrival_step2": {
-            "ru": "❤️ *Шаг 2: Осмотр врача*\n\nвы:📍 Регистратура находится на 2-м этаже приёмного корпуса.\n✔ Проходите ЭКГ\n✔ Проходите осмотр врача\n\nПри необходимости назначаются:\n• МРТ\n• МСКТ\n• Лабораторные анализы\n\n📍 Вы находитесь в приёмном отделении на *2-м этаже*.",
-            "uz": "❤️ *2-bosqich: Shifokor ko'rigi*\n\nSiz: 📍 Registratura qabulxonaning 2-qavatida joylashgan.\n✔ EKG tekshiruvidan o'tasiz\n✔ Shifokor ko'rigidan o'tasiz\n\nZarurat bo'lsa:\n• MRT\n• MSKT\n• Laboratoriya tekshiruvlari tavsiya qilinadi\n\n📍 Siz qabulxonaning *2-qavatida*siz.",
-            "kz": "❤️ *2-кезең: Дәрігер қарауы*\n\nСіз: 📍 Тіркеу бөлімі қабылдау корпусының 2-қабатында орналасқан.\n✔ ЭКГ тексерісінен өтесіз\n✔ Дәрігер қарауынан өтесіз\n\nҚажет болса:\n• МРТ\n• МСКТ\n• Зертхана анализдері\n\n📍 Сіз қабылдау бөлімінің *2-қабатынdasız*.",
+            "ru": "❤️ *Шаг 2: Осмотр врача*\n\nвы:📍  на 2-м этаже приёмного корпуса.\n✅ Проходите ЭКГ\n✅ Проходите осмотр врача\n✅ Заполняете расписку\n\nПри необходимости назначаются:\n• МРТ\n• МСКТ\n• Лабораторные анализы\n\n📍 Вы находитесь в приёмном отделении на *2-м этаже*.",
+            "uz": "❤️ *2-bosqich: Shifokor ko'rigi*\n\nSiz: 📍  qabulxonaning 2-qavatida joylashgan.\n✅ EKG tekshiruvidan o'tasiz\n✅ Shifokor ko'rigidan o'tasiz\n✅ Tilxat to'ldirasiz\n\nZarurat bo'lsa:\n• MRT\n• MSKT\n• Laboratoriya tekshiruvlari tavsiya qilinadi\n\n📍 Siz qabulxonaning *2-qavatida*siz.",
+            "kz": "❤️ *2-кезең: Дәрігер қарауы*\n\nСіз: 📍  қабылдау корпусының 2-қабатында орналасқан.\n✅ ЭКГ тексерісінен өтесіз\n✅ Дәрігер қарауынан өтесіз\n✅ Тілхат толтырасыз\n\nҚажет болса:\n• МРТ\n• МСКТ\n• Зертхана анализдері\n\n📍 Сіз қабылдау бөлімінің *2-қабатынdasız*.",
             "video": "",
         },
         "arrival_step3": {
