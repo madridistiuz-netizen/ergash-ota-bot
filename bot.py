@@ -251,9 +251,6 @@ DEFAULT_DATA = {
     ],
     "other_diagnostics": [
         "УЗИ (ўт-жигар ва бошқалар) — 70 000 сўмдан",
-        "Маммография — 250 000 сўм",
-        "Фиброскан — 220 000 сўм",
-        "Криолиполиз — 56 000 сўм",
     ],
     "lab": [
         "Инсулин — 105 000",
@@ -522,11 +519,11 @@ def rooms_type_keyboard(lang, category):
 def diagnostics_keyboard(lang):
     labels = {
         "ru": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ и другие",  "🔬 Лаборатория", "🍂 Фиброскан", "⬅️ Назад"),
+               "📡 УЗИ", "🔬 Лаборатория", "🩺 Маммография", "🫀 Фиброскан", "⬅️ Назад"),
         "uz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ ва бошқалар",  "🔬 Laboratoriya", "🍂 Fibroscan tekshiruvi", "⬅️ Orqaga"),
+               "📡 УЗИ", "🔬 Laboratoriya", "🩺 Mammografiya", "🫀 Fibroskan", "⬅️ Orqaga"),
         "kz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УДЗ және басқа",  "🔬 Зертхана", "🍂 Фиброскан", "⬅️ Артқа"),
+               "📡 УДЗ", "🔬 Зертхана", "🩺 Маммография", "🫀 Фибросканерлеу", "⬅️ Артқа"),
     }[lang]
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="diag_mrt15"),
@@ -535,7 +532,9 @@ def diagnostics_keyboard(lang):
          InlineKeyboardButton(labels[3], callback_data="diag_mskt128")],
         [InlineKeyboardButton(labels[4], callback_data="diag_other")],
         [InlineKeyboardButton(labels[5], callback_data="diag_lab")],
-        [InlineKeyboardButton(labels[6], callback_data="back_main")],
+        [InlineKeyboardButton(labels[6], callback_data="diag_mammografiya"),
+         InlineKeyboardButton(labels[7], callback_data="diag_fibroskan")],
+        [InlineKeyboardButton(labels[8], callback_data="menu_diagnostics")],
     ])
 
 
@@ -1344,8 +1343,54 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "diag_other":
         lines = "\n".join([f"• {x}" for x in d["other_diagnostics"]])
-        title = {"ru": "📡 *УЗИ и другие:*", "uz": "📡 *УЗИ va boshqalar:*", "kz": "📡 *УДЗ және басқалар:*"}[lang]
+        title = {"ru": "📡 *УЗИ — цены:*", "uz": "📡 *УЗИ — narxlar:*", "kz": "📡 *УДЗ — бағалар:*"}[lang]
         await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+
+    elif data == "diag_mammografiya":
+        text = {
+            "ru": (
+                "🩺 *Маммография*\n\n"
+                "💰 *Цена:* 250 000 сум\n\n"
+                "Рентгенологическое исследование молочных желёз для ранней диагностики."
+            ),
+            "uz": (
+                "🩺 *Mammografiya*\n\n"
+                "💰 *Narx:* 250 000 so'm\n\n"
+                "Ko'krak bezlarini erta aniqlash uchun rentgenologik tekshiruv."
+            ),
+            "kz": (
+                "🩺 *Маммография*\n\n"
+                "💰 *Баға:* 250 000 сум\n\n"
+                "Сүт бездерін ерте анықтауға арналған рентгенологиялық зерттеу."
+            ),
+        }[lang]
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+
+    elif data == "diag_fibroskan":
+        text = {
+            "ru": (
+                "🫀 *Фибросканирование печени*\n\n"
+                "💰 *Цена:* 220 000 сум\n\n"
+                "Безболезненное исследование состояния печени без биопсии.\n\n"
+                "⏱ Длительность: 15–20 минут\n"
+                "📋 Подготовка: натощак (4–6 часов)"
+            ),
+            "uz": (
+                "🫀 *Jigar fibroskan tekshiruvi*\n\n"
+                "💰 *Narx:* 220 000 so'm\n\n"
+                "Biopsiysiz jigar holatini og'riqsiz tekshirish.\n\n"
+                "⏱ Davomiyligi: 15–20 daqiqa\n"
+                "📋 Tayyorgarlik: och qorin (4–6 soat)"
+            ),
+            "kz": (
+                "🫀 *Бауырды фибросканерлеу*\n\n"
+                "💰 *Баға:* 220 000 сум\n\n"
+                "Биопсиясыз бауыр жағдайын ауырусыз тексеру.\n\n"
+                "⏱ Ұзақтығы: 15–20 минут\n"
+                "📋 Дайындық: аш қарын (4–6 сағат)"
+            ),
+        }[lang]
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
 
     elif data == "diag_lab":
         lines = "\n".join([f"• {x}" for x in d["lab"]])
