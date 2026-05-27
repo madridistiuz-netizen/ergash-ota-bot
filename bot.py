@@ -96,6 +96,7 @@ DEFAULT_DATA = {
     "cert_photos": [],
     "ward_photos": [],
     "clinic_photos": [],
+    "team_photos": [],
     "korpuslar": [
         {
             "id": "m_yangi",
@@ -1061,8 +1062,48 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── Jamoa ──
     elif data == "menu_staff":
         staff = d.get("staff", [])
-        title = {"ru": "👥 *Наша команда:*", "uz": "👥 *Jamoamiz:*", "kz": "👥 *Біздің команда:*"}[lang]
-        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        intro = {
+            "ru": (
+                "👨‍⚕️ *Наша команда*\n\n"
+                "В частном медицинском центре «Эргаш ота» работают опытные врачи, медсёстры и специалисты.\n\n"
+                "Главная цель нашей команды — индивидуальный подход, качественное обслуживание и искренняя забота о каждом пациенте.\n\n"
+                "🏥 *В нашей клинике работают:*\n"
+                "✔ Опытные врачи\n"
+                "✔ Квалифицированные медсёстры\n"
+                "✔ Специалисты диагностики\n"
+                "✔ Сотрудники физиотерапии и реабилитации\n\n"
+                "💙 Здоровье, комфорт и доверие пациентов — наша главная ценность."
+            ),
+            "uz": (
+                "👨‍⚕️ *Bizning jamoamiz*\n\n"
+                "\"Ergash ota\" xususiy tibbiyot markazida tajribali shifokorlar, hamshiralar va mutaxassislar faoliyat olib boradi.\n\n"
+                "Bizning jamoamizning asosiy maqsadi — har bir bemorga individual yondashuv, sifatli xizmat va samimiy e'tibor ko'rsatishdir.\n\n"
+                "🏥 *Klinikamizda:*\n"
+                "✔ Tajribali shifokorlar\n"
+                "✔ Malakali hamshiralar\n"
+                "✔ Diagnostika mutaxassislari\n"
+                "✔ Fizioterapiya va reabilitatsiya xodimlari\n\n"
+                "faoliyat yuritadi.\n\n"
+                "💙 Biz bemorlarning sog'lig'i, qulayligi va ishonchini eng muhim qadriyat deb bilamiz."
+            ),
+            "kz": (
+                "👨‍⚕️ *Біздің команда*\n\n"
+                "«Эргаш ота» жеке медициналық орталығында тәжірибелі дәрігерлер, медбикелер және мамандар жұмыс істейді.\n\n"
+                "Командамыздың басты мақсаты — әр науқасқа жеке көзқарас, сапалы қызмет және шынайы қамқорлық.\n\n"
+                "🏥 *Клиникамызда жұмыс істейді:*\n"
+                "✔ Тәжірибелі дәрігерлер\n"
+                "✔ Білікті медбикелер\n"
+                "✔ Диагностика мамандары\n"
+                "✔ Физиотерапия және реабилитация қызметкерлері\n\n"
+                "💙 Науқастардың денсаулығы, жайлылығы және сенімі — біздің басты құндылығымыз."
+            ),
+        }[lang]
+        await query.edit_message_text(intro, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        # Jamoaning rasmlari (admin orqali yuklangan)
+        team_photos = d.get("team_photos", [])
+        if team_photos:
+            await send_photos(context, chat_id, team_photos)
+        # Alohida a'zolar (eski tizim)
         for member in staff:
             text = f"👨‍⚕️ *{member['name']}*\n{member['role']}"
             if member.get("photo_id"):
@@ -1628,6 +1669,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if waiting == "clinic":
         d["clinic_photos"].append(file_id)
         await update.message.reply_text(f"✅ Klinika rasmi qo'shildi! Jami: {len(d['clinic_photos'])} ta")
+    elif waiting == "team":
+        d.setdefault("team_photos", []).append(file_id)
+        await update.message.reply_text(f"✅ Jamoa rasmi qo'shildi! Jami: {len(d['team_photos'])} ta")
     elif waiting == "ward":
         d["ward_photos"].append(file_id)
         await update.message.reply_text(f"✅ Palata rasmi qo'shildi! Jami: {len(d['ward_photos'])} ta")
