@@ -1641,7 +1641,7 @@ FAQ_DATA = {
 }
 
 # ─── BOOKING SERVICES ─────────────────────────────────────────────────────────
-   DIAG_SERVICES = {
+DIAG_SERVICES = {
     "ru": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УЗИ", "🩺 Маммография", "🔬 Лаборатория", "🫀 Фибросканирование"],
     "uz": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УЗИ", "🩺 Mammografiya", "🔬 Laboratoriya", "🫀 Fibroskan"],
     "kz": ["🧲 МРТ 3Т", "🧲 МРТ 1.5Т", "🖥 МСКТ 256", "🖥 МСКТ 128", "📡 УДЗ", "🩺 Маммография", "🔬 Зертхана", "🫀 Фибросканерлеу"],
@@ -1718,7 +1718,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=booking_type_keyboard(lang))
-elif data == "fibroskan_book":
+    elif data == "fibroskan_book":
         context.user_data["booking"] = {}
         context.user_data["booking_type"] = "diagnostika"
         context.user_data["booking_step"] = "name"
@@ -2277,4 +2277,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
