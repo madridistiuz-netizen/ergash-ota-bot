@@ -1753,7 +1753,13 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
             "uz": f"✅ Xizmat: *{service}*\n\n📝 1/3 qadam\n*Ism va Familiyangizni* yozing:",
             "kz": f"✅ Қызмет: *{service}*\n\n📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:",
         }[lang]
-        await query.edit_message_text(ask, parse_mode="Markdown")
+        back_kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+                callback_data="book_diagnostika"
+            )]
+        ])
+        await query.edit_message_text(ask, parse_mode="Markdown", reply_markup=back_kb)
 
     elif data == "book_confirm":
         booking = context.user_data.get("booking", {})
