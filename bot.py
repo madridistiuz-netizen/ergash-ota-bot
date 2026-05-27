@@ -35,9 +35,9 @@ DEFAULT_DATA = {
         "name_ru": "Бердикул Эргашев Журакулович",
         "name_uz": "Berdiqul Ergashev Jo'raqulovich",
         "name_kz": "Бердіқұл Ерғашев Жўрақұлович",
-        "title_ru": "Главный врач  \nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран Академик",
-        "title_uz": "Bosh shifokor  \nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi Akademik",
-        "title_kz": "Бас дәрігер  \nЖоғары санатты дәрігер\nКуратты профессор Академик",
+        "title_ru": "Главный врач — Академик\nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран",
+        "title_uz": "Bosh shifokor — Akademik\nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi",
+        "title_kz": "Бас дәрігер — Академик\nЖоғары санатты дәрігер\nКуратты профессор",
         "photo_id": "",
     },
     "staff": [
@@ -856,6 +856,127 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await context.bot.send_video(chat_id=chat_id, video=vid)
                 except Exception:
                     pass
+
+        elif section == "malham":
+            # Malham bo'limi — 3 ta sahifa
+            next_label = {"ru": "➡️ Далее", "uz": "➡️ Keyingi", "kz": "➡️ Келесі"}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            text = {
+                "ru": (
+                    "🌙 *2️⃣ Первый день лечения*\n\n"
+                    "📖 Раздел 1 из 3\n\n"
+                    "1️⃣ *Вы заселились в палату*\n"
+                    "✔ Медсёстры размещают вас в палате\n"
+                    "✔ Объясняют распорядок лечения\n"
+                    "✔ Сообщают время процедур\n\n"
+                    "2️⃣ *Очищение организма*\n"
+                    "✔ Примерно через 1,5–2 часа проводится клизма\n"
+                    "✔ Рекомендуется пить яблочный сок\n"
+                    "✔ Принимаются травяные чаи"
+                ),
+                "uz": (
+                    "🌙 *2️⃣ Birinchi kun muolaja tartibi*\n\n"
+                    "📖 1-qism / 3 dan\n\n"
+                    "1️⃣ *Siz Xonaga joylashdingiz*\n"
+                    "✔ Hamshiralar sizni xonaga joylashtiradi\n"
+                    "✔ Davolanish tartibi tushuntiriladi\n"
+                    "✔ Muolajalar vaqti haqida ma'lumot beriladi\n\n"
+                    "2️⃣ *Organizimni tozalash jarayoni*\n"
+                    "✔ Taxminan 1,5 – 2 soatdan keyin klizma muolajasi qilinadi\n"
+                    "✔ Olma sharbatini ichish tavsiya etiladi\n"
+                    "✔ Giyohli choylar qabul qilinadi"
+                ),
+                "kz": (
+                    "🌙 *2️⃣ Бірінші күн ем тәртібі*\n\n"
+                    "📖 1-бөлім / 3-тен\n\n"
+                    "1️⃣ *Сіз палатаға орналастыңыз*\n"
+                    "✔ Медбикелер сізді палатаға орналастырады\n"
+                    "✔ Емдеу тәртібі түсіндіріледі\n"
+                    "✔ Процедуралар уақыты туралы хабарланады\n\n"
+                    "2️⃣ *Ағзаны тазарту процесі*\n"
+                    "✔ Шамамен 1,5–2 сағаттан кейін клизма жасалады\n"
+                    "✔ Алма шырынын ішу ұсынылады\n"
+                    "✔ Шөптен жасалған шайлар қабылданады"
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_malham_step2")],
+                [InlineKeyboardButton(back_label, callback_data="menu_guide")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+        elif section == "malham_step2":
+            next_label = {"ru": "➡️ Далее", "uz": "➡️ Keyingi", "kz": "➡️ Келесі"}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            text = {
+                "ru": (
+                    "🌙 *2️⃣ Первый день лечения*\n\n"
+                    "📖 Раздел 2 из 3\n\n"
+                    "3️⃣ *Подготовка к завтрашнему лечению*\n"
+                    "🌿 Ваша процедура первого дня:\n"
+                    "• Очищение организма\n"
+                    "• Подготовка к приёму мальхама\n\n"
+                    "📍 Это делается для того, чтобы организм был готов к лечению.\n\n"
+                    "📍 Со следующего дня начинается основное лечение и приём Мальхама."
+                ),
+                "uz": (
+                    "🌙 *2️⃣ Birinchi kun muolaja tartibi*\n\n"
+                    "📖 2-qism / 3 dan\n\n"
+                    "3️⃣ *Ertangi davolanishga tayyorlash*\n"
+                    "🌿 Sizning birinchi kun muolajangiz:\n"
+                    "• organizmni tozalash\n"
+                    "• malham ichishga tayyorlash\n\n"
+                    "uchun amalga oshiriladi.\n\n"
+                    "📍 Ertangi kundan boshlab asosiy davolanish va Malham qabul qilish jarayoni boshlanadi."
+                ),
+                "kz": (
+                    "🌙 *2️⃣ Бірінші күн ем тәртібі*\n\n"
+                    "📖 2-бөлім / 3-тен\n\n"
+                    "3️⃣ *Ертеңгі емге дайындық*\n"
+                    "🌿 Бірінші күнгі процедураңыз:\n"
+                    "• ағзаны тазарту\n"
+                    "• мальхам қабылдауға дайындық\n\n"
+                    "үшін жасалады.\n\n"
+                    "📍 Келесі күннен бастап негізгі емдеу және Мальхам қабылдау басталады."
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_malham_step3")],
+                [InlineKeyboardButton(back_label, callback_data="guide_malham")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+        elif section == "malham_step3":
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            guide_label = {"ru": "📖 К руководству", "uz": "📖 Qo'llanmaga", "kz": "📖 Нұсқаулыққа"}[lang]
+            text = {
+                "ru": (
+                    "🌙 *2️⃣ Первый день лечения*\n\n"
+                    "📖 Раздел 3 из 3\n\n"
+                    "⚠️ *Важно:*\n\n"
+                    "*Главная цель процедуры первого дня — подготовить организм к Мальхаму.*\n\n"
+                    "Это означает, что первый день полностью посвящён очищению и подготовке тела к основному лечению."
+                ),
+                "uz": (
+                    "🌙 *2️⃣ Birinchi kun muolaja tartibi*\n\n"
+                    "📖 3-qism / 3 dan\n\n"
+                    "⚠️ *Muhim:*\n\n"
+                    "*Birinchi kun muolajasining asosiy mohiyati — organizmni Malxamga tayyorlash hisoblanadi.*\n\n"
+                    "Ya'ni, birinchi kun to'liq tozalanish va asosiy davolanishga tayyorlashga bag'ishlanadi."
+                ),
+                "kz": (
+                    "🌙 *2️⃣ Бірінші күн ем тәртібі*\n\n"
+                    "📖 3-бөлім / 3-тен\n\n"
+                    "⚠️ *Маңызды:*\n\n"
+                    "*Бірінші күнгі процедураның негізгі мәні — ағзаны Мальхамға дайындау болып табылады.*\n\n"
+                    "Яғни, бірінші күн толығымен тазарту және негізгі емге дайындалуға арналған."
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(guide_label, callback_data="menu_guide")],
+                [InlineKeyboardButton(back_label, callback_data="guide_malham_step2")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
         else:
             # Boshqa bo'limlar
