@@ -786,7 +786,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await handle_booking_callbacks(query, context, data, lang, chat_id)
 
-    elif data in ("menu_booking", "book_statsionar", "book_diagnostika", "fibroskan_menu", "fibroskan_book") or \
+    elif data in ("menu_booking", "book_statsionar", "book_diagnostika") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
@@ -1718,28 +1718,6 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=booking_type_keyboard(lang))
-    elif data == "fibroskan_book":
-        context.user_data["booking"] = {}
-        context.user_data["booking_type"] = "diagnostika"
-        context.user_data["booking_step"] = "name"
-        context.user_data.setdefault("booking", {})["service"] = {
-            "ru": "🫀 Фибросканирование",
-            "uz": "🫀 Fibroskan",
-            "kz": "🫀 Фибросканерлеу",
-        }[lang]
-        ask = {
-            "ru": "🫀 *Запись на фибросканирование*\n\n📝 Шаг 1/3\nНапишите ваше *Имя и Фамилию*:",
-            "uz": "🫀 *Fibroskan uchun yozilish*\n\n📝 1/3 qadam\n*Ism va Familiyangizni* yozing:",
-            "kz": "🫀 *Фибросканерлеуге жазылу*\n\n📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:",
-        }[lang]
-        back_kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(
-                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
-                callback_data="book_diagnostika"
-            )]
-        ])
-        await query.edit_message_text(ask, parse_mode="Markdown", reply_markup=back_kb)
-    
     elif data == "book_statsionar":
         context.user_data["booking"] = {}
         context.user_data["booking_type"] = "statsionar"
@@ -1767,65 +1745,52 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         services = DIAG_SERVICES.get(lang, DIAG_SERVICES["ru"])
         service = services[idx]
 
-        # Fibroskan tugmasi bosilsa — narx sahifasi chiqadi
         fibroskan_names = ["🫀 Фибросканирование", "🫀 Fibroskan", "🫀 Фибросканерлеу"]
         if service in fibroskan_names:
-            text = {
+            # Fibroskan: narx ma'lumoti + to'g'ridan-to'g'ri ism yozishga o'tish
+            context.user_data.setdefault("booking", {})["service"] = service
+            context.user_data["booking_type"] = "diagnostika"
+            context.user_data["booking_step"] = "name"
+            ask = {
                 "ru": (
                     "🫀 *Фибросканирование печени*\n\n"
-                    "Безболезненное и точное исследование состояния печени.\n\n"
                     "💰 *Цены:*\n"
                     "• Стандарт: 150 000 сум\n"
                     "• С консультацией врача: 200 000 сум\n\n"
                     "⏱ Длительность: 15–20 минут\n"
                     "📋 Подготовка: натощак (4–6 часов)\n\n"
-                    "Хотите записаться?"
+                    "📝 Шаг 1/3\nНапишите ваше *Имя и Фамилию*:"
                 ),
                 "uz": (
                     "🫀 *Jigar fibroskan tekshiruvi*\n\n"
-                    "Og'riqsiz va aniq jigar holati tekshiruvi.\n\n"
                     "💰 *Narxlar:*\n"
                     "• Standart: 150 000 so'm\n"
                     "• Shifokor maslahati bilan: 200 000 so'm\n\n"
                     "⏱ Davomiyligi: 15–20 daqiqa\n"
                     "📋 Tayyorgarlik: och qorin (4–6 soat)\n\n"
-                    "Yozilishni xohlaysizmi?"
+                    "📝 1/3 qadam\n*Ism va Familiyangizni* yozing:"
                 ),
                 "kz": (
                     "🫀 *Бауырды фибросканерлеу*\n\n"
-                    "Ауырусыз және дәл бауыр жағдайын тексеру.\n\n"
                     "💰 *Бағалар:*\n"
                     "• Стандарт: 150 000 сум\n"
                     "• Дәрігер кеңесімен: 200 000 сум\n\n"
                     "⏱ Ұзақтығы: 15–20 минут\n"
                     "📋 Дайындық: аш қарын (4–6 сағат)\n\n"
-                    "Жазылғыңыз келе ме?"
+                    "📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:"
                 ),
             }[lang]
-            book_label = {"ru": "📝 Записаться", "uz": "📝 Yozilish", "kz": "📝 Жазылу"}[lang]
-            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-            kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton(book_label, callback_data="fibroskan_book")],
-                [InlineKeyboardButton(back_label, callback_data="book_diagnostika")],
-            ])
-            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
-            return
+        else:
+            # Boshqa xizmatlar
+            context.user_data.setdefault("booking", {})["service"] = service
+            context.user_data["booking_type"] = "diagnostika"
+            context.user_data["booking_step"] = "name"
+            ask = {
+                "ru": f"✅ Услуга: *{service}*\n\n📝 Шаг 1/3\nНапишите ваше *Имя и Фамилию*:",
+                "uz": f"✅ Xizmat: *{service}*\n\n📝 1/3 qadam\n*Ism va Familiyangizni* yozing:",
+                "kz": f"✅ Қызмет: *{service}*\n\n📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:",
+            }[lang]
 
-        # Boshqa xizmatlar uchun — ism yozish bosqichi
-        context.user_data.setdefault("booking", {})["service"] = service
-        context.user_data["booking_step"] = "name"
-        ask = {
-            "ru": f"✅ Услуга: *{service}*\n\n📝 Шаг 1/3\nНапишите ваше *Имя и Фамилию*:",
-            "uz": f"✅ Xizmat: *{service}*\n\n📝 1/3 qadam\n*Ism va Familiyangizni* yozing:",
-            "kz": f"✅ Қызмет: *{service}*\n\n📝 1/3 қадам\n*Аты-жөніңізді* жазыңыз:",
-        }[lang]
-        back_kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(
-                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
-                callback_data="book_diagnostika"
-            )]
-        ])
-        await query.edit_message_text(ask, parse_mode="Markdown", reply_markup=back_kb)
         back_kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(
                 {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
