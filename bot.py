@@ -16,7 +16,7 @@ OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
 STATSIONAR_CHANNEL = int(os.getenv("STATSIONAR_CHANNEL", "-1003991204638"))
 DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
-DATA_FILE = "data.json"
+DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
 
 DEFAULT_DATA = {
     "contacts": {
@@ -35,9 +35,9 @@ DEFAULT_DATA = {
         "name_ru": "Бердикул Эргашев Журакулович",
         "name_uz": "Berdiqul Ergashev Jo'raqulovich",
         "name_kz": "Бердіқұл Ерғашев Жўрақұлович",
-        "title_ru": "Главный врач  \nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран Академик",
-        "title_uz": "Bosh shifokor  \nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi Akademik",
-        "title_kz": "Бас дәрігер \nЖоғары санатты дәрігер\nКуратты профессор Академик",
+        "title_ru": "Главный врач — Академик\nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран",
+        "title_uz": "Bosh shifokor — Akademik\nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi",
+        "title_kz": "Бас дәрігер — Академик\nЖоғары санатты дәрігер\nКуратты профессор",
         "photo_id": "",
     },
     "staff": [
