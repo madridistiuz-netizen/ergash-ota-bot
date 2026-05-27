@@ -35,9 +35,9 @@ DEFAULT_DATA = {
         "name_ru": "Бердикул Эргашев Журакулович",
         "name_uz": "Berdiqul Ergashev Jo'raqulovich",
         "name_kz": "Бердіқұл Ерғашев Жўрақұлович",
-        "title_ru": "Главный врач — Академик\nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран",
-        "title_uz": "Bosh shifokor — Akademik\nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi",
-        "title_kz": "Бас дәрігер — Академик\nЖоғары санатты дәрігер\nКуратты профессор",
+        "title_ru": "Главный врач  \nВрач высшей категории\nПочётный профессор\nДействительный член академии наук Туран Академик",
+        "title_uz": "Bosh shifokor  \nOliy toifali shifokor\nFaxriy professor\nTuron fanlari akademiyasining haqiqiy a'zosi Akademik",
+        "title_kz": "Бас дәрігер  \nЖоғары санатты дәрігер\nКуратты профессор Академик",
         "photo_id": "",
     },
     "staff": [
