@@ -565,7 +565,7 @@ def guide_keyboard(lang):
             "3️⃣ Protseduralar va kun",
             "4️⃣ Infrastruktura",
             "5️⃣ Qoidalar",
-            "6️⃣ Uyga nima olish",
+            "6️⃣ Uyga tafsiyaoma",
             "⬅️ Orqaga",
         ),
         "kz": (
@@ -574,7 +574,7 @@ def guide_keyboard(lang):
             "3️⃣ Процедуралар және күн",
             "4️⃣ Инфрақұрылым",
             "5️⃣ Ережелер",
-            "6️⃣ Үйге не алу керек",
+            "6️⃣ Үйге ұсыным",
             "⬅️ Артқа",
         ),
     }[lang]
@@ -962,6 +962,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ])
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
+        elif section == "shopping":
+            text = {
+                "ru": "🏠 *Рекомендации на дом*\n\nВыберите раздел:",
+                "uz": "🏠 *Uyga tafsiyaoma*\n\nBo'limni tanlang:",
+                "kz": "🏠 *Үйге ұсыным*\n\nБөлімді таңдаңыз:",
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton("ℹ️ Muhim qoidalar", callback_data="info_qoidalar")],
+                [InlineKeyboardButton("🚫 Nimalar mumkin emas?", callback_data="info_taqiq")],
+                [InlineKeyboardButton("🍲 Taomnoma", callback_data="menu_taomnoma")],
+                [InlineKeyboardButton("🌿 Surgi giyohi", callback_data="info_giyoh")],
+                [InlineKeyboardButton(back_label, callback_data="menu_guide")],
+            ])
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
         else:
             # Boshqa bo'limlar
             section_data = guide_data_all.get(section, {})
@@ -980,6 +996,114 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await context.bot.send_video(chat_id=chat_id, video=vid)
                 except Exception:
                     pass
+
+    # ── Uyga tafsiyaoma — quyi bo'limlar ──
+    elif data == "info_qoidalar":
+        text = (
+            "🏥 *'Ergash ota' tibbiyot markazining shifokor tavsiyalari*\n\n"
+            "Hurmatli bemor! Markazimizda davolanish kursini yakunlaganingiz bilan tabriklaymiz. "
+            "Sog'ligingizni tiklash va natijani mustahkamlash uchun uy sharoitida 14 kundan 24 kungacha "
+            "qat'iy parhez saqlashingiz zarur.\n\n"
+            "⚠️ *Eng muhim qoidalar:*\n"
+            "• Dastlabki 3 kun davomida umuman non iste'mol qilmang!\n"
+            "• Jismoniy og'ir ishlar qilish va og'ir yuk ko'tarish mumkin emas."
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "info_taqiq":
+        text = (
+            "🚫 *Parhez davomida eyish va qilish mutlaqo taqiqlangan narsalar:*\n\n"
+            "• Yog'li va xamirli taomlar\n"
+            "• Sho'r, achchiq va o'tkir ziravorli ovqatlar\n"
+            "• Dudlangan (kopchyoniy) mahsulotlar\n"
+            "• Dukkaklilar: No'xat va moshli taomlar\n"
+            "• Spirtli ichimliklar\n"
+            "• Tamaki mahsulotlari (sigaret, nos va h.k.)"
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "info_giyoh":
+        text = (
+            "🌿 *Surgi giyohini ichish va tayyorlash yo'riqnomasi*\n\n"
+            "Uyingizga berilgan surgi giyohi (ich suruvchi o't) ichaklarni tozalash va hazm tizimini "
+            "yaxshilash uchun juda muhimdir.\n\n"
+            "☕️ *Tayyorlash usuli (Damlash):*\n"
+            "Surgi giyohi xuddi oddiy choy kabi damlanadi:\n"
+            "1. Idishga yoki choynakka belgilangan miqdordagi giyohni 10–15 daqiqa davomida damlab qo'yasiz.\n\n"
+            "🕒 *Ichish vaqti:* Giyohni faqat ovqatlangandan keyin (to'q qoringa) iliq holatda choy o'rnida ichish kerak.\n\n"
+            "❓ *Nima sodir bo'ladi?:*\n"
+            "• Ich kelishi suriladi (toksin va shlaklar tozalanadi).\n"
+            "• Qorin dam bo'lishi yoki engil sanchiq bo'lishi tabiiy hol, xavotir olmang.\n"
+            "• Suv balansi uchun ruxsat etilgan sharbatlardan ichib turing."
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "menu_taomnoma":
+        text = "🍲 *Taomnoma*\n\nQuyidagilardan birini tanlang:"
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("☀️ Nonushta", callback_data="sub_nonushta")],
+            [InlineKeyboardButton("🌤 Tushlik", callback_data="sub_tushlik")],
+            [InlineKeyboardButton("🌙 Kechki ovqat", callback_data="sub_kechki")],
+            [InlineKeyboardButton("🧃 Sharbatlar", callback_data="sub_sharbat")],
+            [InlineKeyboardButton(back_label, callback_data="guide_shopping")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "sub_nonushta":
+        text = (
+            "☀️ *Nonushta*\n\n"
+            "• Engil qatiqli taomlar yoki suyuq qatiq\n"
+            "• Toza tabiiy asal (1-2 choy qoshiq)\n"
+            "• Dastlabki 3 kunda nonsiz, keyin ozroq qora non bilan"
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "sub_tushlik":
+        text = (
+            "🌤 *Tushlik*\n\n"
+            "Issiq va engil hazm bo'luvchi suyuq sho'rvalar (go'shtlari yog'siz bo'lsin):\n"
+            "• Chopma sho'rva\n"
+            "• Qaynatma sho'rva\n"
+            "• Tovuq sho'rva\n"
+            "• Baliqli sho'rva\n"
+            "• Karam sho'rva"
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "sub_kechki":
+        text = (
+            "🌙 *Kechki ovqat*\n\n"
+            "Tushlikdan qolgan engil sho'rvalar yoki qatiqli taomlar "
+            "(uxlashdan 3-4 soat oldin)."
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "sub_sharbat":
+        text = (
+            "🧃 *Sharbatlar*\n\n"
+            "Kuniga 250-400 grammgacha yangi chiqarilgan:\n"
+            "• Olma suvi\n"
+            "• Sabzi suvi\n"
+            "• Bodring suvi\n"
+            "• Tarvuz suvi\n"
+            "• O'rik suvi"
+        )
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Klinika haqida — submenu ──
     elif data == "menu_clinic":
