@@ -1954,7 +1954,17 @@ FAQ_DATA = {
             "💡 *Bizning shifo falsafamiz:*\n"
             "'Ergash ota' markazi shunchaki kasallik belgilarini (simptomlarini) vaqtinchalik bostirmaydi. Bizning asosiy maqsadimiz — *kasallikning kelib chiqish sabablarini aniqlash va uni tub ildizi bilan bartaraf etishdir!*"
         )),
-        ("💰 Narx qanday shakllanadi?", "Narx — 1 kun/1 kishi uchun. Ichiga kiradi: turar joy, davolash, fizioterapiya, УЗИ, tahlillar, МРТ 1.5Т yoki МСКТ (1 organ)."),
+        ("💰 Narx qanday shakllanadi?", (
+            "💰 *Narxlar qanday shakllanadi?*\n\n"
+            "Tibbiyot markazimizda narxlar va xizmatlar quyidagi tartibda hisoblanadi:\n\n"
+            "• 🛏 *Xona to'lovi ichida:* Siz tanlagan xona narxiga *yotoq joy va asosiy davolanish muolajalari* kiritilgan.\n"
+            "• 🧬 *Xona turiga qarab muolajalar:* bepul qo'shimcha muolajalar to'lov ichiga kiritilgan bo'ladi.\n"
+            "• 👤 *Me'yor:* Narxlar *bir kunga va bir kishi uchun* ko'rsatilgan. Sizga maqul bo'lgan xona to'lovini davolanish kuniga ko'paytirsangiz umumiy to'lov kelib chiqadi.\n\n"
+            "⚠️ *Kun va tun hisoblash tartibi:*\n"
+            "• Agar *10 kunlik* to'lov qilsangiz, bu *9 kecha va 10 kunni* tashkil qiladi.\n"
+            "• Oxirgi kuni bemor markazda tunab qolmaydi (*nochivat qilmaydi*) va xonani soat *17:00 gacha* bo'shatib berishi kerak bo'ladi.\n\n"
+            "Kelish va ketish vaqtingizni hamda xona turini tanlashda ushbu qoidalarga e'tibor berishingizni so'raymiz."
+        )),
         ("🧲 МРТ ga qanday tayyorlanish kerak?", "Maxsus tayyorgarlik kerak emas. Metall buyumlarni yechib qo'ying. Kontrastli МРТ da — 4–6 soat oldin ovqat emas."),
         ("💊 Operatsiyasiz davolanish bormi?", "Ha. Klinika *konservativ davolash* ga ixtisoslashgan — operatsiyasiz, tabiiy usullar va fizioterapiya bilan."),
         ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli korpuslarda joylashadi."),
