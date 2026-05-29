@@ -1927,7 +1927,15 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 FAQ_DATA = {
     "ru": [
-        ("⏱ Сколько дней нужно лечиться?", "Минимальный курс — *10 дней*. Оптимальный — *21 день*. Длительность определяет врач после осмотра."),
+        ("📅 Срок лечения?", (
+            "📅 *Сколько дней нужно лечиться?*\n\n"
+            "Уважаемый пациент! Срок лечения в нашем центре определяется *индивидуально* лечащим врачом в зависимости от состояния каждого организма:\n\n"
+            "• 🩺 *Курсы лечения:* В зависимости от степени заболевания — *18, 21 или 24 дня*.\n"
+            "• 🛡 *Профилактика:* Для предотвращения болезни рекомендуется минимум *12–14 дней*.\n"
+            "• ⚠️ *Минимальный срок:* Для ощутимого результата важно, чтобы лечение составляло *не менее 10 дней*.\n\n"
+            "💡 *Наша философия исцеления:*\n"
+            "Центр «Эргаш ота» не просто временно подавляет симптомы болезни. Наша главная цель — *выявить причины болезни и устранить их с корнем!*"
+        )),
         ("💰 Как формируется цена?", "Цена — за 1 день/1 человека. Включает: проживание, лечение, физиотерапию, УЗИ, анализы, МРТ 1.5Т или МСКТ (1 орган)."),
         ("🧲 Как подготовиться к МРТ?", "Специальная подготовка не требуется. Снимите металлические предметы. При МРТ с контрастом — не есть 4–6 часов до процедуры."),
         ("💊 Лечение без операции?", "Да. Клиника специализируется на *консервативном лечении* — без операций, с использованием натуральных методов и физиотерапии."),
@@ -1937,7 +1945,15 @@ FAQ_DATA = {
         ("🕐 Режим работы?", "Пн–Сб: 08:00–18:00. Воскресенье: приём новых пациентов."),
     ],
     "uz": [
-        ("⏱ Necha kun davolanish kerak?", "Minimal kurs — *10 kun*. Optimal — *21 kun*. Muddatni shifokor ko'rikdan keyin belgilaydi."),
+        ("📅 Davolanish muddati?", (
+            "📅 *Davolanish muddati necha kun?*\n\n"
+            "Hurmatli bemor! Markazimizda davolanish muddati har bir organizmning holatiga qarab, shifokor tomonidan *individual* belgilanadi:\n\n"
+            "• 🩺 *Davolash kurslari:* Kasallik darajasiga qarab *18, 21 yoki 24 kun* davom etadi.\n"
+            "• 🛡 *Profilaktika:* Kasallikning oldini olish uchun kamida *12–14 kun* tavsiya etiladi.\n"
+            "• ⚠️ *Eng kam muddat:* Natija sezilishi uchun davolanish *10 kundan kam bo'lmasligi* muhim.\n\n"
+            "💡 *Bizning shifo falsafamiz:*\n"
+            "'Ergash ota' markazi shunchaki kasallik belgilarini (simptomlarini) vaqtinchalik bostirmaydi. Bizning asosiy maqsadimiz — *kasallikning kelib chiqish sabablarini aniqlash va uni tub ildizi bilan bartaraf etishdir!*"
+        )),
         ("💰 Narx qanday shakllanadi?", "Narx — 1 kun/1 kishi uchun. Ichiga kiradi: turar joy, davolash, fizioterapiya, УЗИ, tahlillar, МРТ 1.5Т yoki МСКТ (1 organ)."),
         ("🧲 МРТ ga qanday tayyorlanish kerak?", "Maxsus tayyorgarlik kerak emas. Metall buyumlarni yechib qo'ying. Kontrastli МРТ da — 4–6 soat oldin ovqat emas."),
         ("💊 Operatsiyasiz davolanish bormi?", "Ha. Klinika *konservativ davolash* ga ixtisoslashgan — operatsiyasiz, tabiiy usullar va fizioterapiya bilan."),
@@ -1947,7 +1963,15 @@ FAQ_DATA = {
         ("🕐 Ish vaqti?", "Du–Shan: 08:00–18:00. Yakshanba: yangi bemorlar qabuli."),
     ],
     "kz": [
-        ("⏱ Қанша күн емделу керек?", "Минималды курс — *10 күн*. Оптималды — *21 күн*. Мерзімді дәрігер қарағаннан кейін белгілейді."),
+        ("📅 Емдеу мерзімі?", (
+            "📅 *Емдеу неше күн?*\n\n"
+            "Құрметті науқас! Орталығымызда емдеу мерзімі әр ағзаның жағдайына байланысты дәрігер тарапынан *жеке* белгіленеді:\n\n"
+            "• 🩺 *Емдеу курстары:* Ауру деңгейіне байланысты *18, 21 немесе 24 күн* созылады.\n"
+            "• 🛡 *Профилактика:* Ауруды болдырмау үшін кемінде *12–14 күн* ұсынылады.\n"
+            "• ⚠️ *Ең аз мерзім:* Нәтиже сезілуі үшін емдеу *10 күннен кем болмауы* маңызды.\n\n"
+            "💡 *Біздің емдеу философиямыз:*\n"
+            "«Эргаш ота» орталығы тек ауру белгілерін уақытша басумен шектелмейді. Біздің басты мақсатымыз — *ауру себептерін анықтап, оны түбірімен жою!*"
+        )),
         ("💰 Баға қалай қалыптасады?", "Баға — 1 күн/1 адам үшін. Кіреді: тұру, емдеу, физиотерапия, УДЗ, анализдер, МРТ 1.5Т немесе МСКТ."),
         ("🧲 МРТ-ге қалай дайындалу керек?", "Арнайы дайындық қажет емес. Металл заттарды шешіңіз."),
         ("💊 Операциясыз емдеу бар ма?", "Иә. Клиника *консервативті емдеуге* маманданған — операциясыз, табиғи әдістермен."),
