@@ -388,6 +388,18 @@ def load_data():
             if key not in saved:
                 saved[key] = val
                 updated = True
+        # korpuslar ichidagi xonalarga yangi maydonlarni qo'shish
+        default_korpuslar = DEFAULT_DATA.get("korpuslar", [])
+        saved_korpuslar = saved.get("korpuslar", [])
+        for dk in default_korpuslar:
+            for sk in saved_korpuslar:
+                if sk.get("id") == dk.get("id"):
+                    for di, dxona in enumerate(dk.get("xonalar", [])):
+                        if di < len(sk.get("xonalar", [])):
+                            for field, value in dxona.items():
+                                if field not in sk["xonalar"][di]:
+                                    sk["xonalar"][di][field] = value
+                                    updated = True
         if updated:
             save_data(saved)
         return saved
