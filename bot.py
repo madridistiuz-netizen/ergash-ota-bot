@@ -122,7 +122,7 @@ DEFAULT_DATA = {
             "emoji": "🏠",
             "photos": [],
             "xonalar": [
-                {"nom": "Umumiy", "kishi": "10", "uz_adult": "185 000", "uz_child": "172 000", "foreign_adult": "308 000", "foreign_child": "293 000", "photos": []},
+                {"nom": "Umumiy", "kishi": "10", "uz_adult": "185 000", "uz_child": "172 000", "foreign_adult": "308 000", "foreign_child": "293 000", "photos": [], "description_uz": "🛏 *Umumiy (Obshiy) xona sharoitlari*\n\n• 🏢 *Korpus:* Asosiy korpus\n• 👥 *Sig'imi:* 10 kishi uchun mo'ljallangan\n\n⚙️ *Xonada mavjud qulayliklar:*\n✅ 10 ta alohida qulay krovat\n✅ Har bir bemor uchun alohida tumba\n✅ Kiyimlar uchun kiyim osgich (veshalka)\n✅ Oyoq kiyimlar uchun maxsus stelaj\n✅ Yuqori tezlikdagi Wi-Fi hududi\n✅ Dam olish va hordiq chiqarish uchun televizor\n\n☀️ *Isitish va sovitish tizimi:* Xonada qishki isitish tizimi to'liq mavjud (Yozgi konditsioner tizimi mavjud emas).\n\n🛁 *Yuvinish va gigiyena xonasi:* Dush va hojatxonalar (tualet) Umumiy tashqarida."},
                 {"nom": "Urta miyona", "kishi": "2-3", "uz_adult": "224 000", "uz_child": "209 000", "foreign_adult": "317 000", "foreign_child": "300 000", "photos": []},
                 {"nom": "Urta miyona", "kishi": "4-5", "uz_adult": "213 000", "uz_child": "198 000", "foreign_adult": "308 000", "foreign_child": "293 000", "photos": []},
                 {"nom": "Z/Urta miyona", "kishi": "2", "uz_adult": "269 000", "uz_child": "254 000", "foreign_adult": "354 000", "foreign_child": "339 000", "photos": []},
@@ -1312,6 +1312,16 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         xona = korpus["xonalar"][xona_idx]
         korpus_name = korpus["name_uz"] if lang == "uz" else korpus["name_ru"]
         included = d.get("xona_included", {}).get(lang, "")
+
+        # Agar xonaning alohida tavsifi bo'lsa — uni ko'rsat
+        description_uz = xona.get("description_uz", "")
+        if description_uz and lang == "uz":
+            back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
+                "⬅️ Orqaga", callback_data=f"korpus_{korpus['id']}")]])
+            await query.edit_message_text(description_uz, parse_mode="Markdown", reply_markup=back_kb)
+            if xona.get("photos"):
+                await send_photos(context, chat_id, xona["photos"])
+            return
 
         text = {
             "ru": (
