@@ -99,23 +99,6 @@ DEFAULT_DATA = {
     "team_photos": [],
     "korpuslar": [
         {
-            "id": "m_yangi",
-            "name_uz": "M Yangi Korpus",
-            "name_ru": "Новый корпус М",
-            "emoji": "🏢",
-            "photos": [],
-            "xonalar": [
-                {"nom": "M/Urta miyona", "kishi": "3-5", "uz_adult": "313 000", "uz_child": "298 000", "foreign_adult": "313 000", "foreign_child": "298 000", "photos": []},
-                {"nom": "M/Lyuks", "kishi": "4-6", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
-                {"nom": "M/Lyuks AB", "kishi": "2-3", "uz_adult": "465 000", "uz_child": "450 000", "foreign_adult": "465 000", "foreign_child": "450 000", "photos": []},
-                {"nom": "M/Lyuks", "kishi": "3", "uz_adult": "385 000", "uz_child": "370 000", "foreign_adult": "385 000", "foreign_child": "370 000", "photos": []},
-                {"nom": "M/Lyuks", "kishi": "2", "uz_adult": "495 000", "uz_child": "480 000", "foreign_adult": "495 000", "foreign_child": "480 000", "photos": []},
-                {"nom": "M/VIP", "kishi": "2", "uz_adult": "699 000", "uz_child": "684 000", "foreign_adult": "699 000", "foreign_child": "684 000", "photos": []},
-                {"nom": "M/VIP", "kishi": "1", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
-                {"nom": "M/Apartament", "kishi": "2", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
-            ]
-        },
-        {
             "id": "umumiy_z",
             "name_uz": "Umumiy + Z Korpus",
             "name_ru": "Общий + Z корпус",
@@ -144,8 +127,8 @@ DEFAULT_DATA = {
         },
         {
             "id": "d_diagnostika",
-            "name_uz": "D/Diagnostika Korpus",
-            "name_ru": "Корпус Д/Диагностика",
+            "name_uz": "D Korpus",
+            "name_ru": "Д корпус",
             "emoji": "🔬",
             "photos": [],
             "xonalar": [
@@ -162,6 +145,23 @@ DEFAULT_DATA = {
             "photos": [],
             "xonalar": [
                 {"nom": "S/Lyuks", "kishi": "4", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
+            ]
+        },
+        {
+            "id": "m_yangi",
+            "name_uz": "M Yangi Korpus",
+            "name_ru": "Новый корпус М",
+            "emoji": "🏢",
+            "photos": [],
+            "xonalar": [
+                {"nom": "M/Urta miyona", "kishi": "3-5", "uz_adult": "313 000", "uz_child": "298 000", "foreign_adult": "313 000", "foreign_child": "298 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "4-6", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
+                {"nom": "M/Lyuks AB", "kishi": "2-3", "uz_adult": "465 000", "uz_child": "450 000", "foreign_adult": "465 000", "foreign_child": "450 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "3", "uz_adult": "385 000", "uz_child": "370 000", "foreign_adult": "385 000", "foreign_child": "370 000", "photos": []},
+                {"nom": "M/Lyuks", "kishi": "2", "uz_adult": "495 000", "uz_child": "480 000", "foreign_adult": "495 000", "foreign_child": "480 000", "photos": []},
+                {"nom": "M/VIP", "kishi": "2", "uz_adult": "699 000", "uz_child": "684 000", "foreign_adult": "699 000", "foreign_child": "684 000", "photos": []},
+                {"nom": "M/VIP", "kishi": "1", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
+                {"nom": "M/Apartament", "kishi": "2", "uz_adult": "760 000", "uz_child": "745 000", "foreign_adult": "760 000", "foreign_child": "745 000", "photos": []},
             ]
         },
     ],
@@ -388,18 +388,27 @@ def load_data():
             if key not in saved:
                 saved[key] = val
                 updated = True
-        # korpuslar ichidagi xonalarga yangi maydonlarni qo'shish
+        # korpuslar tartibini va nomlarini DEFAULT_DATA dan yangilash
         default_korpuslar = DEFAULT_DATA.get("korpuslar", [])
-        saved_korpuslar = saved.get("korpuslar", [])
+        saved_korpuslar = {k["id"]: k for k in saved.get("korpuslar", [])}
+        merged_korpuslar = []
         for dk in default_korpuslar:
-            for sk in saved_korpuslar:
-                if sk.get("id") == dk.get("id"):
-                    for di, dxona in enumerate(dk.get("xonalar", [])):
-                        if di < len(sk.get("xonalar", [])):
-                            for field, value in dxona.items():
-                                if field not in sk["xonalar"][di]:
-                                    sk["xonalar"][di][field] = value
-                                    updated = True
+            sk = saved_korpuslar.get(dk["id"], {})
+            merged = dict(dk)
+            # Rasmlarni saqlab qolish
+            merged["photos"] = sk.get("photos", [])
+            # Xonalarni birlashtirish
+            merged_xonalar = []
+            for di, dxona in enumerate(dk.get("xonalar", [])):
+                sx = sk.get("xonalar", [{}] * (di + 1))
+                sxona = sx[di] if di < len(sx) else {}
+                mxona = dict(dxona)
+                mxona["photos"] = sxona.get("photos", [])
+                merged_xonalar.append(mxona)
+            merged["xonalar"] = merged_xonalar
+            merged_korpuslar.append(merged)
+        saved["korpuslar"] = merged_korpuslar
+        updated = True
         if updated:
             save_data(saved)
         return saved
