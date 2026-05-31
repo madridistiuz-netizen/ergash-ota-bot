@@ -1029,108 +1029,244 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ── Uyga tafsiyaoma — quyi bo'limlar ──
     elif data == "info_qoidalar":
-        text = (
-            "🏥 *'Ergash ota' tibbiyot markazining shifokor tavsiyalari*\n\n"
-            "Hurmatli bemor! Markazimizda davolanish kursini yakunlaganingiz bilan tabriklaymiz. "
-            "Sog'ligingizni tiklash va natijani mustahkamlash uchun uy sharoitida 14 kundan 24 kungacha "
-            "qat'iy parhez saqlashingiz zarur.\n\n"
-            "⚠️ *Eng muhim qoidalar:*\n"
-            "• Dastlabki 3 kun davomida umuman non iste'mol qilmang!\n"
-            "• Jismoniy og'ir ishlar qilish va og'ir yuk ko'tarish mumkin emas."
-        )
+        text = {
+            "uz": (
+                "🏥 *'Ergash ota' tibbiyot markazining shifokor tavsiyalari*\n\n"
+                "Hurmatli bemor! Markazimizda davolanish kursini yakunlaganingiz bilan tabriklaymiz. "
+                "Sog'ligingizni tiklash va natijani mustahkamlash uchun uy sharoitida 14 kundan 24 kungacha "
+                "qat'iy parhez saqlashingiz zarur.\n\n"
+                "⚠️ *Eng muhim qoidalar:*\n"
+                "• Dastlabki 3 kun davomida umuman non iste'mol qilmang!\n"
+                "• Jismoniy og'ir ishlar qilish va og'ir yuk ko'tarish mumkin emas."
+            ),
+            "ru": (
+                "🏥 *Рекомендации врача центра «Эргаш ота»*\n\n"
+                "Уважаемый пациент! Поздравляем с завершением курса лечения в нашем центре. "
+                "Для восстановления здоровья и закрепления результата необходимо строго соблюдать "
+                "диету в домашних условиях от 14 до 24 дней.\n\n"
+                "⚠️ *Важные правила:*\n"
+                "• В первые 3 дня полностью исключите хлеб!\n"
+                "• Тяжёлый физический труд и подъём тяжестей запрещены."
+            ),
+            "kz": (
+                "🏥 *«Эргаш ота» орталығы дәрігерінің ұсыныстары*\n\n"
+                "Құрметті науқас! Орталығымызда емдеу курсын аяқтағаныңызбен құттықтаймыз. "
+                "Денсаулықты қалпына келтіру және нәтижені бекіту үшін үй жағдайында 14 күннен 24 күнге дейін "
+                "қатаң диета сақтауыңыз қажет.\n\n"
+                "⚠️ *Маңызды ережелер:*\n"
+                "• Алғашқы 3 күн нан мүлдем жемеңіз!\n"
+                "• Ауыр дене жұмысы және ауыр зат көтеру мүмкін емес."
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "info_taqiq":
-        text = (
-            "🚫 *Parhez davomida eyish va qilish mutlaqo taqiqlangan narsalar:*\n\n"
-            "• Yog'li va xamirli taomlar\n"
-            "• Sho'r, achchiq va o'tkir ziravorli ovqatlar\n"
-            "• Dudlangan (kopchyoniy) mahsulotlar\n"
-            "• Dukkaklilar: No'xat va moshli taomlar\n"
-            "• Spirtli ichimliklar\n"
-            "• Tamaki mahsulotlari (sigaret, nos va h.k.)"
-        )
+        text = {
+            "uz": (
+                "🚫 *Parhez davomida eyish va qilish mutlaqo taqiqlangan narsalar:*\n\n"
+                "• Yog'li va xamirli taomlar\n"
+                "• Sho'r, achchiq va o'tkir ziravorli ovqatlar\n"
+                "• Dudlangan (kopchyoniy) mahsulotlar\n"
+                "• Dukkaklilar: No'xat va moshli taomlar\n"
+                "• Spirtli ichimliklar\n"
+                "• Tamaki mahsulotlari (sigaret, nos va h.k.)"
+            ),
+            "ru": (
+                "🚫 *Строго запрещено во время диеты:*\n\n"
+                "• Жирные и мучные блюда\n"
+                "• Солёная, острая и пряная пища\n"
+                "• Копчёные продукты\n"
+                "• Бобовые: горох и блюда из маша\n"
+                "• Алкогольные напитки\n"
+                "• Табачные изделия (сигареты, нас и т.д.)"
+            ),
+            "kz": (
+                "🚫 *Диета кезінде мүлдем тыйым салынады:*\n\n"
+                "• Майлы және ұнды тағамдар\n"
+                "• Тұзды, ащы және өткір дәмдеуіштері бар тағамдар\n"
+                "• Ысталған өнімдер\n"
+                "• Бұршақтылар: бұршақ және маш тағамдары\n"
+                "• Алкогольді сусындар\n"
+                "• Темекі өнімдері (сигарет, нас және т.б.)"
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "info_giyoh":
-        text = (
-            "🌿 *Surgi giyohini ichish va tayyorlash yo'riqnomasi*\n\n"
-            "Uyingizga berilgan surgi giyohi (ich suruvchi o't) ichaklarni tozalash va hazm tizimini "
-            "yaxshilash uchun juda muhimdir.\n\n"
-            "☕️ *Tayyorlash usuli (Damlash):*\n"
-            "Surgi giyohi xuddi oddiy choy kabi damlanadi:\n"
-            "1. Idishga yoki choynakka belgilangan miqdordagi giyohni 10–15 daqiqa davomida damlab qo'yasiz.\n\n"
-            "🕒 *Ichish vaqti:* Giyohni faqat ovqatlangandan keyin (to'q qoringa) iliq holatda choy o'rnida ichish kerak.\n\n"
-            "❓ *Nima sodir bo'ladi?:*\n"
-            "• Ich kelishi suriladi (toksin va shlaklar tozalanadi).\n"
-            "• Qorin dam bo'lishi yoki engil sanchiq bo'lishi tabiiy hol, xavotir olmang.\n"
-            "• Suv balansi uchun ruxsat etilgan sharbatlardan ichib turing."
-        )
+        text = {
+            "uz": (
+                "🌿 *Surgi giyohini ichish va tayyorlash yo'riqnomasi*\n\n"
+                "Uyingizga berilgan surgi giyohi (ich suruvchi o't) ichaklarni tozalash va hazm tizimini "
+                "yaxshilash uchun juda muhimdir.\n\n"
+                "☕️ *Tayyorlash usuli (Damlash):*\n"
+                "Surgi giyohi xuddi oddiy choy kabi damlanadi:\n"
+                "1. Idishga yoki choynakka belgilangan miqdordagi giyohni 10–15 daqiqa davomida damlab qo'yasiz.\n\n"
+                "🕒 *Ichish vaqti:* Giyohni faqat ovqatlangandan keyin (to'q qoringa) iliq holatda choy o'rnida ichish kerak.\n\n"
+                "❓ *Nima sodir bo'ladi?:*\n"
+                "• Ich kelishi suriladi (toksin va shlaklar tozalanadi).\n"
+                "• Qorin dam bo'lishi yoki engil sanchiq bo'lishi tabiiy hol, xavotir olmang.\n"
+                "• Suv balansi uchun ruxsat etilgan sharbatlardan ichib turing."
+            ),
+            "ru": (
+                "🌿 *Инструкция по приёму слабительной травы*\n\n"
+                "Слабительная трава, выданная вам домой, очень важна для очищения кишечника и улучшения пищеварения.\n\n"
+                "☕️ *Способ приготовления (заваривание):*\n"
+                "Трава заваривается как обычный чай:\n"
+                "1. Положите нужное количество травы в посуду или чайник и дайте настояться 10–15 минут.\n\n"
+                "🕒 *Время приёма:* Пить только после еды (на сытый желудок) в тёплом виде вместо чая.\n\n"
+                "❓ *Что произойдёт?:*\n"
+                "• Стул нормализуется (очищаются токсины и шлаки).\n"
+                "• Вздутие или лёгкие колики — естественная реакция, не волнуйтесь.\n"
+                "• Для водного баланса пейте разрешённые соки."
+            ),
+            "kz": (
+                "🌿 *Іш жүргізетін шөпті қабылдау нұсқаулығы*\n\n"
+                "Үйге берілген іш жүргізетін шөп ішекті тазарту және қорыту жүйесін жақсарту үшін өте маңызды.\n\n"
+                "☕️ *Дайындау тәсілі (демдеу):*\n"
+                "Шөп кәдімгі шай сияқты демделеді:\n"
+                "1. Ыдысқа немесе шәйнекке белгіленген мөлшердегі шөпті 10–15 минут демдеп қойыңыз.\n\n"
+                "🕒 *Ішу уақыты:* Шөпті тек тамақтанғаннан кейін (тоқ қарынға) жылы күйінде шай орнына ішу керек.\n\n"
+                "❓ *Не болады?:*\n"
+                "• Іш жүреді (токсиндер мен шлактар тазаланады).\n"
+                "• Іштің кебуі немесе жеңіл сырқырау — табиғи жағдай, алаңдамаңыз.\n"
+                "• Су балансы үшін рұқсат етілген шырындарды ішіп тұрыңыз."
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "menu_taomnoma":
-        text = "🍲 *Taomnoma*\n\nQuyidagilardan birini tanlang:"
+        text = {
+            "uz": "🍲 *Taomnoma*\n\nQuyidagilardan birini tanlang:",
+            "ru": "🍲 *Меню питания*\n\nВыберите раздел:",
+            "kz": "🍲 *Тамақтану мәзірі*\n\nБөлімді таңдаңыз:",
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("☀️ Nonushta", callback_data="sub_nonushta")],
-            [InlineKeyboardButton("🌤 Tushlik", callback_data="sub_tushlik")],
-            [InlineKeyboardButton("🌙 Kechki ovqat", callback_data="sub_kechki")],
-            [InlineKeyboardButton("🧃 Sharbatlar", callback_data="sub_sharbat")],
+            [InlineKeyboardButton({"uz": "☀️ Nonushta", "ru": "☀️ Завтрак", "kz": "☀️ Таңғы ас"}[lang], callback_data="sub_nonushta")],
+            [InlineKeyboardButton({"uz": "🌤 Tushlik", "ru": "🌤 Обед", "kz": "🌤 Түскі ас"}[lang], callback_data="sub_tushlik")],
+            [InlineKeyboardButton({"uz": "🌙 Kechki ovqat", "ru": "🌙 Ужин", "kz": "🌙 Кешкі ас"}[lang], callback_data="sub_kechki")],
+            [InlineKeyboardButton({"uz": "🧃 Sharbatlar", "ru": "🧃 Соки", "kz": "🧃 Шырындар"}[lang], callback_data="sub_sharbat")],
             [InlineKeyboardButton(back_label, callback_data="guide_shopping")],
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "sub_nonushta":
-        text = (
-            "☀️ *Nonushta*\n\n"
-            "• Engil qatiqli taomlar yoki suyuq qatiq\n"
-            "• Toza tabiiy asal (1-2 choy qoshiq)\n"
-            "• Dastlabki 3 kunda nonsiz, keyin ozroq qora non bilan"
-        )
+        text = {
+            "uz": (
+                "☀️ *Nonushta*\n\n"
+                "• Engil qatiqli taomlar yoki suyuq qatiq\n"
+                "• Toza tabiiy asal (1-2 choy qoshiq)\n"
+                "• Dastlabki 3 kunda nonsiz, keyin ozroq qora non bilan"
+            ),
+            "ru": (
+                "☀️ *Завтрак*\n\n"
+                "• Лёгкие блюда с кефиром или жидкий кефир\n"
+                "• Натуральный мёд (1-2 чайные ложки)\n"
+                "• Первые 3 дня без хлеба, затем — немного чёрного хлеба"
+            ),
+            "kz": (
+                "☀️ *Таңғы ас*\n\n"
+                "• Жеңіл айранды тағамдар немесе сұйық айран\n"
+                "• Таза табиғи бал (1-2 шай қасық)\n"
+                "• Алғашқы 3 күн нансыз, содан кейін — аздап қара нанмен"
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "sub_tushlik":
-        text = (
-            "🌤 *Tushlik*\n\n"
-            "Issiq va engil hazm bo'luvchi suyuq sho'rvalar (go'shtlari yog'siz bo'lsin):\n"
-            "• Chopma sho'rva\n"
-            "• Qaynatma sho'rva\n"
-            "• Tovuq sho'rva\n"
-            "• Baliqli sho'rva\n"
-            "• Karam sho'rva"
-        )
+        text = {
+            "uz": (
+                "🌤 *Tushlik*\n\n"
+                "Issiq va engil hazm bo'luvchi suyuq sho'rvalar (go'shtlari yog'siz bo'lsin):\n"
+                "• Chopma sho'rva\n"
+                "• Qaynatma sho'rva\n"
+                "• Tovuq sho'rva\n"
+                "• Baliqli sho'rva\n"
+                "• Karam sho'rva"
+            ),
+            "ru": (
+                "🌤 *Обед*\n\n"
+                "Горячие и лёгкие для переваривания жидкие супы (мясо должно быть нежирным):\n"
+                "• Чопма шурпа\n"
+                "• Отварной бульон\n"
+                "• Куриный суп\n"
+                "• Рыбный суп\n"
+                "• Капустный суп"
+            ),
+            "kz": (
+                "🌤 *Түскі ас*\n\n"
+                "Ыстық және жеңіл қорытылатын сорпалар (еті майсыз болсын):\n"
+                "• Чопма сорпа\n"
+                "• Қайнатма сорпа\n"
+                "• Тауық сорпасы\n"
+                "• Балықты сорпа\n"
+                "• Қырыққабат сорпасы"
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "sub_kechki":
-        text = (
-            "🌙 *Kechki ovqat*\n\n"
-            "Tushlikdan qolgan engil sho'rvalar yoki qatiqli taomlar "
-            "(uxlashdan 3-4 soat oldin)."
-        )
+        text = {
+            "uz": (
+                "🌙 *Kechki ovqat*\n\n"
+                "Tushlikdan qolgan engil sho'rvalar yoki qatiqli taomlar "
+                "(uxlashdan 3-4 soat oldin)."
+            ),
+            "ru": (
+                "🌙 *Ужин*\n\n"
+                "Оставшиеся лёгкие супы с обеда или блюда с кефиром "
+                "(за 3-4 часа до сна)."
+            ),
+            "kz": (
+                "🌙 *Кешкі ас*\n\n"
+                "Түскі асқа қалған жеңіл сорпалар немесе айранды тағамдар "
+                "(ұйқыдан 3-4 сағат бұрын)."
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "sub_sharbat":
-        text = (
-            "🧃 *Sharbatlar*\n\n"
-            "Kuniga 250-400 grammgacha yangi chiqarilgan:\n"
-            "• Olma suvi\n"
-            "• Sabzi suvi\n"
-            "• Bodring suvi\n"
-            "• Tarvuz suvi\n"
-            "• O'rik suvi"
-        )
+        text = {
+            "uz": (
+                "🧃 *Sharbatlar*\n\n"
+                "Kuniga 250-400 grammgacha yangi chiqarilgan:\n"
+                "• Olma suvi\n"
+                "• Sabzi suvi\n"
+                "• Bodring suvi\n"
+                "• Tarvuz suvi\n"
+                "• O'rik suvi"
+            ),
+            "ru": (
+                "🧃 *Соки*\n\n"
+                "До 250-400 граммов в день свежевыжатых:\n"
+                "• Яблочный сок\n"
+                "• Морковный сок\n"
+                "• Огуречный сок\n"
+                "• Арбузный сок\n"
+                "• Абрикосовый сок"
+            ),
+            "kz": (
+                "🧃 *Шырындар*\n\n"
+                "Күніне 250-400 грамм дейін жаңа сығылған:\n"
+                "• Алма шырыны\n"
+                "• Сәбіз шырыны\n"
+                "• Қияр шырыны\n"
+                "• Қарбыз шырыны\n"
+                "• Өрік шырыны"
+            ),
+        }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_taomnoma")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
