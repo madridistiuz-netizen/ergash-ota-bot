@@ -1769,6 +1769,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         idx = int(parts[4])
         days = int(parts[5])
 
+        # Keyingi bosqich uchun saqlash
+        context.user_data["calc_cit"] = cit
+        context.user_data["calc_age"] = age
+        context.user_data["calc_room_idx"] = idx
+        context.user_data["calc_days"] = days
+
         rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
         room = rooms[idx]
         price_str = room["adult"] if age == "adult" else room["child"]
@@ -1871,12 +1877,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         book_label = {"ru": "📞 Записаться на приём", "uz": "📞 Qabulga yozilish", "kz": "📞 Қабылдауға жазылу"}[lang]
+        calc_book_label = {"ru": "🏨 Записаться на эту палату", "uz": "🏨 Shu xona bo'yicha qabulga yozilish", "kz": "🏨 Осы палатаға жазылу"}[lang]
         operator_label = {"ru": "💬 Связаться с оператором", "uz": "💬 Operator bilan bog'lanish", "kz": "💬 Операторға хабарласу"}[lang]
         recalc_label = {"ru": "🔁 Пересчитать", "uz": "🔁 Qayta hisoblash", "kz": "🔁 Қайта есептеу"}[lang]
         back_label = {"ru": "🔙 Назад", "uz": "🔙 Orqaga", "kz": "🔙 Артқа"}[lang]
 
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(book_label, callback_data="menu_booking")],
+            [InlineKeyboardButton(calc_book_label, callback_data="calc_book_statsionar")],
             [InlineKeyboardButton(operator_label, callback_data="menu_operator")],
             [InlineKeyboardButton(recalc_label, callback_data="calc_start")],
             [InlineKeyboardButton(back_label, callback_data=f"calc_room_{cit}_{age}_{idx}")],
@@ -2523,6 +2530,69 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=booking_type_keyboard(lang))
+    elif data == "calc_book_statsionar":
+        # Calculator dan keyin yozilish — xona so'ralmaydi, faqat ism/sana/kishi/telefon
+        cit = context.user_data.get("calc_cit", "uz")
+        age = context.user_data.get("calc_age", "adult")
+        idx = context.user_data.get("calc_room_idx", 0)
+        days = context.user_data.get("calc_days", 0)
+        d = load_data()
+        rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
+        room = rooms[idx] if idx < len(rooms) else {}
+        price_str = room.get("adult" if age == "adult" else "child", "0")
+        price_num = int(price_str.replace(" ", "").replace("\u00a0", ""))
+        total = price_num * days if days else 0
+
+        def fmt(n):
+            return f"{n:,}".replace(",", " ")
+
+        narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
+        cit_label = {
+            "ru": {"uz": "Граждане Узбекистана", "foreign": "Иностранные граждане"}[cit],
+            "uz": {"uz": "O'zbekiston fuqarolari", "foreign": "Chet el fuqarolari"}[cit],
+            "kz": {"uz": "Өзбекстан азаматтары", "foreign": "Шетел азаматтары"}[cit],
+        }[lang]
+        age_label = {
+            "ru": {"adult": "Взрослые", "child": "Дети (до 10 лет)"}[age],
+            "uz": {"adult": "Kattalar", "child": "Bolalar (10 yoshgacha)"}[age],
+            "kz": {"adult": "Ересектер", "child": "Балалар (10 жасқа дейін)"}[age],
+        }[lang]
+
+        # Calc ma'lumotlarini booking session ga saqlash
+        context.user_data["booking"] = {
+            "from_calc": True,
+            "calc_room": room.get("name", "—"),
+            "calc_cit": cit_label,
+            "calc_age": age_label,
+            "calc_price": f"{fmt(price_num)} {narx_word}",
+            "calc_days": str(days) if days else "—",
+            "calc_total": f"{fmt(total)} {narx_word}" if total else "—",
+        }
+        context.user_data["booking_type"] = "statsionar"
+        context.user_data["booking_step"] = "name"
+
+        ask = {
+            "ru": (
+                f"🏨 *Запись на лечение*\n"
+                f"🛏 Палата: *{room.get('name', '—')}*\n"
+                f"💰 1 день: *{fmt(price_num)} {narx_word}*\n\n"
+                f"📝 Шаг 1/4\nНапишите ваше *Имя и Фамилию*:"
+            ),
+            "uz": (
+                f"🏨 *Davolanishga yozilish*\n"
+                f"🛏 Xona: *{room.get('name', '—')}*\n"
+                f"💰 1 kun: *{fmt(price_num)} {narx_word}*\n\n"
+                f"📝 1/4 qadam\n*Ism va Familiyangizni* yozing:"
+            ),
+            "kz": (
+                f"🏨 *Емдеуге жазылу*\n"
+                f"🛏 Палата: *{room.get('name', '—')}*\n"
+                f"💰 1 күн: *{fmt(price_num)} {narx_word}*\n\n"
+                f"📝 1/4 қадам\n*Аты-жөніңізді* жазыңыз:"
+            ),
+        }[lang]
+        await query.edit_message_text(ask, parse_mode="Markdown")
+
     elif data == "book_statsionar":
         context.user_data["booking"] = {}
         context.user_data["booking_type"] = "statsionar"
@@ -2616,26 +2686,46 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
             kishi = booking.get("kishi", "—")
             phone_num = booking.get("phone", "—")
             xona = booking.get("xona", "—")
+            from_calc = booking.get("from_calc", False)
 
             success = {
-                "ru": f"🎉 *Заявка принята!*\n\n👤 {name}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n🛏 Номер: {xona}\n\nОператор свяжется с вами.\n📞 {phone}",
-                "uz": f"🎉 *Ariza qabul qilindi!*\n\n👤 {name}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n🛏 Xona: {xona}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
-                "kz": f"🎉 *Өтінім қабылданды!*\n\n👤 {name}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n🛏 Бөлме: {xona}\n\nОператор байланысады.\n📞 {phone}",
+                "ru": f"🎉 *Заявка принята!*\n\n👤 {name}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n🛏 Номер: {booking.get('calc_room', xona)}\n\nОператор свяжется с вами.\n📞 {phone}",
+                "uz": f"🎉 *Ariza qabul qilindi!*\n\n👤 {name}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n🛏 Xona: {booking.get('calc_room', xona)}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                "kz": f"🎉 *Өтінім қабылданды!*\n\n👤 {name}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n🛏 Бөлме: {booking.get('calc_room', xona)}\n\nОператор байланысады.\n📞 {phone}",
             }[lang]
             await query.edit_message_text(success, parse_mode="Markdown",
                                           reply_markup=back_keyboard(lang))
 
-            lid = (
-                f"🏥 *STATSIONAR LID*\n\n"
-                f"👤 Ism: {name}\n"
-                f"📅 Kelish sanasi: {sana}\n"
-                f"👥 Kishi soni: {kishi}\n"
-                f"📞 Telefon: {phone_num}\n"
-                f"🛏 Xona turi: {xona}\n"
-                f"💬 Telegram: {username}\n"
-                f"🌐 Til: {lang.upper()}\n\n"
-                f"🟢 QO'NG'IROQ QILING!"
-            )
+            if from_calc:
+                lid = (
+                    f"🏥 *STATSIONAR LID (Kalkulyator orqali)*\n\n"
+                    f"👤 Ism: {name}\n"
+                    f"📞 Telefon: {phone_num}\n"
+                    f"📅 Kelish sanasi: {sana}\n"
+                    f"👥 Odam soni: {kishi}\n\n"
+                    f"🇺🇿 Fuqarolik: {booking.get('calc_cit', '—')}\n"
+                    f"👤 Yosh toifasi: {booking.get('calc_age', '—')}\n"
+                    f"🏨 Tanlangan to'lov turi: {booking.get('calc_room', '—')}\n"
+                    f"💰 1 kunlik narx: {booking.get('calc_price', '—')}\n"
+                    f"📅 Davolanish muddati: {booking.get('calc_days', '—')} kun\n"
+                    f"✅ Umumiy summa: {booking.get('calc_total', '—')}\n\n"
+                    f"💬 Telegram: {username}\n"
+                    f"🌐 Til: {lang.upper()}\n\n"
+                    f"📌 Bemor narx kalkulyatori orqali xona/to'lov turini tanlab, shu asosida qabulga yozildi.\n\n"
+                    f"🟢 QO'NG'IROQ QILING!"
+                )
+            else:
+                lid = (
+                    f"🏥 *STATSIONAR LID*\n\n"
+                    f"👤 Ism: {name}\n"
+                    f"📅 Kelish sanasi: {sana}\n"
+                    f"👥 Kishi soni: {kishi}\n"
+                    f"📞 Telefon: {phone_num}\n"
+                    f"🛏 Xona turi: {xona}\n"
+                    f"💬 Telegram: {username}\n"
+                    f"🌐 Til: {lang.upper()}\n\n"
+                    f"🟢 QO'NG'IROQ QILING!"
+                )
             await send_lid(context, STATSIONAR_CHANNEL, lid)
 
         else:  # diagnostika
@@ -2991,6 +3081,55 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if step == "phone":
             context.user_data.setdefault("booking", {})["phone"] = text
+            booking = context.user_data.get("booking", {})
+
+            # Agar calc dan kelgan bo'lsa — xona so'ralmaydi
+            if booking.get("from_calc"):
+                context.user_data["booking_step"] = None
+                narx_word_s = "so'm" if lang == "uz" else ("сум" if lang in ("ru", "kz") else "so'm")
+                summary = {
+                    "ru": (
+                        f"📋 *Проверьте данные:*\n\n"
+                        f"👤 Имя: {booking.get('name')}\n"
+                        f"📅 Дата: {booking.get('sana')}\n"
+                        f"👥 Человек: {booking.get('kishi')}\n"
+                        f"📞 Телефон: {text}\n"
+                        f"🏨 Палата: {booking.get('calc_room')}\n"
+                        f"💰 1 день: {booking.get('calc_price')}\n"
+                        f"📅 Дней: {booking.get('calc_days')}\n"
+                        f"✅ Итого: {booking.get('calc_total')}\n\n"
+                        f"Всё верно?"
+                    ),
+                    "uz": (
+                        f"📋 *Ma'lumotlarni tekshiring:*\n\n"
+                        f"👤 Ism: {booking.get('name')}\n"
+                        f"📅 Sana: {booking.get('sana')}\n"
+                        f"👥 Kishi: {booking.get('kishi')}\n"
+                        f"📞 Telefon: {text}\n"
+                        f"🏨 Xona: {booking.get('calc_room')}\n"
+                        f"💰 1 kun: {booking.get('calc_price')}\n"
+                        f"📅 Kun: {booking.get('calc_days')}\n"
+                        f"✅ Jami: {booking.get('calc_total')}\n\n"
+                        f"Hammasi to'g'rimi?"
+                    ),
+                    "kz": (
+                        f"📋 *Деректерді тексеріңіз:*\n\n"
+                        f"👤 Аты: {booking.get('name')}\n"
+                        f"📅 Күні: {booking.get('sana')}\n"
+                        f"👥 Адам: {booking.get('kishi')}\n"
+                        f"📞 Телефон: {text}\n"
+                        f"🏨 Палата: {booking.get('calc_room')}\n"
+                        f"💰 1 күн: {booking.get('calc_price')}\n"
+                        f"📅 Күн: {booking.get('calc_days')}\n"
+                        f"✅ Жиыны: {booking.get('calc_total')}\n\n"
+                        f"Бәрі дұрыс па?"
+                    ),
+                }[lang]
+                await update.message.reply_text(summary, parse_mode="Markdown",
+                                                reply_markup=confirm_keyboard(lang))
+                return
+
+            # Oddiy statsionar — xona so'rash (5-qadam)
             context.user_data["booking_step"] = "xona"
             ask = {
                 "ru": f"📞 *{text}*\n\n🛏 Шаг 5/5\nКакой *тип номера* вас интересует?\n_(например: Люкс, VIP, Стандарт или напишите 'не знаю')_",
