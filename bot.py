@@ -1000,10 +1000,18 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }[lang]
             back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
             kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton("ℹ️ Muhim qoidalar", callback_data="info_qoidalar")],
-                [InlineKeyboardButton("🚫 Nimalar mumkin emas?", callback_data="info_taqiq")],
-                [InlineKeyboardButton("🍲 Taomnoma", callback_data="menu_taomnoma")],
-                [InlineKeyboardButton("🌿 Surgi giyohi", callback_data="info_giyoh")],
+                [InlineKeyboardButton(
+                    {"ru": "ℹ️ Важные правила", "uz": "ℹ️ Muhim qoidalar", "kz": "ℹ️ Маңызды ережелер"}[lang],
+                    callback_data="info_qoidalar")],
+                [InlineKeyboardButton(
+                    {"ru": "🚫 Что запрещено?", "uz": "🚫 Nimalar mumkin emas?", "kz": "🚫 Не тыйым салынған?"}[lang],
+                    callback_data="info_taqiq")],
+                [InlineKeyboardButton(
+                    {"ru": "🍲 Меню питания", "uz": "🍲 Taomnoma", "kz": "🍲 Тамақтану мәзірі"}[lang],
+                    callback_data="menu_taomnoma")],
+                [InlineKeyboardButton(
+                    {"ru": "🌿 Слабительная трава", "uz": "🌿 Surgi giyohi", "kz": "🌿 Іш жүргізетін шөп"}[lang],
+                    callback_data="info_giyoh")],
                 [InlineKeyboardButton(back_label, callback_data="menu_guide")],
             ])
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
