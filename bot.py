@@ -419,6 +419,9 @@ def load_data():
             merged["xonalar"] = merged_xonalar
             merged_korpuslar.append(merged)
         saved["korpuslar"] = merged_korpuslar
+        # rooms_uz va rooms_foreign ni DEFAULT_DATA dan yangilash
+        saved["rooms_uz"] = DEFAULT_DATA["rooms_uz"]
+        saved["rooms_foreign"] = DEFAULT_DATA["rooms_foreign"]
         updated = True
         if updated:
             save_data(saved)
