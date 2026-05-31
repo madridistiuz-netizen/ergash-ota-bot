@@ -824,7 +824,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await handle_booking_callbacks(query, context, data, lang, chat_id)
 
-    elif data in ("menu_booking", "book_statsionar", "book_diagnostika") or \
+    elif data in ("menu_booking", "book_statsionar", "book_diagnostika", "calc_book_statsionar") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
 
@@ -1704,9 +1704,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(title, parse_mode="Markdown", reply_markup=kb)
 
     elif data.startswith("calc_room_"):
-        # 4-qadam: Kun sonini tanlash
-        # format: calc_room_{cit}_{age}_{idx}
-        parts = data.split("_")  # ["calc", "room", cit, age, idx]
+        # 4-qadam: Kun sonini tanlash + eslatma
+        parts = data.split("_")
         cit = parts[2]
         age = parts[3]
         idx = int(parts[4])
@@ -1719,10 +1718,28 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         price = room["adult"] if age == "adult" else room["child"]
         narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
 
+        warning = {
+            "ru": (
+                f"⚠️ *Важно:* Цена рассчитана за 1 день / 1 человека.\n"
+                f"Если пациентов 2 и более — каждый оплачивается отдельно.\n"
+                f"_Например: {price} {narx_word} × 2 чел × 10 дней = ?_"
+            ),
+            "uz": (
+                f"⚠️ *Muhim:* Ko'rsatilgan narx 1 kun / 1 kishi uchun hisoblangan.\n"
+                f"Agar 2 yoki undan ortiq bemor bo'lsa, har biri alohida hisoblanadi.\n"
+                f"_Masalan: {price} {narx_word} × 2 kishi × 10 kun = ?_"
+            ),
+            "kz": (
+                f"⚠️ *Маңызды:* Көрсетілген баға 1 күн / 1 адам үшін есептелген.\n"
+                f"2 немесе одан көп науқас болса, әр бірі жеке есептеледі.\n"
+                f"_Мысалы: {price} {narx_word} × 2 адам × 10 күн = ?_"
+            ),
+        }[lang]
+
         text = {
-            "ru": f"🧮 *Расчёт стоимости*\n\n🛏 Палата: *{room['name']}* ({room['people']} чел.)\n💰 1 день: *{price} {narx_word}*\n\nВыберите количество дней:",
-            "uz": f"🧮 *Narxni hisoblash*\n\n🛏 Xona: *{room['name']}* ({room['people']} kishi)\n💰 1 kun: *{price} {narx_word}*\n\nNecha kun davolanishni rejalashtiryapsiz?",
-            "kz": f"🧮 *Құнын есептеу*\n\n🛏 Палата: *{room['name']}* ({room['people']} адам)\n💰 1 күн: *{price} {narx_word}*\n\nНеше күн емделуді жоспарлайсыз?",
+            "ru": f"🧮 *Расчёт стоимости*\n\n🛏 Палата: *{room['name']}* ({room['people']} чел.)\n💰 1 день / 1 чел.: *{price} {narx_word}*\n\n{warning}\n\nВыберите количество дней:",
+            "uz": f"🧮 *Narxni hisoblash*\n\n🛏 Xona: *{room['name']}* ({room['people']} kishi)\n💰 1 kun / 1 kishi: *{price} {narx_word}*\n\n{warning}\n\nNecha kun davolanishni rejalashtiryapsiz?",
+            "kz": f"🧮 *Құнын есептеу*\n\n🛏 Палата: *{room['name']}* ({room['people']} адам)\n💰 1 күн / 1 адам: *{price} {narx_word}*\n\n{warning}\n\nНеше күн емделуді жоспарлайсыз?",
         }[lang]
 
         other_label = {"ru": "✏️ Другой срок", "uz": "✏️ Boshqa muddat", "kz": "✏️ Басқа мерзім"}[lang]
@@ -1741,14 +1758,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("calc_other_"):
         # "Boshqa muddat" — foydalanuvchi raqam yozadi
-        parts = data.split("_")  # ["calc", "other", cit, age, idx]
+        parts = data.split("_")
         cit = parts[2]
         age = parts[3]
         idx = int(parts[4])
         context.user_data["calc_cit"] = cit
         context.user_data["calc_age"] = age
         context.user_data["calc_room_idx"] = idx
-        context.user_data["calc_step"] = "waiting_days"  # message handler uchun
+        context.user_data["calc_step"] = "waiting_days"
 
         text = {
             "ru": "✏️ Введите количество дней (только цифры, минимум 1):",
@@ -1761,15 +1778,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data.startswith("calc_days_"):
-        # 5-qadam: Natijani ko'rsatish
-        # format: calc_days_{cit}_{age}_{idx}_{days}
-        parts = data.split("_")  # ["calc", "days", cit, age, idx, days]
+        # 5-qadam: Odam sonini so'rash
+        parts = data.split("_")
         cit = parts[2]
         age = parts[3]
         idx = int(parts[4])
         days = int(parts[5])
 
-        # Keyingi bosqich uchun saqlash
         context.user_data["calc_cit"] = cit
         context.user_data["calc_age"] = age
         context.user_data["calc_room_idx"] = idx
@@ -1777,17 +1792,59 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
         room = rooms[idx]
+        price = room["adult"] if age == "adult" else room["child"]
+        narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
+        day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
+
+        text = {
+            "ru": f"🧮 *Расчёт стоимости*\n\n🛏 *{room['name']}*\n💰 1 день / 1 чел.: *{price} {narx_word}*\n📅 Дней: *{days}*\n\nСколько человек будет лечиться?",
+            "uz": f"🧮 *Narxni hisoblash*\n\n🛏 *{room['name']}*\n💰 1 kun / 1 kishi: *{price} {narx_word}*\n📅 Muddat: *{days} {day_word}*\n\nNecha kishi davolanadi?",
+            "kz": f"🧮 *Құнын есептеу*\n\n🛏 *{room['name']}*\n💰 1 күн / 1 адам: *{price} {narx_word}*\n📅 Мерзім: *{days} {day_word}*\n\nНеше адам емделеді?",
+        }[lang]
+
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("1", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_1"),
+             InlineKeyboardButton("2", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_2"),
+             InlineKeyboardButton("3", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_3")],
+            [InlineKeyboardButton("4", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_4"),
+             InlineKeyboardButton("5", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_5"),
+             InlineKeyboardButton("6", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_6")],
+            [InlineKeyboardButton(back_label, callback_data=f"calc_room_{cit}_{age}_{idx}")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data.startswith("calc_people_"):
+        # 6-qadam: Natijani ko'rsatish (odam soni bilan formula)
+        # format: calc_people_{cit}_{age}_{idx}_{days}_{people}
+        parts = data.split("_")
+        cit = parts[2]
+        age = parts[3]
+        idx = int(parts[4])
+        days = int(parts[5])
+        people = int(parts[6])
+
+        context.user_data["calc_cit"] = cit
+        context.user_data["calc_age"] = age
+        context.user_data["calc_room_idx"] = idx
+        context.user_data["calc_days"] = days
+        context.user_data["calc_people"] = people
+
+        rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
+        room = rooms[idx]
         price_str = room["adult"] if age == "adult" else room["child"]
-
-        # Narxni raqamga o'girish (minglik bo'shliqlarni olib tashlash)
         price_num = int(price_str.replace(" ", "").replace("\u00a0", ""))
-        total = price_num * days
+        total = price_num * days * people
 
-        # Minglik ajratgich bilan formatlash
         def fmt(n):
             return f"{n:,}".replace(",", " ")
 
         narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
+        kishi_word = {"ru": "чел.", "uz": "kishi", "kz": "адам"}[lang]
+        day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
+        day_word1 = {"ru": "день", "uz": "kun", "kz": "күн"}[lang]
+        muddat_label = {"ru": "Срок лечения", "uz": "Davolanish muddati", "kz": "Емдеу мерзімі"}[lang]
+
         cit_label = {
             "ru": {"uz": "Граждане Узбекистана", "foreign": "Иностранные граждане"}[cit],
             "uz": {"uz": "O'zbekiston fuqarolari", "foreign": "Chet el fuqarolari"}[cit],
@@ -1798,85 +1855,57 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": {"adult": "Kattalar", "child": "Bolalar (10 yoshgacha)"}[age],
             "kz": {"adult": "Ересектер", "child": "Балалар (10 жасқа дейін)"}[age],
         }[lang]
-        kishi_word = {"ru": "чел.", "uz": "kishi", "kz": "адам"}[lang]
 
         included = {
-            "ru": (
-                "✔ Проживание\n"
-                "✔ Лечение\n"
-                "✔ Физиотерапия и мануальная терапия\n"
-                "✔ УЗИ, анализ крови, ЭКГ\n"
-                "✔ МРТ 1.5Т или МСКТ — 1 орган"
-            ),
-            "uz": (
-                "✔ Turar joy\n"
-                "✔ Davolanish\n"
-                "✔ Fizioterapiya va manual terapiya\n"
-                "✔ UZI, qon tahlili, EKG\n"
-                "✔ MRT 1.5T yoki MSKT — 1 organ"
-            ),
-            "kz": (
-                "✔ Тұрғын үй\n"
-                "✔ Емдеу\n"
-                "✔ Физиотерапия және мануалды терапия\n"
-                "✔ УДЗ, қан анализі, ЭКГ\n"
-                "✔ МРТ 1.5Т немесе МСКТ — 1 орган"
-            ),
+            "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ — 1 орган",
+            "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG\n✔ MRT 1.5T yoki MSKT — 1 organ",
+            "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ\n✔ МРТ 1.5Т немесе МСКТ — 1 орган",
         }[lang]
-
         extra = {
             "ru": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Растяжка, Ударно-волновая терапия",
             "uz": "MRT 3T, MSKT 256, Mammografiya, Kriolipoliz, Cho'zilish, Zarba-to'lqin terapiyasi",
             "kz": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Созылу, Соққы-толқын терапиясы",
         }[lang]
-
         note = {
             "ru": "📌 *Примечание:* Точный срок лечения определяется врачом после осмотра.",
             "uz": "📌 *Eslatma:* Aniq davolanish muddati shifokor ko'rigidan keyin belgilanadi.",
             "kz": "📌 *Ескерту:* Нақты емдеу мерзімі дәрігер тексерісінен кейін белгіленеді.",
         }[lang]
 
+        formula_label = {
+            "ru": f"📌 *Расчёт:* {fmt(price_num)} × {days} дн × {people} чел = *{fmt(total)} {narx_word}*",
+            "uz": f"📌 *Hisoblash:* {fmt(price_num)} × {days} kun × {people} kishi = *{fmt(total)} {narx_word}*",
+            "kz": f"📌 *Есептеу:* {fmt(price_num)} × {days} күн × {people} адам = *{fmt(total)} {narx_word}*",
+        }[lang]
+        narx_turi = {
+            "ru": "⚠️ Тип цены: за 1 день / 1 человека",
+            "uz": "⚠️ Narx turi: 1 kun / 1 kishi uchun",
+            "kz": "⚠️ Баға түрі: 1 күн / 1 адам үшін",
+        }[lang]
         result_title = {
             "ru": "✅ *Результат расчёта*",
             "uz": "✅ *Hisoblash natijasi*",
             "kz": "✅ *Есептеу нәтижесі*",
         }[lang]
 
-        incl_title = {
-            "ru": "📦 *В стоимость входит:*",
-            "uz": "📦 *Narx tarkibiga kiradi:*",
-            "kz": "📦 *Құнға кіреді:*",
-        }[lang]
-
-        extra_title = {
-            "ru": "➕ *Дополнительные услуги оплачиваются отдельно:*",
-            "uz": "➕ *Qo'shimcha xizmatlar alohida hisoblanadi:*",
-            "kz": "➕ *Қосымша қызметтер жеке есептеледі:*",
-        }[lang]
-
-        total_label = {
-            "ru": "💳 *Итого к оплате:*",
-            "uz": "💳 *Jami to'lov:*",
-            "kz": "💳 *Жиыны:*",
-        }[lang]
-
-        day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
-        day_word1 = {"ru": "день", "uz": "kun", "kz": "күн"}[lang]
-        muddat_label = {"ru": "Срок лечения", "uz": "Davolanish muddati", "kz": "Емдеу мерзімі"}[lang]
+        incl_title = {"ru": "В стоимость входит", "uz": "Narx tarkibiga kiradi", "kz": "Құнға кіреді"}[lang]
+        extra_title = {"ru": "Дополнительно", "uz": "Qo'shimcha xizmatlar alohida", "kz": "Қосымша жеке"}[lang]
 
         text = (
             f"{result_title}\n\n"
             f"🏨 *{room['name']}* ({room['people']} {kishi_word})\n"
+            f"{narx_turi}\n"
             f"👤 {cit_label} | {age_label}\n"
             f"💰 1 {day_word1}: *{fmt(price_num)} {narx_word}*\n"
-            f"📅 {muddat_label}: *{days} {day_word}*\n\n"
-            f"{total_label} *{fmt(total)} {narx_word}*\n\n"
-            f"{incl_title}\n{included}\n\n"
-            f"{extra_title}\n_{extra}_\n\n"
+            f"📅 {muddat_label}: *{days} {day_word}*\n"
+            f"👥 Odam soni: *{people} {kishi_word}*\n\n"
+            f"✅ *Jami to'lov: {fmt(total)} {narx_word}*\n\n"
+            f"{formula_label}\n\n"
+            f"📦 *{incl_title}:*\n{included}\n\n"
+            f"➕ *{extra_title}:*\n_{extra}_\n\n"
             f"{note}"
         )
 
-        book_label = {"ru": "📞 Записаться на приём", "uz": "📞 Qabulga yozilish", "kz": "📞 Қабылдауға жазылу"}[lang]
         calc_book_label = {"ru": "🏨 Записаться на эту палату", "uz": "🏨 Shu xona bo'yicha qabulga yozilish", "kz": "🏨 Осы палатаға жазылу"}[lang]
         operator_label = {"ru": "💬 Связаться с оператором", "uz": "💬 Operator bilan bog'lanish", "kz": "💬 Операторға хабарласу"}[lang]
         recalc_label = {"ru": "🔁 Пересчитать", "uz": "🔁 Qayta hisoblash", "kz": "🔁 Қайта есептеу"}[lang]
@@ -1886,10 +1915,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(calc_book_label, callback_data="calc_book_statsionar")],
             [InlineKeyboardButton(operator_label, callback_data="menu_operator")],
             [InlineKeyboardButton(recalc_label, callback_data="calc_start")],
-            [InlineKeyboardButton(back_label, callback_data=f"calc_room_{cit}_{age}_{idx}")],
+            [InlineKeyboardButton(back_label, callback_data=f"calc_days_{cit}_{age}_{idx}_{days}")],
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
-
     # ── Diagnostika ──
     elif data == "menu_diagnostics":
         title = {
@@ -2566,7 +2594,8 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
             "calc_age": age_label,
             "calc_price": f"{fmt(price_num)} {narx_word}",
             "calc_days": str(days) if days else "—",
-            "calc_total": f"{fmt(total)} {narx_word}" if total else "—",
+            "calc_people": str(context.user_data.get("calc_people", 1)),
+            "calc_total": f"{fmt(price_num * days * context.user_data.get('calc_people', 1))} {narx_word}" if days else "—",
         }
         context.user_data["booking_type"] = "statsionar"
         context.user_data["booking_step"] = "name"
@@ -2702,7 +2731,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                     f"👤 Ism: {name}\n"
                     f"📞 Telefon: {phone_num}\n"
                     f"📅 Kelish sanasi: {sana}\n"
-                    f"👥 Odam soni: {kishi}\n\n"
+                    f"👥 Odam soni: {booking.get('calc_people', '—')}\n\n"
                     f"🇺🇿 Fuqarolik: {booking.get('calc_cit', '—')}\n"
                     f"👤 Yosh toifasi: {booking.get('calc_age', '—')}\n"
                     f"🏨 Tanlangan to'lov turi: {booking.get('calc_room', '—')}\n"
@@ -3059,12 +3088,23 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if step == "sana":
             context.user_data.setdefault("booking", {})["sana"] = text
-            context.user_data["booking_step"] = "kishi"
-            ask = {
-                "ru": f"📅 *{text}*\n\n👥 Шаг 3/5\nСколько *человек* приедет?",
-                "uz": f"📅 *{text}*\n\n👥 3/5 qadam\nNecha *kishi* keladi?",
-                "kz": f"📅 *{text}*\n\n👥 3/5 қадам\nНеше *адам* келеді?",
-            }[lang]
+            booking = context.user_data.get("booking", {})
+
+            # Agar calc dan kelgan bo'lsa — kishi soni oldin tanlangan
+            if booking.get("from_calc"):
+                context.user_data["booking_step"] = "phone"
+                ask = {
+                    "ru": f"📅 *{text}*\n\n📞 Шаг 3/4\nНапишите *номер телефона*:",
+                    "uz": f"📅 *{text}*\n\n📞 3/4 qadam\n*Telefon raqamingizni* yozing:",
+                    "kz": f"📅 *{text}*\n\n📞 3/4 қадам\n*Телефон нөміріңізді* жазыңыз:",
+                }[lang]
+            else:
+                context.user_data["booking_step"] = "kishi"
+                ask = {
+                    "ru": f"📅 *{text}*\n\n👥 Шаг 3/5\nСколько *человек* приедет?",
+                    "uz": f"📅 *{text}*\n\n👥 3/5 qadam\nNecha *kishi* keladi?",
+                    "kz": f"📅 *{text}*\n\n👥 3/5 қадам\nНеше *адам* келеді?",
+                }[lang]
             await update.message.reply_text(ask, parse_mode="Markdown")
             return
 
@@ -3092,7 +3132,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"📋 *Проверьте данные:*\n\n"
                         f"👤 Имя: {booking.get('name')}\n"
                         f"📅 Дата: {booking.get('sana')}\n"
-                        f"👥 Человек: {booking.get('kishi')}\n"
+                        f"👥 Человек: {booking.get('calc_people', '—')}\n"
                         f"📞 Телефон: {text}\n"
                         f"🏨 Палата: {booking.get('calc_room')}\n"
                         f"💰 1 день: {booking.get('calc_price')}\n"
@@ -3104,7 +3144,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"📋 *Ma'lumotlarni tekshiring:*\n\n"
                         f"👤 Ism: {booking.get('name')}\n"
                         f"📅 Sana: {booking.get('sana')}\n"
-                        f"👥 Kishi: {booking.get('kishi')}\n"
+                        f"👥 Kishi: {booking.get('calc_people', '—')}\n"
                         f"📞 Telefon: {text}\n"
                         f"🏨 Xona: {booking.get('calc_room')}\n"
                         f"💰 1 kun: {booking.get('calc_price')}\n"
@@ -3116,7 +3156,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"📋 *Деректерді тексеріңіз:*\n\n"
                         f"👤 Аты: {booking.get('name')}\n"
                         f"📅 Күні: {booking.get('sana')}\n"
-                        f"👥 Адам: {booking.get('kishi')}\n"
+                        f"👥 Адам: {booking.get('calc_people', '—')}\n"
                         f"📞 Телефон: {text}\n"
                         f"🏨 Палата: {booking.get('calc_room')}\n"
                         f"💰 1 күн: {booking.get('calc_price')}\n"
