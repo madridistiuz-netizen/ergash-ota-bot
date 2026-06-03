@@ -1501,13 +1501,30 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Agar xonaning alohida tavsifi bo'lsa — uni ko'rsat
         desc_key = f"description_{lang}"
         description = xona.get(desc_key) or xona.get("description_uz", "")
-        if description:
+       if description:
+            # Avval eski rasm xabarlarini o'chirish
+            old_ids = context.user_data.pop("xona_photo_ids", [])
+            for mid in old_ids:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+                except Exception:
+                    pass
+
             back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
                 {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
                 callback_data=f"korpus_{korpus['id']}")]])
             await query.edit_message_text(description, parse_mode="Markdown", reply_markup=back_kb)
+
+            # Yangi rasmlarni yuborib, message_id larini saqlab qolish
             if xona.get("photos"):
-                await send_photos(context, chat_id, xona["photos"])
+                sent_ids = []
+                for photo_id in xona["photos"][:10]:
+                    try:
+                        msg = await context.bot.send_photo(chat_id=chat_id, photo=photo_id)
+                        sent_ids.append(msg.message_id)
+                    except Exception:
+                        pass
+                context.user_data["xona_photo_ids"] = sent_ids
             return
 
         text = {
