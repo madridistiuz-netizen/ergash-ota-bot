@@ -3364,6 +3364,7 @@ def main():
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
+    app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
     app.add_handler(CommandHandler("admin_staff_add", admin_handler))
     app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
