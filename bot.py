@@ -1439,6 +1439,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ── Palatalar — Korpus tanlash ──
     elif data == "menu_wards":
+        # Xona rasmlarini o'chirish
+        old_ids = context.user_data.pop("xona_photo_ids", [])
+        for mid in old_ids:
+            try:
+                await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+            except Exception:
+                pass
+
         korpuslar = d.get("korpuslar", [])
         title = {
             "ru": "🏨 *Корпуса клиники*\n\nВыберите корпус:",
@@ -1457,6 +1465,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=InlineKeyboardMarkup(buttons))
 
     elif data.startswith("korpus_"):
+        # Orqaga kelganda eski xona rasmlarini o'chirish
+        old_ids = context.user_data.pop("xona_photo_ids", [])
+        for mid in old_ids:
+            try:
+                await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+            except Exception:
+                pass
+
         korpus_id = data.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
         korpus = next((k for k in korpuslar if k["id"] == korpus_id), None)
@@ -2293,6 +2309,45 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 📝 *Matn o'zgartirish:*
 `/admin contacts|phone1|+998901234567`"""
         await update.message.reply_text(help_text, parse_mode="Markdown")
+        return
+
+    if text.startswith("/admin_photo_clear"):
+        parts = text.split()
+        if len(parts) < 2:
+            await update.message.reply_text("Format: /admin_photo_clear xona_umumiy_z_3")
+            return
+        target = parts[1]
+        d = load_data()
+        if target.startswith("xona_"):
+            last_underscore = target.rfind("_")
+            korpus_id = target[5:last_underscore]
+            xona_idx = int(target[last_underscore + 1:])
+            for k in d.get("korpuslar", []):
+                if k["id"] == korpus_id:
+                    if xona_idx < len(k["xonalar"]):
+                        k["xonalar"][xona_idx]["photos"] = []
+                        save_data(d)
+                        await update.message.reply_text(f"✅ {korpus_id} / {xona_idx}-xona rasmlari tozalandi!")
+                    else:
+                        await update.message.reply_text("❌ Xona topilmadi")
+                    return
+            await update.message.reply_text("❌ Korpus topilmadi")
+        elif target.startswith("korpus_"):
+            korpus_id = target.replace("korpus_", "")
+            for k in d.get("korpuslar", []):
+                if k["id"] == korpus_id:
+                    k["photos"] = []
+                    save_data(d)
+                    await update.message.reply_text(f"✅ {korpus_id} korpus rasmlari tozalandi!")
+                    return
+            await update.message.reply_text("❌ Korpus topilmadi")
+        elif target in ("clinic", "team", "ward", "cert", "samarkand", "bukhara"):
+            key = target + "_photos"
+            d[key] = []
+            save_data(d)
+            await update.message.reply_text(f"✅ {target} rasmlari tozalandi!")
+        else:
+            await update.message.reply_text("❌ Noto'g'ri format")
         return
 
     if text.startswith("/admin_photo"):
