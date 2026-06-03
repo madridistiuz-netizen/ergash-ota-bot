@@ -1501,7 +1501,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Agar xonaning alohida tavsifi bo'lsa — uni ko'rsat
         desc_key = f"description_{lang}"
         description = xona.get(desc_key) or xona.get("description_uz", "")
-       if description:
+        if description:
             # Avval eski rasm xabarlarini o'chirish
             old_ids = context.user_data.pop("xona_photo_ids", [])
             for mid in old_ids:
