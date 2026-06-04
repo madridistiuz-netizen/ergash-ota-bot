@@ -163,7 +163,10 @@ DEFAULT_DATA = {
             "emoji": "🔬",
             "photos": [],
             "xonalar": [
-                {"nom": "D/Urta miyona", "kishi": "3", "uz_adult": "243 000", "uz_child": "228 000", "foreign_adult": "317 000", "foreign_child": "300 000", "photos": []},
+                {"nom": "D/Urta miyona", "kishi": "3", "uz_adult": "243 000", "uz_child": "228 000", "foreign_adult": "317 000", "foreign_child": "300 000", "photos": [],
+                 "description_uz": "🛏 *D/Urta miyona (3 kishi) xona sharoitlari*\n\n• 🏢 *Korpus:* Diagnostika\n• 👥 *Sig'imi:* 3 kishi uchun mo'ljallangan\n\n⚙️ *Xonaning ichida mavjud qulayliklar:*\n✅ 3 ta alohida qulay krovat\n✅ Har bir bemor uchun shaxsiy tumba\n✅ Kiyimlarni tartibli saqlash uchun keng shkaf\n✅ Yuqori tezlikdagi Wi-Fi hududi\n✅ Hordiq chiqarish uchun televizor\n\n☀️ *Isitish va sovitish tizimi:* Xonada qishki isitish tizimi to'liq mavjud (Yozgi konditsioner tizimi mavjud emas).\n\n🛁 *Shaxsiy gigiyena va qulaylik (Xona ichida):*\n✅ Yuvinish uchun qulay rakovina",
+                 "description_ru": "🛏 *Условия палаты Д/Средний (3 человека)*\n\n• 🏢 *Корпус:* Диагностика\n• 👥 *Вместимость:* 3 человека\n\n⚙️ *Удобства внутри палаты:*\n✅ 3 отдельные удобные кровати\n✅ Личная тумбочка для каждого пациента\n✅ Просторный шкаф для одежды\n✅ Высокоскоростной Wi-Fi\n✅ Телевизор для отдыха\n\n☀️ *Отопление и охлаждение:* Зимнее отопление полностью есть (летнего кондиционера нет).\n\n🛁 *Личная гигиена и удобства (внутри палаты):*\n✅ Удобная раковина для умывания",
+                 "description_kz": "🛏 *Д/Орта деңгейлі (3 адам) палата жағдайлары*\n\n• 🏢 *Корпус:* Диагностика\n• 👥 *Сыйымдылығы:* 3 адам\n\n⚙️ *Палата ішіндегі қолайлықтар:*\n✅ 3 жеке ыңғайлы кереует\n✅ Әр науқасқа жеке тумба\n✅ Кең шкаф\n✅ Жоғары жылдамдықты Wi-Fi\n✅ Теледидар\n\n☀️ *Жылыту:* Қысқы жылыту толық бар (жазғы кондиционер жоқ).\n\n🛁 *Жеке гигиена және қолайлық (палата ішінде):*\n✅ Ыңғайлы раковина"},
                 {"nom": "D/Lyuks", "kishi": "5", "uz_adult": "420 000", "uz_child": "405 000", "foreign_adult": "420 000", "foreign_child": "405 000", "photos": []},
                 {"nom": "D/Lyuks", "kishi": "2", "uz_adult": "495 000", "uz_child": "480 000", "foreign_adult": "495 000", "foreign_child": "480 000", "photos": []},
             ]
