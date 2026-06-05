@@ -783,6 +783,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
+    logger.info(f"CALLBACK: data='{data}'")
     d = load_data()
     lang = get_lang(context)
     phone = d["contacts"]["phone1"]
@@ -2016,6 +2017,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(title, reply_markup=diagnostics_keyboard(lang))
 
     elif data == "diag_mrt15":
+        logger.info(f"diag_mrt15 handler ishga tushdi, lang={lang}")
         lines = "\n".join([f"• {x}" for x in d["mrt_15"]])
         title = {"ru": "🧲 *МРТ 1.5Т — цены:*", "uz": "🧲 *МРТ 1.5Т — narxlar:*", "kz": "🧲 *МРТ 1.5Т — бағалар:*"}[lang]
         call_label = {"ru": "📞 Позвонить в МРТ 1.5Т", "uz": "📞 МРТ 1.5Т ga qo'ng'iroq", "kz": "📞 МРТ 1.5Т-ға қоңырау"}[lang]
