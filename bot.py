@@ -2005,6 +2005,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(back_label, callback_data=f"calc_days_{cit}_{age}_{idx}_{days}")],
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
     # ── Diagnostika ──
     elif data == "menu_diagnostics":
         title = {
