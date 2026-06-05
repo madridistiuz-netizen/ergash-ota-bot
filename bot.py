@@ -2017,28 +2017,58 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "diag_mrt15":
         lines = "\n".join([f"• {x}" for x in d["mrt_15"]])
         title = {"ru": "🧲 *МРТ 1.5Т — цены:*", "uz": "🧲 *МРТ 1.5Т — narxlar:*", "kz": "🧲 *МРТ 1.5Т — бағалар:*"}[lang]
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        call_label = {"ru": "📞 Позвонить в МРТ 1.5Т", "uz": "📞 МРТ 1.5Т ga qo'ng'iroq", "kz": "📞 МРТ 1.5Т-ға қоңырау"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(call_label, url="tel:+998664556015")],
+            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
+        ])
+        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mrt3t":
         title = {"ru": "🧲 МРТ 3Т — выберите группу:", "uz": "🧲 МРТ 3Т — guruhni tanlang:", "kz": "🧲 МРТ 3Т — топты таңдаңыз:"}[lang]
-        await query.edit_message_text(title, reply_markup=mrt3t_groups_keyboard(lang))
+        call_label = {"ru": "📞 Позвонить в МРТ 3Т", "uz": "📞 МРТ 3Т ga qo'ng'iroq", "kz": "📞 МРТ 3Т-ға қоңырау"}[lang]
+        # MRT 3T guruh tugmalariga qo'ng'iroq tugmasini qo'shamiz
+        kb = mrt3t_groups_keyboard(lang)
+        existing = kb.inline_keyboard
+        existing.insert(0, [InlineKeyboardButton(call_label, url="tel:+998557010756")])
+        kb = InlineKeyboardMarkup(existing)
+        await query.edit_message_text(title, reply_markup=kb)
 
     elif data.startswith("mrt3t_"):
         group = data[6:]
         items = d["mrt_3t_groups"].get(group, [])
         lines = "\n".join([f"• {x}" for x in items])
+        call_label = {"ru": "📞 Позвонить в МРТ 3Т", "uz": "📞 МРТ 3Т ga qo'ng'iroq", "kz": "📞 МРТ 3Т-ға қоңырау"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(call_label, url="tel:+998557010756")],
+            [InlineKeyboardButton(back_label, callback_data="diag_mrt3t")],
+        ])
         await query.edit_message_text(f"🧲 *МРТ 3Т — {group}:*\n\n{lines}",
-                                      parse_mode="Markdown", reply_markup=back_keyboard(lang))
+                                      parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mskt256":
         lines = "\n".join([f"• {x}" for x in d["mskt_256"]])
         title = {"ru": "🖥 *МСКТ 256 — цены:*", "uz": "🖥 *МСКТ 256 — narxlar:*", "kz": "🖥 *МСКТ 256 — бағалар:*"}[lang]
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        call_label = {"ru": "📞 Позвонить в МСКТ 256", "uz": "📞 МСКТ 256 ga qo'ng'iroq", "kz": "📞 МСКТ 256-ға қоңырау"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(call_label, url="tel:+998664556007")],
+            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
+        ])
+        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mskt128":
         lines = "\n".join([f"• {x}" for x in d["mskt_128"]])
         title = {"ru": "🖥 *МСКТ 128 — цены:*", "uz": "🖥 *МСКТ 128 — narxlar:*", "kz": "🖥 *МСКТ 128 — бағалар:*"}[lang]
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        call_label = {"ru": "📞 Позвонить в МСКТ 128", "uz": "📞 МСКТ 128 ga qo'ng'iroq", "kz": "📞 МСКТ 128-ға қоңырау"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(call_label, url="tel:+998664556007")],
+            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
+        ])
+        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_other":
         lines = "\n".join([f"• {x}" for x in d["other_diagnostics"]])
