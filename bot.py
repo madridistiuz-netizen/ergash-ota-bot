@@ -2028,11 +2028,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "diag_mrt3t":
         title = {"ru": "🧲 МРТ 3Т — выберите группу:", "uz": "🧲 МРТ 3Т — guruhni tanlang:", "kz": "🧲 МРТ 3Т — топты таңдаңыз:"}[lang]
         call_label = {"ru": "📞 Позвонить в МРТ 3Т", "uz": "📞 МРТ 3Т ga qo'ng'iroq", "kz": "📞 МРТ 3Т-ға қоңырау"}[lang]
-        # MRT 3T guruh tugmalariga qo'ng'iroq tugmasini qo'shamiz
-        kb = mrt3t_groups_keyboard(lang)
-        existing = kb.inline_keyboard
-        existing.insert(0, [InlineKeyboardButton(call_label, url="tel:+998557010756")])
-        kb = InlineKeyboardMarkup(existing)
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        groups_kb = mrt3t_groups_keyboard(lang).inline_keyboard
+        kb = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(call_label, url="tel:+998557010756")]] +
+            groups_kb
+        )
         await query.edit_message_text(title, reply_markup=kb)
 
     elif data.startswith("mrt3t_"):
