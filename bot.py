@@ -2401,7 +2401,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Noto'g'ri format")
         return
 
-    if text.startswith("/admin_photo"):
+    if text.startswith("/admin_photo") and not text.startswith("/admin_photo_clear"):
         parts = text.split()
         if len(parts) < 2:
             await update.message.reply_text("Format: /admin_photo clinic|ward|samarkand|bukhara|doctor")
@@ -2487,8 +2487,10 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         korpus_id = waiting[5:last_underscore]
         xona_idx = int(waiting[last_underscore + 1:])
         korpuslar = d.get("korpuslar", [])
+        found_korpus = False
         for k in korpuslar:
             if k["id"] == korpus_id:
+                found_korpus = True
                 if xona_idx < len(k["xonalar"]):
                     k["xonalar"][xona_idx]["photos"].append(file_id)
                     save_data(d)
@@ -2496,7 +2498,17 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await update.message.reply_text(f"✅ {xona_nom} xona rasmi qo'shildi!")
                     context.user_data["waiting_photo"] = None
                     return
-        await update.message.reply_text("❌ Xona topilmadi")
+                else:
+                    await update.message.reply_text(
+                        f"❌ Xona topilmadi. Korpus: {korpus_id}, idx: {xona_idx}, "
+                        f"xonalar soni: {len(k['xonalar'])}"
+                    )
+                    context.user_data["waiting_photo"] = None
+                    return
+        if not found_korpus:
+            ids = [k["id"] for k in korpuslar]
+            await update.message.reply_text(f"❌ Korpus topilmadi: '{korpus_id}'. Mavjud: {ids}")
+        context.user_data["waiting_photo"] = None
         return
         idx = int(waiting.split("_")[1])
         if idx < len(d["staff"]):
@@ -3308,38 +3320,40 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if step == "xona":
             context.user_data.setdefault("booking", {})["xona"] = text
             context.user_data["booking_step"] = None
-            booking = context.user_data.get("booking", {})
-            summary = {
+            # ... booking ma'lumotlari saqlandi, ogohlantirishli xabar yuboriladi
+            warning = {
                 "ru": (
-                    f"📋 *Проверьте данные:*\n\n"
-                    f"👤 Имя: {booking.get('name')}\n"
-                    f"📅 Дата: {booking.get('sana')}\n"
-                    f"👥 Человек: {booking.get('kishi')}\n"
-                    f"📞 Телефон: {booking.get('phone')}\n"
-                    f"🛏 Номер: {text}\n\n"
-                    f"Всё верно?"
+                    f"📋 *Ваше пожелание по номеру принято!*\n\n"
+                    f"⚠️ *Важное примечание (обратите внимание):*\n"
+                    f"Выбор типа номера — это *не 100% бронирование*.\n\n"
+                    f"*Как проходит размещение?*\n"
+                    f"1. Если в день приезда запрошенный вами номер *свободен* — вы получите его первым.\n"
+                    f"2. Если номер *занят другими пациентами* — вас временно разместят в свободное место, "
+                    f"а как только нужный номер освободится — сразу переселят.\n\n"
+                    f"Спасибо за понимание! Запись к врачу успешно завершена."
                 ),
                 "uz": (
-                    f"📋 *Ma'lumotlarni tekshiring:*\n\n"
-                    f"👤 Ism: {booking.get('name')}\n"
-                    f"📅 Sana: {booking.get('sana')}\n"
-                    f"👥 Kishi: {booking.get('kishi')}\n"
-                    f"📞 Telefon: {booking.get('phone')}\n"
-                    f"🛏 Xona: {text}\n\n"
-                    f"Hammasi to'g'rimi?"
+                    f"📋 *Sizning xona bo'yicha istagingiz qabul qilindi!*\n\n"
+                    f"⚠️ *Muhim eslatma (E'tibor bering):*\n"
+                    f"Xona turini tanlashingiz — bu xonani *100% oldindan band qilish (bron qilish) degani emas*.\n\n"
+                    f"*Joylashtirish tartibi qanday bo'ladi?*\n"
+                    f"1. Siz kelgan kuni so'ragan xona turi *bo'sh bo'lsa*, birinchilardan bo'lib aynan sizga taqdim etiladi.\n"
+                    f"2. Agar u xona *boshqa bemorlar bilan band bo'lsa*, sizni vaqtinchalik mavjud bo'sh joyga joylashtiramiz "
+                    f"va xona bo'shashi bilan darhol o'zingiz xohlagan xonaga o'tkazib beramiz.\n\n"
+                    f"Ko'rsatgan to'g'ri tushunchangiz uchun tashakkur! Shifokor qabuliga yozilish jarayoni muvaffaqiyatli yakunlandi."
                 ),
                 "kz": (
-                    f"📋 *Деректерді тексеріңіз:*\n\n"
-                    f"👤 Аты: {booking.get('name')}\n"
-                    f"📅 Күні: {booking.get('sana')}\n"
-                    f"👥 Адам: {booking.get('kishi')}\n"
-                    f"📞 Телефон: {booking.get('phone')}\n"
-                    f"🛏 Бөлме: {text}\n\n"
-                    f"Бәрі дұрыс па?"
+                    f"📋 *Бөлме бойынша тілегіңіз қабылданды!*\n\n"
+                    f"⚠️ *Маңызды ескерту (назар аударыңыз):*\n"
+                    f"Бөлме түрін таңдау — бұл бөлмені *100% алдын ала брондау дегенді білдірмейді*.\n\n"
+                    f"*Орналастыру тәртібі қандай?*\n"
+                    f"1. Келген күні сұраған бөлмеңіз *бос болса* — ең бірінші болып сізге ұсынылады.\n"
+                    f"2. Егер бөлме *басқа науқастармен бос болмаса* — сізді уақытша бос орынға орналастырамыз, "
+                    f"бөлме босаған бетте дереу ауыстырып береміз.\n\n"
+                    f"Түсінушілігіңіз үшін рахмет! Дәрігер қабылдауына жазылу сәтті аяқталды."
                 ),
             }[lang]
-            await update.message.reply_text(summary, parse_mode="Markdown",
-                                            reply_markup=confirm_keyboard(lang))
+            await update.message.reply_text(warning, parse_mode="Markdown")
             return
 
     # ── DIAGNOSTIKA FLOW ──
