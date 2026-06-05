@@ -2020,18 +2020,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(f"diag_mrt15 handler ishga tushdi, lang={lang}")
         lines = "\n".join([f"• {x}" for x in d["mrt_15"]])
         title = {"ru": "🧲 *МРТ 1.5Т — цены:*", "uz": "🧲 *МРТ 1.5Т — narxlar:*", "kz": "🧲 *МРТ 1.5Т — бағалар:*"}[lang]
-        call_label = {"ru": "📞 +998664556015 (МРТ 1.5Т)", "uz": "📞 +998664556015 (МРТ 1.5Т)", "kz": "📞 +998664556015 (МРТ 1.5Т)"}[lang]
+        phone_line = {"ru": "\n\n📞 Запись: +998664556015", "uz": "\n\n📞 Qo'ng'iroq: +998664556015", "kz": "\n\n📞 Қоңырау: +998664556015"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(call_label, callback_data="call_mrt15")],
-            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
-        ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        await query.edit_message_text(f"{title}\n\n{lines}{phone_line}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mrt3t":
         title = {"ru": "🧲 МРТ 3Т — выберите группу:", "uz": "🧲 МРТ 3Т — guruhni tanlang:", "kz": "🧲 МРТ 3Т — топты таңдаңыз:"}[lang]
         call_label = {"ru": "📞 +998557010756 (МРТ 3Т)", "uz": "📞 +998557010756 (МРТ 3Т)", "kz": "📞 +998557010756 (МРТ 3Т)"}[lang]
-        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         groups_kb = mrt3t_groups_keyboard(lang).inline_keyboard
         kb = InlineKeyboardMarkup(
             [[InlineKeyboardButton(call_label, callback_data="call_mrt3t")]] +
@@ -2043,36 +2039,27 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group = data[6:]
         items = d["mrt_3t_groups"].get(group, [])
         lines = "\n".join([f"• {x}" for x in items])
-        call_label = {"ru": "📞 +998557010756 (МРТ 3Т)", "uz": "📞 +998557010756 (МРТ 3Т)", "kz": "📞 +998557010756 (МРТ 3Т)"}[lang]
+        phone_line = {"ru": "\n\n📞 Запись: +998557010756", "uz": "\n\n📞 Qo'ng'iroq: +998557010756", "kz": "\n\n📞 Қоңырау: +998557010756"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(call_label, callback_data="call_mrt3t")],
-            [InlineKeyboardButton(back_label, callback_data="diag_mrt3t")],
-        ])
-        await query.edit_message_text(f"🧲 *МРТ 3Т — {group}:*\n\n{lines}",
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="diag_mrt3t")]])
+        await query.edit_message_text(f"🧲 *МРТ 3Т — {group}:*\n\n{lines}{phone_line}",
                                       parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mskt256":
         lines = "\n".join([f"• {x}" for x in d["mskt_256"]])
         title = {"ru": "🖥 *МСКТ 256 — цены:*", "uz": "🖥 *МСКТ 256 — narxlar:*", "kz": "🖥 *МСКТ 256 — бағалар:*"}[lang]
-        call_label = {"ru": "📞 +998664556007 (МСКТ 256)", "uz": "📞 +998664556007 (МСКТ 256)", "kz": "📞 +998664556007 (МСКТ 256)"}[lang]
+        phone_line = {"ru": "\n\n📞 Запись: +998664556007", "uz": "\n\n📞 Qo'ng'iroq: +998664556007", "kz": "\n\n📞 Қоңырау: +998664556007"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(call_label, callback_data="call_mskt")],
-            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
-        ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        await query.edit_message_text(f"{title}\n\n{lines}{phone_line}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mskt128":
         lines = "\n".join([f"• {x}" for x in d["mskt_128"]])
         title = {"ru": "🖥 *МСКТ 128 — цены:*", "uz": "🖥 *МСКТ 128 — narxlar:*", "kz": "🖥 *МСКТ 128 — бағалар:*"}[lang]
-        call_label = {"ru": "📞 +998664556007 (МСКТ 128)", "uz": "📞 +998664556007 (МСКТ 128)", "kz": "📞 +998664556007 (МСКТ 128)"}[lang]
+        phone_line = {"ru": "\n\n📞 Запись: +998664556007", "uz": "\n\n📞 Qo'ng'iroq: +998664556007", "kz": "\n\n📞 Қоңырау: +998664556007"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(call_label, callback_data="call_mskt")],
-            [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
-        ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        await query.edit_message_text(f"{title}\n\n{lines}{phone_line}", parse_mode="Markdown", reply_markup=kb)
 
     elif data == "call_mrt15":
         text = {"ru": "📞 *МРТ 1.5Т*\nТелефон: +998 66 455 60 15", "uz": "📞 *МРТ 1.5Т*\nTelefon: +998 66 455 60 15", "kz": "📞 *МРТ 1.5Т*\nТелефон: +998 66 455 60 15"}[lang]
