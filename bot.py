@@ -2033,7 +2033,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         call_label = {"ru": "📞 МРТ 3Т — позвонить", "uz": "📞 МРТ 3Т — telefon qilish", "kz": "📞 МРТ 3Т — қоңырау шалу"}[lang]
         groups_kb = list(mrt3t_groups_keyboard(lang).inline_keyboard)
         kb = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(call_label, callback_data="call_mrt3t")]] + groups_kb
+            groups_kb + [[InlineKeyboardButton(call_label, callback_data="call_mrt3t")]]
         )
         await query.edit_message_text(title, reply_markup=kb)
 
