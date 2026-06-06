@@ -634,8 +634,8 @@ def mrt3t_groups_keyboard(lang):
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
     d = load_data()
     buttons = []
-    for group in d["mrt_3t_groups"].keys():
-        buttons.append([InlineKeyboardButton(f"📋 {group}", callback_data=f"mrt3t_{group}")])
+    for i, group in enumerate(d["mrt_3t_groups"].keys()):
+        buttons.append([InlineKeyboardButton(f"📋 {group}", callback_data=f"mrt3t_{i}")])
     buttons.append([InlineKeyboardButton(back, callback_data="menu_diagnostics")])
     return InlineKeyboardMarkup(buttons)
 
@@ -2039,8 +2039,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(title, reply_markup=kb)
 
     elif data.startswith("mrt3t_"):
-        group = data[6:]
-        items = d["mrt_3t_groups"].get(group, [])
+        idx = int(data[6:])
+        groups = d["mrt_3t_groups"]
+        group_name = list(groups.keys())[idx]
+        items = groups[group_name]
         lines = "\n".join([f"• {x}" for x in items])
         call_label = {"ru": "📞 МРТ 3Т — позвонить", "uz": "📞 МРТ 3Т — telefon qilish", "kz": "📞 МРТ 3Т — қоңырау шалу"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
@@ -2048,7 +2050,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(call_label, callback_data="call_mrt3t")],
             [InlineKeyboardButton(back_label, callback_data="diag_mrt3t")],
         ])
-        await query.edit_message_text(f"🧲 *МРТ 3Т — {group}:*\n\n{lines}",
+        await query.edit_message_text(f"🧲 *МРТ 3Т — {group_name}:*\n\n{lines}",
                                       parse_mode="Markdown", reply_markup=kb)
 
     elif data == "diag_mskt256":
