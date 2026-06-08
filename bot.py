@@ -2857,8 +2857,10 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
+DOCTORS_GROUP_ID = -1002145678912  # Shifokorlar guruhi
+
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Bemor tibbiy hujjat (rasm yoki fayl) yuborsa — adminга yo'naltiradi"""
+    """Bemor tibbiy hujjat yuborsa — shifokorlar guruhiga yo'naltiradi"""
     if not context.user_data.get("waiting_medical_doc"):
         return
     context.user_data["waiting_medical_doc"] = False
@@ -2868,25 +2870,28 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     username = f"@{user.username}" if user.username else str(user.id)
     lang_label = {"ru": "Русский", "uz": "O'zbek", "kz": "Қазақ"}.get(lang, lang)
 
+    # USER_ID yashirin tarzda caption ga kiritiladi — shifokor reply qilganda topish uchun
     caption = (
         f"⚠️ *Yangi tibbiy hujjat kelib tushdi!*\n\n"
         f"👤 Ism: {user.full_name}\n"
         f"💬 Telegram: {username}\n"
-        f"🌐 Til: {lang_label}\n\n"
-        f"📋 Bemor o'z kasalligini ro'yxatda topolmadi va hujjat yubordi."
+        f"🌐 Til: {lang_label}\n"
+        f"🆔 `uid:{user.id}`\n\n"
+        f"📋 Bemor o'z kasalligini ro'yxatda topolmadi va hujjat yubordi.\n"
+        f"_Javob berish uchun shu xabarga REPLY qiling._"
     )
 
     try:
         if update.message.photo:
             file_id = update.message.photo[-1].file_id
             await context.bot.send_photo(
-                chat_id=ADMIN_ID, photo=file_id,
+                chat_id=DOCTORS_GROUP_ID, photo=file_id,
                 caption=caption, parse_mode="Markdown"
             )
         elif update.message.document:
             file_id = update.message.document.file_id
             await context.bot.send_document(
-                chat_id=ADMIN_ID, document=file_id,
+                chat_id=DOCTORS_GROUP_ID, document=file_id,
                 caption=caption, parse_mode="Markdown"
             )
 
@@ -2895,9 +2900,48 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             "uz": "✅ Hujjatlaringiz qabul qilindi! Shifokorlar ko'rib chiqib, tez orada siz bilan bog'lanishadi.",
             "kz": "✅ Құжаттарыңыз қабылданды! Дәрігерлер қарап шығып, жақын арада сізбен байланысады.",
         }[lang]
-        await update.message.reply_text(confirm, parse_mode="Markdown")
+        await update.message.reply_text(confirm)
     except Exception as e:
         logger.error(f"medical_doc_handler error: {e}")
+
+
+async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Shifokor guruhda bemorning xabariga REPLY qilganda — bemorga yetkazadi"""
+    msg = update.message
+    if not msg or not msg.reply_to_message:
+        return
+
+    # Faqat shifokorlar guruhidan
+    if msg.chat.id != DOCTORS_GROUP_ID:
+        return
+
+    # Asl xabarda uid ni topamiz
+    original = msg.reply_to_message
+    original_text = original.caption or original.text or ""
+    import re
+    match = re.search(r"uid:(\d+)", original_text)
+    if not match:
+        return
+
+    patient_id = int(match.group(1))
+    doctor_name = msg.from_user.full_name if msg.from_user else "Shifokor"
+
+    reply_text = (
+        f"👨‍⚕️ *Shifokordan javob:*\n\n"
+        f"{msg.text or msg.caption or ''}"
+    )
+
+    try:
+        await context.bot.send_message(
+            chat_id=patient_id,
+            text=reply_text,
+            parse_mode="Markdown"
+        )
+        # Guruhda tasdiqlash
+        await msg.reply_text("✅ Javob bemorga yetkazildi.")
+    except Exception as e:
+        logger.error(f"doctor_reply_handler error: {e}")
+        await msg.reply_text(f"❌ Xato: {e}")
 
 
 
@@ -3903,6 +3947,7 @@ def main():
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
