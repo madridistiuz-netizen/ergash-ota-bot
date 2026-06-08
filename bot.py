@@ -2945,6 +2945,7 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 
+async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
         return
