@@ -1844,15 +1844,106 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "send_medical_docs":
-        context.user_data["waiting_medical_doc"] = True
+        # FSM state ni boshlash
+        context.user_data["med_state"] = {
+            "photos": [],
+            "voice_id": None,
+            "bemor_matni": "",
+        }
         text = {
-            "ru": "📄 Хорошо! Пришлите фото или PDF-файл с вашими медицинскими документами. Мы передадим их нашим врачам.",
-            "uz": "📄 Yaxshi! Tibbiy hujjatlaringiz rasmini yoki PDF faylini yuboring. Uni shifokorlarimizga yetkazamiz.",
-            "kz": "📄 Жақсы! Медициналық құжаттарыңыздың суретін немесе PDF файлын жіберіңіз. Оны дәрігерлеріміздің назарына жеткіземіз.",
+            "ru": (
+                "📄 *Отправьте материалы по вашей болезни:*\n\n"
+                "📸 Фото документов (МРТ, УЗИ, анализы) — можно несколько\n"
+                "🎤 Голосовое сообщение с описанием жалоб\n"
+                "✍️ Или напишите текстом\n\n"
+                "_Когда всё готово — нажмите кнопку ниже._"
+            ),
+            "uz": (
+                "📄 *Kasalligingiz bo'yicha materiallar yuboring:*\n\n"
+                "📸 Hujjatlar rasmi (MRT, UZI, tahlillar) — bir nechtasini yuborishingiz mumkin\n"
+                "🎤 Shikoyatlaringizni ovozli xabar orqali ayting\n"
+                "✍️ Yoki matn ko'rinishida yozing\n\n"
+                "_Hammasi tayyor bo'lgach — quyidagi tugmani bosing._"
+            ),
+            "kz": (
+                "📄 *Ауруыңыз бойынша материалдар жіберіңіз:*\n\n"
+                "📸 Құжаттар суреті (МРТ, УДЗ, анализдер) — бірнеше жіберуге болады\n"
+                "🎤 Шағымдарыңызды дауыстық хабармен айтыңыз\n"
+                "✍️ Немесе мәтін түрінде жазыңыз\n\n"
+                "_Бәрі дайын болған соң — төмендегі түймені басыңыз._"
+            ),
         }[lang]
-        back_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="disease_not_found")]])
+        confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+        cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+            [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+        ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "confirm_medical":
+        # Yig'ilgan ma'lumotlarni guruhga yuborish
+        med = context.user_data.get("med_state", {})
+        photos = med.get("photos", [])
+        voice_id = med.get("voice_id")
+        bemor_matni = med.get("bemor_matni", "")
+        user = query.from_user
+        username = f"@{user.username}" if user.username else str(user.id)
+        lang_label = {"ru": "Русский", "uz": "O'zbek", "kz": "Қазақ"}.get(lang, lang)
+
+        if not photos and not voice_id and not bemor_matni:
+            err = {"ru": "⚠️ Вы ничего не отправили. Пришлите фото, голосовое или текст.", "uz": "⚠️ Hech narsa yubormadingiiz. Rasm, ovoz yoki matn yuboring.", "kz": "⚠️ Ештеңе жібермедіңіз. Сурет, дауыс немесе мәтін жіберіңіз."}[lang]
+            await query.answer(err, show_alert=True)
+            return
+
+        caption_base = (
+            f"⚠️ *Yangi tibbiy murojaat!*\n\n"
+            f"👤 {user.full_name}\n"
+            f"💬 {username}\n"
+            f"🌐 {lang_label}\n"
+            f"🆔 `uid:{user.id}`"
+        )
+        if bemor_matni:
+            caption_base += f"\n\n💬 *Shikoyat:*\n_{bemor_matni}_"
+        caption_base += f"\n\n_Javob uchun REPLY qiling._"
+
+        try:
+            from telegram import InputMediaPhoto
+            if photos:
+                if len(photos) == 1:
+                    await context.bot.send_photo(
+                        chat_id=DOCTORS_GROUP_ID, photo=photos[0],
+                        caption=caption_base, parse_mode="Markdown"
+                    )
+                else:
+                    media = [InputMediaPhoto(p) for p in photos]
+                    media[0] = InputMediaPhoto(photos[0], caption=caption_base, parse_mode="Markdown")
+                    await context.bot.send_media_group(chat_id=DOCTORS_GROUP_ID, media=media)
+
+            if voice_id:
+                voice_cap = (
+                    f"🎤 *Ovozli xabar* | {user.full_name}\n"
+                    f"🆔 `uid:{user.id}`\n_Javob uchun REPLY qiling._"
+                )
+                await context.bot.send_voice(
+                    chat_id=DOCTORS_GROUP_ID, voice=voice_id,
+                    caption=voice_cap, parse_mode="Markdown"
+                )
+
+            if not photos and not voice_id and bemor_matni:
+                await context.bot.send_message(
+                    chat_id=DOCTORS_GROUP_ID,
+                    text=caption_base, parse_mode="Markdown"
+                )
+
+            # State ni tozalash
+            context.user_data["med_state"] = {}
+
+            ok = {"ru": "✅ Отправлено! Врачи свяжутся с вами.", "uz": "✅ Yuborildi! Shifokorlar siz bilan bog'lanishadi.", "kz": "✅ Жіберілді! Дәрігерлер сізбен байланысады."}[lang]
+            await query.edit_message_text(ok, parse_mode="Markdown")
+        except Exception as e:
+            logger.error(f"confirm_medical error: {e}")
+            await query.answer(f"Xato: {e}", show_alert=True)
     elif data == "menu_wards":
         # Xona rasmlarini o'chirish
         old_ids = context.user_data.pop("xona_photo_ids", [])
@@ -2860,47 +2951,59 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 DOCTORS_GROUP_ID = -5193012514  # Shifokorlar guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Bemor tibbiy hujjat yuborsa — shifokorlar guruhiga yo'naltiradi"""
-    # waiting_medical_doc bo'lsa yuboradi, bo'lmasa ham — har doim ishlaydi
+    """Bemor rasm/fayl yuborsa — FSM state ga qo'shadi"""
     user = update.effective_user
     lang = get_lang(context)
-    username = f"@{user.username}" if user.username else str(user.id)
-    lang_label = {"ru": "Русский", "uz": "O'zbek", "kz": "Қазақ"}.get(lang, lang)
-    context.user_data["waiting_medical_doc"] = False
 
-    # USER_ID yashirin tarzda caption ga kiritiladi — shifokor reply qilganda topish uchun
-    caption = (
-        f"⚠️ *Yangi tibbiy hujjat kelib tushdi!*\n\n"
-        f"👤 Ism: {user.full_name}\n"
-        f"💬 Telegram: {username}\n"
-        f"🌐 Til: {lang_label}\n"
-        f"🆔 `uid:{user.id}`\n\n"
-        f"📋 Bemor o'z kasalligini ro'yxatda topolmadi va hujjat yubordi.\n"
-        f"_Javob berish uchun shu xabarga REPLY qiling._"
-    )
+    # Med state yo'q bo'lsa — init qilamiz
+    if "med_state" not in context.user_data:
+        context.user_data["med_state"] = {"photos": [], "voice_id": None, "bemor_matni": ""}
 
-    try:
-        if update.message.photo:
-            file_id = update.message.photo[-1].file_id
-            await context.bot.send_photo(
-                chat_id=DOCTORS_GROUP_ID, photo=file_id,
-                caption=caption, parse_mode="Markdown"
-            )
-        elif update.message.document:
-            file_id = update.message.document.file_id
-            await context.bot.send_document(
-                chat_id=DOCTORS_GROUP_ID, document=file_id,
-                caption=caption, parse_mode="Markdown"
-            )
+    med = context.user_data["med_state"]
 
-        confirm = {
-            "ru": "✅ Ваши документы получены! Врачи ознакомятся и свяжутся с вами в ближайшее время.",
-            "uz": "✅ Hujjatlaringiz qabul qilindi! Shifokorlar ko'rib chiqib, tez orada siz bilan bog'lanishadi.",
-            "kz": "✅ Құжаттарыңыз қабылданды! Дәрігерлер қарап шығып, жақын арада сізбен байланысады.",
-        }[lang]
-        await update.message.reply_text(confirm)
-    except Exception as e:
-        logger.error(f"medical_doc_handler error: {e}")
+    if update.message.photo:
+        photo_id = update.message.photo[-1].file_id
+        med["photos"].append(photo_id)
+        count = len(med["photos"])
+        confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+        cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+        added = {"ru": f"📸 Фото добавлено ({count} шт.). Можно добавить ещё или отправить.", "uz": f"📸 Rasm qo'shildi ({count} ta). Yana qo'shishingiz yoki yuborishingiz mumkin.", "kz": f"📸 Сурет қосылды ({count} дана). Тағы қосуға немесе жіберуге болады."}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+            [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+        ])
+        await update.message.reply_text(added, reply_markup=kb)
+
+    elif update.message.document:
+        file_id = update.message.document.file_id
+        med["photos"].append(file_id)
+        confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+        cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+        added = {"ru": "📁 Документ добавлен.", "uz": "📁 Hujjat qo'shildi.", "kz": "📁 Құжат қосылды."}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+            [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+        ])
+        await update.message.reply_text(added, reply_markup=kb)
+
+
+async def medical_voice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Bemor ovozli xabar yuborsa — FSM state ga saqlaydi"""
+    lang = get_lang(context)
+
+    if "med_state" not in context.user_data:
+        context.user_data["med_state"] = {"photos": [], "voice_id": None, "bemor_matni": ""}
+
+    context.user_data["med_state"]["voice_id"] = update.message.voice.file_id
+
+    confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+    cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+    saved = {"ru": "🎤 Голосовое сообщение сохранено. Можно добавить фото или сразу отправить.", "uz": "🎤 Ovozli xabar saqlandi. Rasm qo'shishingiz yoki yuborishingiz mumkin.", "kz": "🎤 Дауыстық хабар сақталды. Сурет қосуға немесе жіберуге болады."}[lang]
+    kb = InlineKeyboardMarkup([
+        [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+        [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+    ])
+    await update.message.reply_text(saved, reply_markup=kb)
 
 
 async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2908,8 +3011,6 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     msg = update.message
     if not msg or not msg.reply_to_message:
         return
-
-    # Faqat shifokorlar guruhidan
     if msg.chat.id != DOCTORS_GROUP_ID:
         return
 
@@ -2922,20 +3023,24 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         return
 
     patient_id = int(match.group(1))
-    doctor_name = msg.from_user.full_name if msg.from_user else "Shifokor"
-
-    reply_text = (
-        f"👨‍⚕️ *Shifokordan javob:*\n\n"
-        f"{msg.text or msg.caption or ''}"
-    )
 
     try:
-        await context.bot.send_message(
-            chat_id=patient_id,
-            text=reply_text,
-            parse_mode="Markdown"
-        )
-        # Guruhda tasdiqlash
+        if msg.voice:
+            # Shifokor ovozli javob yubordi
+            voice_cap = "👨‍⚕️ *Shifokordan ovozli javob:*"
+            await context.bot.send_voice(
+                chat_id=patient_id,
+                voice=msg.voice.file_id,
+                caption=voice_cap,
+                parse_mode="Markdown"
+            )
+        elif msg.text or msg.caption:
+            reply_text = f"👨‍⚕️ *Shifokordan javob:*\n\n{msg.text or msg.caption}"
+            await context.bot.send_message(
+                chat_id=patient_id,
+                text=reply_text,
+                parse_mode="Markdown"
+            )
         await msg.reply_text("✅ Javob bemorga yetkazildi.")
     except Exception as e:
         logger.error(f"doctor_reply_handler error: {e}")
@@ -3549,6 +3654,25 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg, parse_mode="Markdown")
         return
 
+    # ── TIBBIY MUROJAAT — matn saqlash ──
+    if context.user_data.get("med_state") is not None and \
+       not context.user_data.get("calc_step") and \
+       not context.user_data.get("booking_step"):
+        med = context.user_data.get("med_state", {})
+        if isinstance(med, dict) and text and not text.startswith("/"):
+            med["bemor_matni"] = text
+            context.user_data["med_state"] = med
+            lang = get_lang(context)
+            confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+            cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+            saved = {"ru": "✍️ Текст сохранён. Добавьте фото или отправьте.", "uz": "✍️ Matn saqlandi. Rasm qo'shing yoki yuboring.", "kz": "✍️ Мәтін сақталды. Сурет қосыңыз немесе жіберіңіз."}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+                [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+            ])
+            await update.message.reply_text(saved, reply_markup=kb)
+            return
+
     # ── NARX HISOBLASH — "Boshqa muddat" kiritish ──
     if context.user_data.get("calc_step") == "waiting_days":
         context.user_data["calc_step"] = None  # reset
@@ -3965,7 +4089,9 @@ def main():
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ADMIN_ID), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.VOICE & ~filters.User(ADMIN_ID), medical_voice_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
