@@ -1596,6 +1596,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 {"ru": "✨ Оздоровление и профилактика", "uz": "✨ Umumiy tozalash va profilaktika", "kz": "✨ Сауықтыру және профилактика"}[lang],
                 callback_data="dis_umumiy")],
             [InlineKeyboardButton(
+                {"ru": "🔍 Моей болезни нет в списке", "uz": "🔍 Mening kasalligim ro'yxatda yo'q", "kz": "🔍 Менің ауруым тізімде жоқ"}[lang],
+                callback_data="disease_not_found")],
+            [InlineKeyboardButton(
                 {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
                 callback_data="menu_clinic")],
         ])
@@ -1605,7 +1608,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = {
             "ru": (
                 "🍏 *Заболевания ЖКТ и обмена веществ:*\n\n"
-                "Срок лечения обычно составляет *18, 21 или 24 дня* в зависимости от состояния пациента:\n\n"
+                "Срок лечения обычно составляет *18, 21 или 24 дня* в зависимости от состояния пациента и размера камней:\n\n"
+                "• Желчнокаменная болезнь (естественное выведение камней из желчного пузыря и комплексное лечение)\n"
                 "• Заболевания желудочно-кишечного тракта\n"
                 "• Заболевания печени и желчевыводящих путей\n"
                 "• Хронические запоры и хронические диареи\n"
@@ -1615,7 +1619,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ),
             "uz": (
                 "🍏 *Oshqozon-ichak va modda almashinuvi kasalliklari:*\n\n"
-                "Bemor holatiga qarab davolanish muddati odatda *18, 21 yoki 24 kun* etib belgilanadi:\n\n"
+                "Bemor holatiga va toshlarning o'lchamiga qarab davolanish muddati odatda *18, 21 yoki 24 kun* etib belgilanadi:\n\n"
+                "• O't tosh kasalligi (O't qopidagi toshlarni tabiiy tushirish va kompleks davolash)\n"
                 "• Oshqozon-ichak yo'llari kasalliklari\n"
                 "• Jigar va o't yo'llari kasalliklari\n"
                 "• Surunkali qabziyatlar va surunkali diareyalar\n"
@@ -1624,8 +1629,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "• Semizlik xastaligi (vazn kamaytirish)"
             ),
             "kz": (
-                "🍏 *Асқазан-ішек және зат алмасу ауруларыы:*\n\n"
-                "Науқас жағдайына байланысты емдеу мерзімі *18, 21 немесе 24 күн* белгіленеді:\n\n"
+                "🍏 *Асқазан-ішек және зат алмасу аурулары:*\n\n"
+                "Науқас жағдайына және тастардың өлшеміне байланысты емдеу мерзімі *18, 21 немесе 24 күн* белгіленеді:\n\n"
+                "• Өт тас ауруы (өт қабындағы тастарды табиғи жолмен шығару және кешенді емдеу)\n"
                 "• Асқазан-ішек жолдары аурулары\n"
                 "• Бауыр және өт жолдары аурулары\n"
                 "• Созылмалы іш қату және созылмалы диареялар\n"
@@ -1793,7 +1799,60 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
-    # ── Palatalar — Korpus tanlash ──
+    elif data == "disease_not_found":
+        text = {
+            "ru": (
+                "🔍 *Вашего заболевания нет в списке?*\n\n"
+                "Чтобы врачи нашего центра дали точный диагноз и рекомендации по срокам лечения, "
+                "им необходимо ознакомиться с вашими медицинскими документами.\n\n"
+                "📋 *Пожалуйста, нажмите кнопку ниже и пришлите нам:*\n"
+                "• Последнее заключение врача (диагноз)\n"
+                "• Снимки МРТ, МСКТ или УЗИ\n"
+                "• Или результаты последних анализов крови\n"
+                "_(В формате фото или PDF)_\n\n"
+                "_После отправки документов наши врачи изучат их и свяжутся с вами._"
+            ),
+            "uz": (
+                "🔍 *Sizning kasalligingiz ro'yxatda mavjud emasmi?*\n\n"
+                "Markazimiz shifokorlari sizga aniq tashxis va davolash muddati bo'yicha tavsiya berishlari uchun "
+                "amaldagi tibbiy hujjatlaringizni ko'rib chiqishlari kerak.\n\n"
+                "📋 *Iltimos, pastdagi tugmani bosing va bizga:*\n"
+                "• Oxirgi shifokor xulosasi (diagnoz)\n"
+                "• MRT, MSKT yoki UZI qog'ozlari rasmi\n"
+                "• Yoki oxirgi qon tahlillari natijalarini yuboring\n"
+                "_(Rasm yoki PDF formatida)_\n\n"
+                "_Hujjatlarni yuborganingizdan so'ng, shifokorlarimiz ularni o'rganib chiqib, siz bilan bog'lanishadi._"
+            ),
+            "kz": (
+                "🔍 *Сіздің ауруыңыз тізімде жоқ па?*\n\n"
+                "Орталығымыздың дәрігерлері дәл диагноз қою және емдеу мерзімі бойынша ұсыныс беру үшін "
+                "медициналық құжаттарыңызды қарап шығуы керек.\n\n"
+                "📋 *Төмендегі түймені басып, бізге жіберіңіз:*\n"
+                "• Соңғы дәрігер қорытындысы (диагноз)\n"
+                "• МРТ, МСКТ немесе УДЗ суреттері\n"
+                "• Немесе соңғы қан анализдерінің нәтижелері\n"
+                "_(Сурет немесе PDF форматында)_\n\n"
+                "_Құжаттарды жібергеннен кейін дәрігерлеріміз оларды зерделеп, сізбен байланысады._"
+            ),
+        }[lang]
+        send_label = {"ru": "📄 Отправить документы", "uz": "📄 Hujjatlarni yuborish", "kz": "📄 Құжаттарды жіберу"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(send_label, callback_data="send_medical_docs")],
+            [InlineKeyboardButton(back_label, callback_data="menu_diseases")],
+        ])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "send_medical_docs":
+        context.user_data["waiting_medical_doc"] = True
+        text = {
+            "ru": "📄 Хорошо! Пришлите фото или PDF-файл с вашими медицинскими документами. Мы передадим их нашим врачам.",
+            "uz": "📄 Yaxshi! Tibbiy hujjatlaringiz rasmini yoki PDF faylini yuboring. Uni shifokorlarimizga yetkazamiz.",
+            "kz": "📄 Жақсы! Медициналық құжаттарыңыздың суретін немесе PDF файлын жіберіңіз. Оны дәрігерлеріміздің назарына жеткіземіз.",
+        }[lang]
+        back_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="disease_not_found")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
     elif data == "menu_wards":
         # Xona rasmlarini o'chirish
         old_ids = context.user_data.pop("xona_photo_ids", [])
@@ -2798,7 +2857,50 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
-async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Bemor tibbiy hujjat (rasm yoki fayl) yuborsa — adminга yo'naltiradi"""
+    if not context.user_data.get("waiting_medical_doc"):
+        return
+    context.user_data["waiting_medical_doc"] = False
+
+    user = update.effective_user
+    lang = get_lang(context)
+    username = f"@{user.username}" if user.username else str(user.id)
+    lang_label = {"ru": "Русский", "uz": "O'zbek", "kz": "Қазақ"}.get(lang, lang)
+
+    caption = (
+        f"⚠️ *Yangi tibbiy hujjat kelib tushdi!*\n\n"
+        f"👤 Ism: {user.full_name}\n"
+        f"💬 Telegram: {username}\n"
+        f"🌐 Til: {lang_label}\n\n"
+        f"📋 Bemor o'z kasalligini ro'yxatda topolmadi va hujjat yubordi."
+    )
+
+    try:
+        if update.message.photo:
+            file_id = update.message.photo[-1].file_id
+            await context.bot.send_photo(
+                chat_id=ADMIN_ID, photo=file_id,
+                caption=caption, parse_mode="Markdown"
+            )
+        elif update.message.document:
+            file_id = update.message.document.file_id
+            await context.bot.send_document(
+                chat_id=ADMIN_ID, document=file_id,
+                caption=caption, parse_mode="Markdown"
+            )
+
+        confirm = {
+            "ru": "✅ Ваши документы получены! Врачи ознакомятся и свяжутся с вами в ближайшее время.",
+            "uz": "✅ Hujjatlaringiz qabul qilindi! Shifokorlar ko'rib chiqib, tez orada siz bilan bog'lanishadi.",
+            "kz": "✅ Құжаттарыңыз қабылданды! Дәрігерлер қарап шығып, жақын арада сізбен байланысады.",
+        }[lang]
+        await update.message.reply_text(confirm, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"medical_doc_handler error: {e}")
+
+
+
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
         return
@@ -3799,6 +3901,8 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
+    app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
