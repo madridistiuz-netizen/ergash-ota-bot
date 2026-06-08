@@ -381,9 +381,105 @@ DEFAULT_DATA = {
         "kz": "✅ Бағаға кіретін қызметтер:\n• Тұру\n• Емдеу\n• Физиотерапия және мануалды терапия\n• УДЗ, қан анализі, ЭКГ\n• МРТ 1.5Т немесе МСКТ (1 орган)\n\n➕ Қосымша:\nМРТ-3Т, МСКТ-256, Маммография, Криолиполиз",
     },
     "clinic_info_text": {
-        "uz": "🏥 *\"Ergash ota\" xususiy tibbiyot markazi*\n\nZamonaviy diagnostika va kompleks davolash markazi.\n\n📍 *Manzil:*\nKattaqo'rg'on shahri, Qozoq ovul massivi\n\n🕐 *Ish vaqti:*\nDu–Shan: 08:00 – 18:00\nYakshanba: Registratsiya bo'limi ishlaydi — yangi kelgan bemorlar qabul qilinadi va birinchi kun davolash boshlanadi\n\n📞 *Oldindan yozilish:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Zamonaviy diagnostika:*\n• MRT 3 Tesla\n• Canon Aquilion MSKT 256 kesimli\n• NUESOFT MSKT 128 kesimli\n• Mammografiya\n• UZI diagnostikasi\n• Laboratoriya tekshiruvlari\n\n💆‍♂️ *Davolash va muolajalar:*\n• Fizioterapiya\n• Manual terapiya\n• Zarba-to'lqin terapiyasi\n• Umurtqa cho'zish muolajalari\n• Kriolipoliz\n\n🏨 *Qulay statsionar sharoit:*\n• Shinam xonalar\n• Kuzatuv va davolash\n• Individual yondashuv\n\n💎 *Davolanish paketiga kiradi:*\n✔ Turar joy\n✔ Davolash muolajalari\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG\n✔ MRT 1.5T yoki MSKT (1 organ)\n\n✅ *Bir joyning o'zida:*\nDiagnostika • Davolash • Reabilitatsiya • Statsionar kuzatuv\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Salomatligingiz — bizning ustuvor vazifamiz.\"_",
-        "ru": "🏥 *Частный медицинский центр \"Эргаш ота\"*\n\nСовременный центр диагностики и комплексного лечения.\n\n📍 *Адрес:*\nг. Каттакурган, массив Казак овул\n\n🕐 *Режим работы:*\nПн–Сб: 08:00 – 18:00\nВоскресенье: работает регистратура — принимаем новых пациентов, лечение начинается в первый же день\n\n📞 *Запись на приём:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Современная диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 срезов\n• NUESOFT МСКТ 128 срезов\n• Маммография\n• УЗИ диагностика\n• Лабораторные исследования\n\n💆‍♂️ *Лечение и процедуры:*\n• Физиотерапия\n• Мануальная терапия\n• Ударно-волновая терапия\n• Вытяжение позвоночника\n• Криолиполиз\n\n🏨 *Комфортный стационар:*\n• Уютные номера\n• Наблюдение и лечение\n• Индивидуальный подход\n\n💎 *В стоимость лечения входит:*\n✔ Проживание\n✔ Лечебные процедуры\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ (1 орган)\n\n✅ *Всё в одном месте:*\nДиагностика • Лечение • Реабилитация • Стационарное наблюдение\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Ваше здоровье — наша главная задача.\"_",
-        "kz": "🏥 *\"Эргаш ота\" жеке медициналық орталығы*\n\nЗаманауи диагностика және кешенді емдеу орталығы.\n\n📍 *Мекенжай:*\nКаттақурғон қаласы, Қазақ овул массиві\n\n🕐 *Жұмыс уақыты:*\nДс–Сб: 08:00 – 18:00\nЖексенбі: тіркеу бөлімі жұмыс істейді — жаңа науқастар қабылданады\n\n📞 *Жазылу:*\n+998 93 226 45 66\n+998 93 346 62 77\n\n🔬 *Заманауи диагностика:*\n• МРТ 3 Тесла\n• Canon Aquilion МСКТ 256 кесінді\n• NUESOFT МСКТ 128 кесінді\n• Маммография\n• УДЗ диагностикасы\n• Зертхана зерттеулері\n\n💆‍♂️ *Емдеу және процедуралар:*\n• Физиотерапия\n• Мануалды терапия\n• Соққы-толқын терапиясы\n• Омыртқаны созу\n• Криолиполиз\n\n💎 *Емдеу бағасына кіреді:*\n✔ Тұру\n✔ Емдеу процедуралары\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ\n✔ МРТ 1.5Т немесе МСКТ (1 орган)\n\n📸 Instagram: @ergashotaclinis\n🌐 https://ergash-ota-tm.uz/\n\n_\"Денсаулығыңыз — біздің басты міндетіміз.\"_",
+        "uz": (
+            "🏥 *\"Ergash ota\" xususiy tibbiyot markazi*\n\n"
+            "Zamonaviy diagnostika va kompleks davolash markazi.\n\n"
+            "📍 *Manzil:* Kattaqo'rg'on shahri, Qozoq ovul massivi\n\n"
+            "🕐 *Ish vaqti:*\n"
+            "• Du–Shan: 08:00 – 18:00\n"
+            "• Yakshanba: Dam olish kuni. Registratsiya bo'limi ishlaydi — yangi kelgan bemorlar qabul qilinadi va birinchi kun davolash boshlanadi.\n\n"
+            "📞 *Qo'shimcha ma'lumotlar uchun:* Du–Shan: 08:00 – 18:00\n"
+            "+998 93 346 62 77\n"
+            "+998 93 226 45 67\n\n"
+            "🔬 *Zamonaviy diagnostika:*\n"
+            "• MRT 3 Tesla\n"
+            "• Canon Aquilion MSKT 256 kesimli\n"
+            "• NUESOFT MSKT 128 kesimli\n"
+            "• Mammografiya\n"
+            "• Fibroscan\n"
+            "• UZI diagnostikasi\n"
+            "• Laboratoriya tekshiruvlari\n\n"
+            "💆‍♂️ *Davolash va muolajalar:*\n"
+            "• Fizioterapiya | Manual terapiya\n"
+            "• Zarba-to'lqin terapiyasi\n"
+            "• Umurtqa cho'zish muolajalari | Kriolipoliz\n\n"
+            "🏨 *Davo paketiga nimalar kiradi?*\n"
+            "_(Xona turiga qarab asosiy paket tarkibi):_\n"
+            "✔️ Turar joy va shinam statsionar sharoit\n"
+            "✔️ Davolash muolajalari\n"
+            "✔️ Fizioterapiya va manual terapiya\n"
+            "✔️ UZI, qon tahlili, EKG\n"
+            "✔️ Lyuks xonalarda: MRT 1.5T yoki MSKT (1 organ)\n\n"
+            "✅ *Bir joyning o'zida:* Diagnostika • Reabilitatsiya • Statsionar • Davolash\n\n"
+            "📸 *Instagram:* https://www.instagram.com/ergashotaclinics\n"
+            "🌐 *Veb-sayt:* https://ergash-ota-tm.uz/"
+        ),
+        "ru": (
+            "🏥 *Частный медицинский центр «Эргаш ота»*\n\n"
+            "Современный центр диагностики и комплексного лечения.\n\n"
+            "📍 *Адрес:* г. Каттакурган, массив Казак овул\n\n"
+            "🕐 *Режим работы:*\n"
+            "• Пн–Сб: 08:00 – 18:00\n"
+            "• Воскресенье: Выходной. Регистратура работает — принимаются новые пациенты, в первый день начинается лечение.\n\n"
+            "📞 *Для справок:* Пн–Сб: 08:00 – 18:00\n"
+            "+998 93 346 62 77\n"
+            "+998 93 226 45 67\n\n"
+            "🔬 *Современная диагностика:*\n"
+            "• МРТ 3 Тесла\n"
+            "• Canon Aquilion МСКТ 256 срезов\n"
+            "• NUESOFT МСКТ 128 срезов\n"
+            "• Маммография\n"
+            "• Фибросканирование\n"
+            "• УЗИ диагностика\n"
+            "• Лабораторные исследования\n\n"
+            "💆‍♂️ *Лечение и процедуры:*\n"
+            "• Физиотерапия | Мануальная терапия\n"
+            "• Ударно-волновая терапия\n"
+            "• Вытяжение позвоночника | Криолиполиз\n\n"
+            "🏨 *Что входит в лечебный пакет?*\n"
+            "_(В зависимости от типа палаты):_\n"
+            "✔️ Проживание и комфортные условия\n"
+            "✔️ Лечебные процедуры\n"
+            "✔️ Физиотерапия и мануальная терапия\n"
+            "✔️ УЗИ, анализ крови, ЭКГ\n"
+            "✔️ В люкс-палатах: МРТ 1.5Т или МСКТ (1 орган)\n\n"
+            "✅ *В одном месте:* Диагностика • Реабилитация • Стационар • Лечение\n\n"
+            "📸 *Instagram:* https://www.instagram.com/ergashotaclinics\n"
+            "🌐 *Сайт:* https://ergash-ota-tm.uz/"
+        ),
+        "kz": (
+            "🏥 *«Эргаш ота» жеке медициналық орталығы*\n\n"
+            "Заманауи диагностика және кешенді емдеу орталығы.\n\n"
+            "📍 *Мекенжай:* Каттақўрғон қаласы, Қазақ овул массиві\n\n"
+            "🕐 *Жұмыс уақыты:*\n"
+            "• Дс–Сб: 08:00 – 18:00\n"
+            "• Жексенбі: Демалыс. Тіркеу бөлімі жұмыс істейді — жаңа науқастар қабылданады, бірінші күні ем басталады.\n\n"
+            "📞 *Анықтама үшін:* Дс–Сб: 08:00 – 18:00\n"
+            "+998 93 346 62 77\n"
+            "+998 93 226 45 67\n\n"
+            "🔬 *Заманауи диагностика:*\n"
+            "• МРТ 3 Тесла\n"
+            "• Canon Aquilion МСКТ 256 кесінді\n"
+            "• NUESOFT МСКТ 128 кесінді\n"
+            "• Маммография\n"
+            "• Фибросканерлеу\n"
+            "• УДЗ диагностикасы\n"
+            "• Зертханалық зерттеулер\n\n"
+            "💆‍♂️ *Емдеу және процедуралар:*\n"
+            "• Физиотерапия | Мануалды терапия\n"
+            "• Соққы-толқын терапиясы\n"
+            "• Омыртқаны созу | Криолиполиз\n\n"
+            "🏨 *Ем бумасына не кіреді?*\n"
+            "_(Палата түріне байланысты):_\n"
+            "✔️ Тұрғын үй және ыңғайлы жағдай\n"
+            "✔️ Ем процедуралары\n"
+            "✔️ Физиотерапия және мануалды терапия\n"
+            "✔️ УДЗ, қан анализі, ЭКГ\n"
+            "✔️ Люкс палаталарда: МРТ 1.5Т немесе МСКТ (1 орган)\n\n"
+            "✅ *Бір жерде:* Диагностика • Реабилитация • Стационар • Емдеу\n\n"
+            "📸 *Instagram:* https://www.instagram.com/ergashotaclinics\n"
+            "🌐 *Сайт:* https://ergash-ota-tm.uz/"
+        ),
     },
     "weekend": {
         "ru": "🌅 В воскресенье мы работаем для новых пациентов!\n\n✅ Приём и регистрация\n✅ Первичный осмотр\n✅ Начало лечения в первый же день\n\n🕌 А в свободное время — экскурсии в Самарканд и Бухару!\n\n📞 Свяжитесь с нами: {phone}",
@@ -475,6 +571,8 @@ def load_data():
             merged["xonalar"] = merged_xonalar
             merged_korpuslar.append(merged)
         saved["korpuslar"] = merged_korpuslar
+        # clinic_info_text ni DEFAULT_DATA dan har doim yangilash
+        saved["clinic_info_text"] = DEFAULT_DATA["clinic_info_text"]
         # rooms_uz va rooms_foreign ni DEFAULT_DATA dan yangilash
         saved["rooms_uz"] = DEFAULT_DATA["rooms_uz"]
         saved["rooms_foreign"] = DEFAULT_DATA["rooms_foreign"]
