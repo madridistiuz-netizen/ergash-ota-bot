@@ -1571,21 +1571,227 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ── Kasalliklar ──
     elif data == "menu_diseases":
-        diseases = d.get("diseases", [])
         title = {
-            "ru": "🩺 *Список лечимых заболеваний:*\n\n",
-            "uz": "🩺 *Davolanadigan kasalliklar ro'yxati:*\n\n",
-            "kz": "🩺 *Емделетін аурулар тізімі:*\n\n",
+            "ru": "🩺 *Список лечимых заболеваний*\n\nВыберите направление:",
+            "uz": "🩺 *Davolanadigan kasalliklar ro'yxati*\n\nYo'nalishni tanlang:",
+            "kz": "🩺 *Емделетін аурулар тізімі*\n\nБағытты таңдаңыз:",
         }[lang]
-        # Bo'lib yuborish (uzun bo'lgani uchun)
-        chunk = title
-        for disease in diseases:
-            if len(chunk) + len(disease) > 3800:
-                await query.edit_message_text(chunk, parse_mode="Markdown")
-                chunk = disease + "\n"
-            else:
-                chunk += disease + "\n"
-        await query.edit_message_text(chunk, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                {"ru": "🍏 ЖКТ и обмен веществ", "uz": "🍏 Oshqozon-ichak va modda almashinuvi", "kz": "🍏 Асқазан-ішек және зат алмасу"}[lang],
+                callback_data="dis_oshqozon")],
+            [InlineKeyboardButton(
+                {"ru": "🫀 Сердечно-сосудистые и дыхательные", "uz": "🫀 Yurak-qon tomir va nafas yo'llari", "kz": "🫀 Жүрек-қан тамыр және тыныс жолдары"}[lang],
+                callback_data="dis_yurak")],
+            [InlineKeyboardButton(
+                {"ru": "🧠 Нервы, позвоночник и суставы", "uz": "🧠 Asab, umurtqa va bo'g'imlar", "kz": "🧠 Жүйке, омыртқа және буындар"}[lang],
+                callback_data="dis_asab")],
+            [InlineKeyboardButton(
+                {"ru": "🩺 Инфекции и паразиты (Глисты)", "uz": "🩺 Infeksiya va parazitlar (Gijja)", "kz": "🩺 Инфекция және паразиттер (Құрт)"}[lang],
+                callback_data="dis_infeksiya")],
+            [InlineKeyboardButton(
+                {"ru": "🧬 Иммун., гормональные и кожные", "uz": "🧬 Immun, gormonal va teri kasalliklari", "kz": "🧬 Иммун., гормоналды және тері"}[lang],
+                callback_data="dis_immun")],
+            [InlineKeyboardButton(
+                {"ru": "✨ Оздоровление и профилактика", "uz": "✨ Umumiy tozalash va profilaktika", "kz": "✨ Сауықтыру және профилактика"}[lang],
+                callback_data="dis_umumiy")],
+            [InlineKeyboardButton(
+                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
+                callback_data="menu_clinic")],
+        ])
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_oshqozon":
+        text = {
+            "ru": (
+                "🍏 *Заболевания ЖКТ и обмена веществ:*\n\n"
+                "Срок лечения обычно составляет *18, 21 или 24 дня* в зависимости от состояния пациента:\n\n"
+                "• Заболевания желудочно-кишечного тракта\n"
+                "• Заболевания печени и желчевыводящих путей\n"
+                "• Хронические запоры и хронические диареи\n"
+                "• Долихоколон, долихосигма\n"
+                "• Болезнь Гиршпрунга и демпинг-синдром\n"
+                "• Ожирение (снижение веса)"
+            ),
+            "uz": (
+                "🍏 *Oshqozon-ichak va modda almashinuvi kasalliklari:*\n\n"
+                "Bemor holatiga qarab davolanish muddati odatda *18, 21 yoki 24 kun* etib belgilanadi:\n\n"
+                "• Oshqozon-ichak yo'llari kasalliklari\n"
+                "• Jigar va o't yo'llari kasalliklari\n"
+                "• Surunkali qabziyatlar va surunkali diareyalar\n"
+                "• Dolixokolon, dolixosigma kasalliklari\n"
+                "• Girshprung kasalligi va Demping sindrom\n"
+                "• Semizlik xastaligi (vazn kamaytirish)"
+            ),
+            "kz": (
+                "🍏 *Асқазан-ішек және зат алмасу ауруларыы:*\n\n"
+                "Науқас жағдайына байланысты емдеу мерзімі *18, 21 немесе 24 күн* белгіленеді:\n\n"
+                "• Асқазан-ішек жолдары аурулары\n"
+                "• Бауыр және өт жолдары аурулары\n"
+                "• Созылмалы іш қату және созылмалы диареялар\n"
+                "• Долихоколон, долихосигма аурулары\n"
+                "• Гиршпрунг ауруы және демпинг-синдром\n"
+                "• Семіздік (салмақ азайту)"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_yurak":
+        text = {
+            "ru": (
+                "🫀 *Сердечно-сосудистые и респираторные заболевания:*\n\n"
+                "В зависимости от степени заболевания курс лечения длится *от 18 до 24 дней:*\n\n"
+                "• Гипертоническая болезнь и её осложнения\n"
+                "• Атеросклероз и ишемическая болезнь сердца\n"
+                "• Болезнь Рейно\n"
+                "• Хронические заболевания лёгких"
+            ),
+            "uz": (
+                "🫀 *Yurak-qon tomir va nafas yo'llari kasalliklari:*\n\n"
+                "Kasallik darajasiga qarab davolanish muddati *18 tadan 24 kungacha* davom etadi:\n\n"
+                "• Gipertoniya kasalligi va uning asoratlari\n"
+                "• Arterioskleroz va yurak ishemik kasalliklari\n"
+                "• Reyno kasalligi\n"
+                "• O'pkaning surunkali kasalliklari"
+            ),
+            "kz": (
+                "🫀 *Жүрек-қан тамыр және тыныс жолдары аурулары:*\n\n"
+                "Ауру деңгейіне байланысты емдеу курсы *18-ден 24 күнге дейін* созылады:\n\n"
+                "• Гипертония ауруы және оның асқынулары\n"
+                "• Атеросклероз және жүрек ишемиялық ауруы\n"
+                "• Рейно ауруы\n"
+                "• Өкпенің созылмалы аурулары"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_asab":
+        text = {
+            "ru": (
+                "🧠 *Заболевания нервов, позвоночника и суставов:*\n\n"
+                "Комплексный курс лечения назначается на *18, 21 или 24 дня* в зависимости от состояния организма:\n\n"
+                "• Остеохондроз и грыжи дисков шейного, грудного, пояснично-крестцового отделов\n"
+                "• Ревматоидный полиартрит"
+            ),
+            "uz": (
+                "🧠 *Asab, umurtqa va bo'g'im kasalliklari:*\n\n"
+                "Kompleks davolash kursi organizm holatiga ko'ra *18, 21 yoki 24 kun* etib belgilanadi:\n\n"
+                "• Bo'yin, ko'krak, bel-dumg'aza qismlari osteoxondrozi va disk churralari (grija)\n"
+                "• Revmatoidli poliartrit"
+            ),
+            "kz": (
+                "🧠 *Жүйке, омыртқа және буын аурулары:*\n\n"
+                "Кешенді емдеу курсы ағза жағдайына қарай *18, 21 немесе 24 күн* белгіленеді:\n\n"
+                "• Мойын, кеуде, бел-сегізкөз бөлімдерінің остеохондрозы және диск жарықтары\n"
+                "• Ревматоидты полиартрит"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_infeksiya":
+        text = {
+            "ru": (
+                "🩺 *Инфекционные и паразитарные заболевания:*\n\n"
+                "Курс выведения паразитов и лечения осложнений: минимум *12–14 дней (профилактика)* или полный курс *18–21 день*:\n\n"
+                "• Гельминтозы и глистные инвазии\n"
+                "• Осложнения пищевой аллергии\n"
+                "• Лечение пациентов с осложнениями после COVID и TORCH-инфекций\n"
+                "• Эхинококкоз"
+            ),
+            "uz": (
+                "🩺 *Infeksion va parazitar kasalliklar:*\n\n"
+                "Parazitlarni haydash va asoratlarni davolash kursi minimal *12–14 kun (profilaktika)* yoki to'liq *18–21 kun* davom etadi:\n\n"
+                "• Gelmintozlar va gijja kasalliklari\n"
+                "• Oziq-ovqat allergiyasi asoratlari\n"
+                "• COVID va TORCH infeksiyasiga chalingan hamda asoratlangan bemorlarni davolash\n"
+                "• Exinokokkoz kasalligi"
+            ),
+            "kz": (
+                "🩺 *Инфекциялық және паразиттік аурулар:*\n\n"
+                "Паразиттерді шығару және асқынуларды емдеу курсы: кемінде *12–14 күн (профилактика)* немесе толық *18–21 күн*:\n\n"
+                "• Гельминтоздар және құрт аурулары\n"
+                "• Тамақ аллергиясының асқынулары\n"
+                "• COVID және TORCH инфекцияларынан кейін асқынған науқастарды емдеу\n"
+                "• Эхинококкоз"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_immun":
+        text = {
+            "ru": (
+                "🧬 *Иммунные, гормональные и кожные заболевания:*\n\n"
+                "Заболевания, требующие системного подхода — курс лечения *21 или 24 дня:*\n\n"
+                "• Сахарный диабет и заболевания щитовидной железы\n"
+                "• Кожные заболевания (псориаз, экзема, аллергические дерматиты)\n"
+                "• Витилиго\n"
+                "• Болезнь Верльгофа\n"
+                "• Хронический простатит\n"
+                "• Заболевания почек и мочевыводящих путей"
+            ),
+            "uz": (
+                "🧬 *Immun, gormonal va teri kasalliklari:*\n\n"
+                "Tizimli yondashuv talab etiluvchi kasalliklar bo'lib, davolash kursi *21 yoki 24 kun* etib belgilanadi:\n\n"
+                "• Qandli diabet va qalqonsimon bez kasalliklari\n"
+                "• Teri kasalliklari (psoriaz, ekzema, allergik dermatitlar)\n"
+                "• Vitiligo (pes) kasalligi\n"
+                "• Verlgof kasalligi\n"
+                "• Surunkali prostatit\n"
+                "• Buyrak va siydik yo'llari kasalliklari"
+            ),
+            "kz": (
+                "🧬 *Иммундық, гормоналды және тері аурулары:*\n\n"
+                "Жүйелі тәсілді талап ететін аурулар — емдеу курсы *21 немесе 24 күн:*\n\n"
+                "• Қант диабеті және қалқанша без аурулары\n"
+                "• Тері аурулары (псориаз, экзема, аллергиялық дерматиттер)\n"
+                "• Витилиго ауруы\n"
+                "• Верльгоф ауруы\n"
+                "• Созылмалы простатит\n"
+                "• Бүйрек және несеп жолдары аурулары"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "dis_umumiy":
+        text = {
+            "ru": (
+                "✨ *Оздоровление, восстановление иммунитета и профилактика:*\n\n"
+                "Рекомендуемые сроки для предотвращения болезней и повышения жизненных сил:\n\n"
+                "• 🛡 *Профилактические курсы:* Минимум *12–14 дней*\n"
+                "• 🔋 *Повышение и восстановление иммунитета:* Обычно *14–18 дней*\n"
+                "• 🧼 *Глубокое очищение внутренней среды организма:* *21–24 дня*\n"
+                "• 🎗 *Профилактика онкологических заболеваний:* Под наблюдением врача *21–30 дней*"
+            ),
+            "uz": (
+                "✨ *Sog'lomlashtirish, immun tiklash va profilaktika:*\n\n"
+                "Kasallikning oldini olish va organizm quvvatini oshirish uchun tavsiya etiladigan muddatlar:\n\n"
+                "• 🛡 *Profilaktika kurslari:* Kamida *12–14 kun*\n"
+                "• 🔋 *Imunitetni oshirish va qayta tiklash:* Odatda *14–18 kun*\n"
+                "• 🧼 *Inson ichki muhitini chuqur tozalash:* *21–24 kun*\n"
+                "• 🎗 *O'sma kasalliklarini oldini olish profilaktikasi:* Shifokor nazoratida *21–30 kun*"
+            ),
+            "kz": (
+                "✨ *Сауықтыру, иммунды қалпына келтіру және профилактика:*\n\n"
+                "Аурудың алдын алу және ағзаны нығайту үшін ұсынылатын мерзімдер:\n\n"
+                "• 🛡 *Профилактикалық курстар:* Кемінде *12–14 күн*\n"
+                "• 🔋 *Иммунитетті арттыру және қалпына келтіру:* Әдетте *14–18 күн*\n"
+                "• 🧼 *Ағзаның ішкі ортасын тереңдетіп тазалау:* *21–24 күн*\n"
+                "• 🎗 *Онкологиялық аурулардың профилактикасы:* Дәрігер бақылауымен *21–30 күн*"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diseases")]])
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Palatalar — Korpus tanlash ──
     elif data == "menu_wards":
