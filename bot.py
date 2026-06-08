@@ -3053,22 +3053,21 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id != ADMIN_ID:
         return
 
-    # Admin tibbiy hujjat yuborishi mumkin
-    if context.user_data.get("waiting_medical_doc"):
-        context.user_data["waiting_medical_doc"] = False
-        user = update.effective_user
-        username = f"@{user.username}" if user.username else str(user.id)
-        file_id = update.message.photo[-1].file_id
-        caption = (
-            f"⚠️ *Yangi tibbiy hujjat kelib tushdi!*\n\n"
-            f"👤 Ism: {user.full_name}\n"
-            f"💬 Telegram: {username}\n"
-            f"🆔 `uid:{user.id}`\n\n"
-            f"📋 Bemor o'z kasalligini ro'yxatda topolmadi va hujjat yubordi.\n"
-            f"_Javob berish uchun shu xabarga REPLY qiling._"
-        )
-        await context.bot.send_photo(chat_id=DOCTORS_GROUP_ID, photo=file_id, caption=caption, parse_mode="Markdown")
-        await update.message.reply_text("✅ Hujjat shifokorlar guruhiga yuborildi!")
+    # Admin med_state orqali tibbiy hujjat yuborishi
+    if isinstance(context.user_data.get("med_state"), dict):
+        med = context.user_data["med_state"]
+        photo_id = update.message.photo[-1].file_id
+        med["photos"].append(photo_id)
+        count = len(med["photos"])
+        lang = get_lang(context)
+        confirm_label = {"ru": "✅ Подтвердить и отправить", "uz": "✅ Tasdiqlash va yuborish", "kz": "✅ Растау және жіберу"}[lang]
+        cancel_label = {"ru": "⬅️ Отмена", "uz": "⬅️ Bekor qilish", "kz": "⬅️ Бас тарту"}[lang]
+        added = {"ru": f"📸 Фото добавлено ({count} шт.).", "uz": f"📸 Rasm qo'shildi ({count} ta).", "kz": f"📸 Сурет қосылды ({count} дана)."}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(confirm_label, callback_data="confirm_medical")],
+            [InlineKeyboardButton(cancel_label, callback_data="disease_not_found")],
+        ])
+        await update.message.reply_text(added, reply_markup=kb)
         return
 
     waiting = context.user_data.get("waiting_photo")
