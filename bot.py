@@ -2861,14 +2861,12 @@ DOCTORS_GROUP_ID = -1002145678912  # Shifokorlar guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor tibbiy hujjat yuborsa — shifokorlar guruhiga yo'naltiradi"""
-    if not context.user_data.get("waiting_medical_doc"):
-        return
-    context.user_data["waiting_medical_doc"] = False
-
+    # waiting_medical_doc bo'lsa yuboradi, bo'lmasa ham — har doim ishlaydi
     user = update.effective_user
     lang = get_lang(context)
     username = f"@{user.username}" if user.username else str(user.id)
     lang_label = {"ru": "Русский", "uz": "O'zbek", "kz": "Қазақ"}.get(lang, lang)
+    context.user_data["waiting_medical_doc"] = False
 
     # USER_ID yashirin tarzda caption ga kiritiladi — shifokor reply qilganda topish uchun
     caption = (
