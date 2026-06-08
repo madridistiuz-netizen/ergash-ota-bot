@@ -3185,6 +3185,29 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ '{section}' topilmadi")
         context.user_data["waiting_photo"] = None
 
+    elif waiting.startswith("xona_"):
+        last_underscore = waiting.rfind("_")
+        korpus_id = waiting[5:last_underscore]
+        xona_idx = int(waiting[last_underscore + 1:])
+        korpuslar = d.get("korpuslar", [])
+        for k in korpuslar:
+            if k["id"] == korpus_id:
+                if xona_idx < len(k["xonalar"]):
+                    xona = k["xonalar"][xona_idx]
+                    if "videos" not in xona:
+                        xona["videos"] = []
+                    xona["videos"].append(file_id)
+                    save_data(d)
+                    await update.message.reply_text(f"✅ {xona['nom']} xona videosi qo'shildi!")
+                    context.user_data["waiting_photo"] = None
+                    return
+                else:
+                    await update.message.reply_text(f"❌ Xona topilmadi. idx: {xona_idx}")
+                    context.user_data["waiting_photo"] = None
+                    return
+        await update.message.reply_text(f"❌ Korpus topilmadi: {korpus_id}")
+        context.user_data["waiting_photo"] = None
+
 
 
 # ─── FAQ DATA ─────────────────────────────────────────────────────────────────
