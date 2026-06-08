@@ -2398,7 +2398,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "kz": {"adult": "Ересектер", "child": "Балалар (10 жасқа дейін)"}[age],
         }[lang]
 
-        # MRT 1.5T faqat narx >= 340 000 bo'lsa paketga kiradi
+        # Narx >= 340 000: Fizioterapiya+manual terapiya + MRT kiradi
+        # Narx < 340 000: faqat Fizioterapiya (manual terapiya yo'q), MRT yo'q
         if price_num >= 340000:
             included = {
                 "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ — 1 орган",
@@ -2407,9 +2408,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }[lang]
         else:
             included = {
-                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ",
-                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG",
-                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ",
+                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия\n✔ УЗИ, анализ крови, ЭКГ",
+                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya\n✔ UZI, qon tahlili, EKG",
+                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия\n✔ УДЗ, қан анализі, ЭКГ",
             }[lang]
         extra = {
             "ru": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Растяжка, Ударно-волновая терапия",
@@ -3727,7 +3728,8 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
         day_word1 = {"ru": "день", "uz": "kun", "kz": "күн"}[lang]
 
-        # MRT 1.5T faqat narx >= 340 000 bo'lsa paketga kiradi
+        # Narx >= 340 000: Fizioterapiya+manual terapiya + MRT kiradi
+        # Narx < 340 000: faqat Fizioterapiya (manual terapiya yo'q), MRT yo'q
         if price_num >= 340000:
             included = {
                 "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ — 1 орган",
@@ -3736,9 +3738,9 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }[lang]
         else:
             included = {
-                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ",
-                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG",
-                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ",
+                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия\n✔ УЗИ, анализ крови, ЭКГ",
+                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya\n✔ UZI, qon tahlili, EKG",
+                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия\n✔ УДЗ, қан анализі, ЭКГ",
             }[lang]
         extra = {
             "ru": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Растяжка, Ударно-волновая терапия",
