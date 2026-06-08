@@ -2857,7 +2857,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
-DOCTORS_GROUP_ID = -1002145678912  # Shifokorlar guruhi
+DOCTORS_GROUP_ID = -5193012514  # Shifokorlar guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor tibbiy hujjat yuborsa — shifokorlar guruhiga yo'naltiradi"""
@@ -2906,9 +2906,6 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Shifokor guruhda bemorning xabariga REPLY qilganda — bemorga yetkazadi"""
     msg = update.message
-    # Vaqtinchalik: guruh ID ni logga chiqarish
-    if msg and msg.chat:
-        logger.info(f"GROUP MESSAGE: chat_id={msg.chat.id}, type={msg.chat.type}")
     if not msg or not msg.reply_to_message:
         return
 
@@ -3969,7 +3966,6 @@ def main():
     app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
-    app.add_handler(MessageHandler(filters.ChatType.GROUPS, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
