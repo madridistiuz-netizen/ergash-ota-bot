@@ -2893,7 +2893,11 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text.startswith("/admin_video "):
         section = text.replace("/admin_video ", "").strip()
-        context.user_data["waiting_photo"] = f"guide_video_{section}"
+        # xona_ prefiksi bo'lsa to'g'ridan-to'g'ri saqlash
+        if section.startswith("xona_"):
+            context.user_data["waiting_photo"] = section
+        else:
+            context.user_data["waiting_photo"] = f"guide_video_{section}"
         await update.message.reply_text(
             f"🎥 Tayyor! Endi *{section}* bo'limi uchun video yuboring:",
             parse_mode="Markdown"
