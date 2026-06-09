@@ -2031,10 +2031,28 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await context.bot.delete_message(chat_id=chat_id, message_id=mid)
                 except Exception:
                     pass
+            # Video xabarlarini ham o'chirish
+            old_vid_ids = context.user_data.pop("xona_video_ids", [])
+            for mid in old_vid_ids:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+                except Exception:
+                    pass
 
-            back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
-                {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
-                callback_data=f"korpus_{korpus['id']}")]])
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            video_label = {"ru": "🎬 Посмотреть видео", "uz": "🎬 Videoni ko'rish", "kz": "🎬 Бейнені көру"}[lang]
+
+            # Video mavjud bo'lsa tugma qo'shamiz
+            xona_videos = xona.get("videos", [])
+            if xona_videos:
+                back_kb = InlineKeyboardMarkup([
+                    [InlineKeyboardButton(video_label, callback_data=f"xona_video_{korpus['id']}_{xona_idx}")],
+                    [InlineKeyboardButton(back_label, callback_data=f"korpus_{korpus['id']}")],
+                ])
+            else:
+                back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
+                    back_label, callback_data=f"korpus_{korpus['id']}")]])
+
             await query.edit_message_text(description, parse_mode="Markdown", reply_markup=back_kb)
 
             # Yangi rasmlarni yuborib, message_id larini saqlab qolish
@@ -2470,8 +2488,40 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
-    # ── Diagnostika ──
-    elif data == "menu_diagnostics":
+    elif data.startswith("xona_video_"):
+        # format: xona_video_{korpus_id}_{xona_idx}
+        parts = data[len("xona_video_"):]
+        last = parts.rfind("_")
+        korpus_id = parts[:last]
+        xona_idx = int(parts[last+1:])
+
+        # Eski video xabarlarini o'chirish
+        old_vid_ids = context.user_data.pop("xona_video_ids", [])
+        for mid in old_vid_ids:
+            try:
+                await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+            except Exception:
+                pass
+
+        for k in d.get("korpuslar", []):
+            if k["id"] == korpus_id:
+                xona = k["xonalar"][xona_idx]
+                videos = xona.get("videos", [])
+                back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+                # Asosiy xabarni orqaga tugmasi bilan yangilash
+                await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton(back_label, callback_data=f"xona_{korpus_id}_{xona_idx}")]
+                ]))
+                # Videolarni yuborish
+                sent_ids = []
+                for vid_id in videos[:3]:
+                    try:
+                        msg = await context.bot.send_video(chat_id=chat_id, video=vid_id)
+                        sent_ids.append(msg.message_id)
+                    except Exception:
+                        pass
+                context.user_data["xona_video_ids"] = sent_ids
+                return
         title = {
             "ru": "🧲 Выберите вид диагностики:",
             "uz": "🧲 Diagnostika turini tanlang:",
