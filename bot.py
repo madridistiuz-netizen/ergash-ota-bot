@@ -567,6 +567,7 @@ def load_data():
                 sxona = sx[di] if di < len(sx) else {}
                 mxona = dict(dxona)
                 mxona["photos"] = sxona.get("photos", [])
+                mxona["videos"] = sxona.get("videos", [])
                 merged_xonalar.append(mxona)
             merged["xonalar"] = merged_xonalar
             merged_korpuslar.append(merged)
