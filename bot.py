@@ -2006,7 +2006,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if korpus.get("photos"):
             await send_photos(context, chat_id, korpus["photos"])
 
-    elif data.startswith("xona_"):
+    elif data.startswith("xona_") and not data.startswith("xona_video_"):
         # Format: xona_{korpus_id}_{idx}
         # rsplit dan foydalanamiz — oxirgi _ dan ajratamiz
         last_underscore = data.rfind("_")
@@ -2495,6 +2495,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         last = parts.rfind("_")
         korpus_id = parts[:last]
         xona_idx = int(parts[last+1:])
+        logger.info(f"xona_video: korpus_id={korpus_id}, xona_idx={xona_idx}")
 
         # Eski video xabarlarini o'chirish
         old_vid_ids = context.user_data.pop("xona_video_ids", [])
@@ -2508,6 +2509,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if k["id"] == korpus_id:
                 xona = k["xonalar"][xona_idx]
                 videos = xona.get("videos", [])
+                logger.info(f"xona videos: {videos}")
                 back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
                 # Asosiy xabarni orqaga tugmasi bilan yangilash
                 await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup([
