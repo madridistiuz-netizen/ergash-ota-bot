@@ -790,7 +790,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Видео",
             "📜 Сертификаты",
             "📖 История клиники",
-            "🌿 Лечебные мази и процедуры",
+            "🌿 Malham va muolajalar",
             "⬅️ Назад"
         ),
         "uz": (
@@ -801,7 +801,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Videolar",
             "📜 Sertifikatlar",
             "📖 Klinika tarixi",
-            "🌿 Shifobaxsh malham va muolajalar",
+            "🌿 Malham va muolajalar",
             "⬅️ Orqaga"
         ),
         "kz": (
@@ -812,7 +812,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Бейнелер",
             "📜 Сертификаттар",
             "📖 Клиника тарихы",
-            "🌿 Емдік майлар мен процедуралар",
+            "🌿 Malham және процедуралар",
             "⬅️ Артқа"
         ),
     }[lang]
@@ -1508,13 +1508,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── Shifobaxsh malhamlar va muolajalar ──
     elif data == "malham_va_muolajalar":
         title = {
-            "ru": "🌿 *Лечебные мази и процедуры*\n\nВыберите раздел:",
-            "uz": "🌿 *Shifobaxsh malhamlar va muolajalar*\n\nBo'limni tanlang:",
-            "kz": "🌿 *Емдік майлар мен процедуралар*\n\nБөлімді таңдаңыз:",
+            "ru": "🌿 *Malham va muolajalar*\n\nВыберите раздел:",
+            "uz": "🌿 *Malham va muolajalar*\n\nBo'limni tanlang:",
+            "kz": "🌿 *Malham және процедуралар*\n\nБөлімді таңдаңыз:",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        mal_label  = {"ru": "🟢 Лечебные мази",         "uz": "🟢 Shifobaxsh malhamlar",    "kz": "🟢 Емдік майлар"}[lang]
-        muo_label  = {"ru": "🔵 Доп. процедуры",        "uz": "🔵 Qo'shimcha muolajalar",   "kz": "🔵 Қосымша процедуралар"}[lang]
+        mal_label  = {"ru": "🟢 Malham va tabiiy yog'lar", "uz": "🟢 Malham va tabiiy yog'lar", "kz": "🟢 Malham және табиғи майлар"}[lang]
+        muo_label  = {"ru": "🔵 Доп. процедуры",          "uz": "🔵 Qo'shimcha muolajalar",     "kz": "🔵 Қосымша процедуралар"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(mal_label, callback_data="sub_malhamlar")],
             [InlineKeyboardButton(muo_label, callback_data="sub_muolajalar")],
@@ -1524,17 +1524,17 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "sub_malhamlar":
         title = {
-            "ru": "🟢 *Лечебные мази*\n\nВыберите:",
-            "uz": "🟢 *Shifobaxsh malhamlar*\n\nTanlang:",
-            "kz": "🟢 *Емдік майлар*\n\nТаңдаңыз:",
+            "ru": "🟢 *Malham va tabiiy yog'lar*\n\nВыберите:",
+            "uz": "🟢 *Malham va tabiiy yog'lar*\n\nTanlang:",
+            "kz": "🟢 *Malham және табиғи майлар*\n\nТаңдаңыз:",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         items = [
-            ({"ru": "Лечебная мазь",   "uz": "Malham",       "kz": "Малҳам"}[lang],        "mal_malham"),
-            ({"ru": "Фито бар",        "uz": "Fito bar",     "kz": "Фито бар"}[lang],       "mal_fitobar"),
-            ({"ru": "Миндальное масло","uz": "Bodom yog'i",  "kz": "Бадам майы"}[lang],     "mal_bodom"),
-            ({"ru": "Оливковое масло", "uz": "Zaytun yog'i", "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
-            ({"ru": "Чудо мазь",       "uz": "Chuda maz",    "kz": "Чудо мазь"}[lang],      "mal_chuda"),
+            ("Malham",                                                                          "mal_malham"),
+            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],       "mal_fitobar"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],     "mal_bodom"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
+            ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang], "mal_chuda"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
