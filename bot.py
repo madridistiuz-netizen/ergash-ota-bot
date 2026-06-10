@@ -2797,10 +2797,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "• Работает регистратура\n"
                 "• Принимаем новых пациентов\n"
                 "• Осмотр дежурным врачом\n"
-                "• Начало лечения в первый же день\n\n"
-                "🕌 *А в свободное время — экскурсии!*\n"
-                "Посетите древние города Самарканд и Бухару.\n"
-                "Наш сопровождающий лично проведёт вас по историческим местам."
+                "• Начало лечения в первый же день"
             ),
             "uz": (
                 "🌅 *Yakshanba — Ergash-Ota klinikasida*\n\n"
@@ -2809,10 +2806,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "• Registratsiya bo'limi ishlaydi\n"
                 "• Yangi bemorlar qabul qilinadi\n"
                 "• Navbatchi vrach ko'rigidan o'tiladi\n"
-                "• Birinchi kuni davolash boshlanadi\n\n"
-                "🕌 *Bo'sh vaqtda — ekskursiya!*\n"
-                "Qadimiy Samarqand va Buxoroni ziyorat qiling.\n"
-                "Hamrohimiz sizi tarixiy joylarda shaxsan olib yuradi."
+                "• Birinchi kuni davolash boshlanadi"
             ),
             "kz": (
                 "🌅 *Жексенбі — Эргаш-Ота клиникасында*\n\n"
@@ -2820,15 +2814,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "• Тіркеу бөлімі жұмыс істейді\n"
                 "• Жаңа науқастар қабылданады\n"
                 "• Кезекші дәрігер қарайды\n"
-                "• Бірінші күні емдеу басталады\n\n"
-                "🕌 *Бос уақытта — экскурсия!*\n"
-                "Ежелгі Самарқанд пен Бұхараны аралаңыз."
+                "• Бірінші күні емдеу басталады"
             ),
         }[lang]
-        excursion_label = {"ru": "🕌 Записаться на экскурсию", "uz": "🕌 Ekskursiyaga yozilish", "kz": "🕌 Экскурсияға жазылу"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        # EKSKURSIYA TUGMASI VAQTINCHA O'CHIRILGAN
+        # Yoqish uchun quyidagi 2 qatordan # ni olib tashlang va kb ni almashtiring:
+        # excursion_label = {"ru": "🕌 Записаться на экскурсию", "uz": "🕌 Ekskursiyaga yozilish", "kz": "🕌 Экскурсияға жазылу"}[lang]
+        # kb_on = InlineKeyboardMarkup([[InlineKeyboardButton(excursion_label, callback_data="menu_excursion")], [InlineKeyboardButton(back_label, callback_data="back_main")]])
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(excursion_label, callback_data="menu_excursion")],
             [InlineKeyboardButton(back_label, callback_data="back_main")],
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
