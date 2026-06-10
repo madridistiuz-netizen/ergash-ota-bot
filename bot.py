@@ -2525,6 +2525,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         pass
                 context.user_data["xona_video_ids"] = sent_ids
                 return
+        await query.answer("❌ Xona topilmadi")
+        return
+
+    elif data == "menu_diagnostics":
         title = {
             "ru": "🧲 Выберите вид диагностики:",
             "uz": "🧲 Diagnostika turini tanlang:",
