@@ -1603,9 +1603,69 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
+    elif data == "muo_seragem":
+        SERAGEM_PHOTO_ID = d.get("seragem_photo_id", "")
+        text = {
+            "ru": (
+                "🦴 <b>Процедура Серагем</b>\n\n"
+                "Одна из самых современных процедур, помогающая оздоровить позвоночник, улучшить кровообращение и успокоить нервную систему.\n\n"
+                "🎁 <b>Отличная возможность:</b> Эта процедура включена в стоимость проживания в палатах <b>Полулюкс</b> и <b>Люкс</b> нашей клиники! При оплате 10 дней проживания вы получаете 6 процедур бесплатно.\n\n"
+                "💰 Стоимость дополнительного сеанса (вне пакета): 1 сеанс — <b>56 000 сум</b>"
+            ),
+            "uz": (
+                "🦴 <b>Seragem muolajasi</b>\n\n"
+                "Umurtqa pog'onasini sog'lomlashtirish, qon aylanishini yaxshilash va asab tizimini tinchlantirishga yordam beruvchi eng zamonaviy muolajalardan biri.\n\n"
+                "🎁 <b>Ajoyib imkoniyat:</b> Ushbu muolaja klinikamizdagi <b>Yarim lyuks (Pol lyuks)</b> va <b>Lyuks</b> xonalar umumiy to'lovi ichiga kiritilgan! 10 kunlik to'lovga 6 ta muolaja bepul qo'shib beriladi.\n\n"
+                "💰 Paketdan tashqari qo'shimcha olish narxi: 1 seans — <b>56 000 so'm</b>"
+            ),
+            "kz": (
+                "🦴 <b>Серагем ем-шарасы</b>\n\n"
+                "Омыртқаны сауықтыруға, қан айналымын жақсартуға және жүйке жүйесін тыныштандыруға көмектесетін ең заманауи ем-шаралардың бірі.\n\n"
+                "🎁 <b>Керемет мүмкіндік:</b> Бұл ем-шара клиникамыздағы <b>Жартылай люкс (Пол люкс)</b> және <b>Люкс</b> палаталарының жалпы құнына қосылған! 10 күндік төлем жасағанда 6 ем-шара тегін беріледі.\n\n"
+                "💰 Пакеттен тыс қосымша алу бағасы: 1 сеанс — <b>56 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_seragem")]])
+        if SERAGEM_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=SERAGEM_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_seragem":
+        title = {
+            "ru": "🔵 <b>Доп. процедуры</b>\n\nВыберите:",
+            "uz": "🔵 <b>Qo'shimcha muolajalar</b>\n\nTanlang:",
+            "kz": "🔵 <b>Қосымша процедуралар</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Nuga-best",                                                                                                        "muo_nugabest"),
+            ("Seragem",                                                                                                          "muo_seragem"),
+            ({"ru": "Релакс массаж точек ног", "uz": "Relaksatsion oyoq nuqtalari massaji", "kz": "Аяқ нүктелерінің релаксациялық массажы"}[lang], "muo_relaks"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
+            ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
+            ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
+            ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ("Robospine",                                                                                                        "muo_robospine"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await query.message.delete()
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
     elif data in (
         "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
-        "muo_seragem", "muo_relaks", "muo_massaj", "muo_kumush",
+        "muo_relaks", "muo_massaj", "muo_kumush",
         "muo_limfa", "muo_rastyajka", "muo_uwt", "muo_robospine", "muo_kriyo",
     ):
         soon_text = {
@@ -3038,6 +3098,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo doctor` — shifokor rasmi
 `/admin_photo cert` — sertifikat
 `/admin_photo nuga_best` — Nuga-Best rasmi
+`/admin_photo seragem` — Seragem rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3285,6 +3346,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "nuga_best":
         d["nuga_best_photo_id"] = file_id
         await update.message.reply_text("✅ Nuga-Best rasmi saqlandi!")
+    elif waiting == "seragem":
+        d["seragem_photo_id"] = file_id
+        await update.message.reply_text("✅ Seragem rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
