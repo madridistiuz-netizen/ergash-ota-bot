@@ -1561,11 +1561,51 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
-        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(buttons))
+        try:
+            await query.edit_message_text(title, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(buttons))
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "muo_nugabest":
+        NUGA_BEST_PHOTO_ID = d.get("nuga_best_photo_id", "")
+        text = {
+            "ru": (
+                "🦴 *Nuga-Best — термомагнитный массаж позвоночника*\n\n"
+                "Современная технология для коррекции осанки, восстановления позвонков и устранения защемлений нервов.\n\n"
+                "🎁 *Отличная возможность:* Данная процедура включена в стоимость проживания — 6 сеансов за 10 дней!\n\n"
+                "💰 Дополнительный сеанс вне пакета: *56 000 сум*"
+            ),
+            "uz": (
+                "🦴 *Nuga-Best muolajasi*\n\n"
+                "Umurtqa pog'onasini termal magnit bilan massaj qilish, qiyshiqliklarni tiklash va nerv siqilishlarini ochish uchun eng samarali zamonaviy texnologiyadir.\n\n"
+                "🎁 *Ajoyib imkoniyat:* Ushbu muolaja klinikamizdagi barcha turdagi xonalar to'lovi ichiga kiritilgan — 10 kunlik to'lovga 6 ta muolaja!\n\n"
+                "💰 Paketdan tashqari qo'shimcha olish narxi: 1 seans — *56 000 so'm*"
+            ),
+            "kz": (
+                "🦴 *Nuga-Best процедурасы — термомагниттік омыртқа массажы*\n\n"
+                "Омыртқаны қалпына келтіру, қисықтықты түзету және жүйке қысылуын жою үшін заманауи тиімді технология.\n\n"
+                "🎁 *Тамаша мүмкіндік:* Бұл процедура барлық нөмір төлемдеріне кіреді — 10 күндік төлемге 6 рет!\n\n"
+                "💰 Пакеттен тыс қосымша баға: 1 сеанс — *56 000 сум*"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="sub_muolajalar")]])
+        if NUGA_BEST_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=NUGA_BEST_PHOTO_ID,
+                caption=text,
+                parse_mode="Markdown",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data in (
         "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
-        "muo_nugabest", "muo_seragem", "muo_relaks", "muo_massaj", "muo_kumush",
+        "muo_seragem", "muo_relaks", "muo_massaj", "muo_kumush",
         "muo_limfa", "muo_rastyajka", "muo_uwt", "muo_robospine", "muo_kriyo",
     ):
         soon_text = {
@@ -2997,6 +3037,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo bukhara` — Buxoro
 `/admin_photo doctor` — shifokor rasmi
 `/admin_photo cert` — sertifikat
+`/admin_photo nuga_best` — Nuga-Best rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3241,6 +3282,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "cert":
         d["cert_photos"].append(file_id)
         await update.message.reply_text(f"✅ Sertifikat rasmi qo'shildi! Jami: {len(d['cert_photos'])} ta")
+    elif waiting == "nuga_best":
+        d["nuga_best_photo_id"] = file_id
+        await update.message.reply_text("✅ Nuga-Best rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
