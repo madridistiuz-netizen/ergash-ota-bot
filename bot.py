@@ -790,6 +790,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Видео",
             "📜 Сертификаты",
             "📖 История клиники",
+            "🌿 Лечебные мази и процедуры",
             "⬅️ Назад"
         ),
         "uz": (
@@ -800,6 +801,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Videolar",
             "📜 Sertifikatlar",
             "📖 Klinika tarixi",
+            "🌿 Shifobaxsh malhamlar va muolajalar",
             "⬅️ Orqaga"
         ),
         "kz": (
@@ -810,6 +812,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Бейнелер",
             "📜 Сертификаттар",
             "📖 Клиника тарихы",
+            "🌿 Емдік майлар мен процедуралар",
             "⬅️ Артқа"
         ),
     }[lang]
@@ -821,7 +824,8 @@ def clinic_submenu_keyboard(lang):
         [InlineKeyboardButton(labels[4], callback_data="clinic_video")],
         [InlineKeyboardButton(labels[5], callback_data="clinic_certs")],
         [InlineKeyboardButton(labels[6], callback_data="clinic_history")],
-        [InlineKeyboardButton(labels[7], callback_data="back_main")],
+        [InlineKeyboardButton(labels[7], callback_data="malham_va_muolajalar")],
+        [InlineKeyboardButton(labels[8], callback_data="back_main")],
     ])
 
 
@@ -1500,6 +1504,80 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang],
             callback_data="menu_clinic")]])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back)
+
+    # ── Shifobaxsh malhamlar va muolajalar ──
+    elif data == "malham_va_muolajalar":
+        title = {
+            "ru": "🌿 *Лечебные мази и процедуры*\n\nВыберите раздел:",
+            "uz": "🌿 *Shifobaxsh malhamlar va muolajalar*\n\nBo'limni tanlang:",
+            "kz": "🌿 *Емдік майлар мен процедуралар*\n\nБөлімді таңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        mal_label  = {"ru": "🟢 Лечебные мази",         "uz": "🟢 Shifobaxsh malhamlar",    "kz": "🟢 Емдік майлар"}[lang]
+        muo_label  = {"ru": "🔵 Доп. процедуры",        "uz": "🔵 Qo'shimcha muolajalar",   "kz": "🔵 Қосымша процедуралар"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(mal_label, callback_data="sub_malhamlar")],
+            [InlineKeyboardButton(muo_label, callback_data="sub_muolajalar")],
+            [InlineKeyboardButton(back_label, callback_data="menu_clinic")],
+        ])
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=kb)
+
+    elif data == "sub_malhamlar":
+        title = {
+            "ru": "🟢 *Лечебные мази*\n\nВыберите:",
+            "uz": "🟢 *Shifobaxsh malhamlar*\n\nTanlang:",
+            "kz": "🟢 *Емдік майлар*\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ({"ru": "Лечебная мазь",   "uz": "Malham",       "kz": "Малҳам"}[lang],        "mal_malham"),
+            ({"ru": "Фито бар",        "uz": "Fito bar",     "kz": "Фито бар"}[lang],       "mal_fitobar"),
+            ({"ru": "Миндальное масло","uz": "Bodom yog'i",  "kz": "Бадам майы"}[lang],     "mal_bodom"),
+            ({"ru": "Оливковое масло", "uz": "Zaytun yog'i", "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
+            ({"ru": "Чудо мазь",       "uz": "Chuda maz",    "kz": "Чудо мазь"}[lang],      "mal_chuda"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "sub_muolajalar":
+        title = {
+            "ru": "🔵 *Доп. процедуры*\n\nВыберите:",
+            "uz": "🔵 *Qo'shimcha muolajalar*\n\nTanlang:",
+            "kz": "🔵 *Қосымша процедуралар*\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Nuga-best",                                                                                           "muo_nugabest"),
+            ("Seragem",                                                                                             "muo_seragem"),
+            ({"ru": "Релакс массаж точек ног", "uz": "Relaksatsion oyoq nuqtalari massaji", "kz": "Аяқ нүктелерінің релаксациялық массажы"}[lang], "muo_relaks"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
+            ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
+            ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
+            ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ("Robospine",                                                                                           "muo_robospine"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await query.edit_message_text(title, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data in (
+        "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
+        "muo_nugabest", "muo_seragem", "muo_relaks", "muo_massaj", "muo_kumush",
+        "muo_limfa", "muo_rastyajka", "muo_uwt", "muo_robospine", "muo_kriyo",
+    ):
+        soon_text = {
+            "ru": "🔄 Информация будет добавлена в ближайшее время...",
+            "uz": "🔄 Ma'lumot tez orada qo'shiladi...",
+            "kz": "🔄 Aqparat jaqın arada qosıladı...",
+        }[lang]
+        # Orqaga tugmasi — malham yoki muolaja bo'limiga qaytaradi
+        back_cb = "sub_malhamlar" if data.startswith("mal_") else "sub_muolajalar"
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data=back_cb)]])
+        await query.edit_message_text(soon_text, reply_markup=kb)
 
     # ── Shifokor ──
     elif data == "menu_doctor":
