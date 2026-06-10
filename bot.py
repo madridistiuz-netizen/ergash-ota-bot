@@ -801,7 +801,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Videolar",
             "📜 Sertifikatlar",
             "📖 Klinika tarixi",
-            "🌿 Shifobaxsh malhamlar va muolajalar",
+            "🌿 Shifobaxsh malham va muolajalar",
             "⬅️ Orqaga"
         ),
         "kz": (
@@ -821,10 +821,10 @@ def clinic_submenu_keyboard(lang):
         [InlineKeyboardButton(labels[1], callback_data="menu_doctor"),
          InlineKeyboardButton(labels[2], callback_data="menu_staff")],
         [InlineKeyboardButton(labels[3], callback_data="menu_diseases")],
+        [InlineKeyboardButton(labels[7], callback_data="malham_va_muolajalar")],
         [InlineKeyboardButton(labels[4], callback_data="clinic_video")],
         [InlineKeyboardButton(labels[5], callback_data="clinic_certs")],
         [InlineKeyboardButton(labels[6], callback_data="clinic_history")],
-        [InlineKeyboardButton(labels[7], callback_data="malham_va_muolajalar")],
         [InlineKeyboardButton(labels[8], callback_data="back_main")],
     ])
 
