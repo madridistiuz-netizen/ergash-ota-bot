@@ -927,7 +927,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=main_menu_keyboard(lang))
 
     # ── FAQ ──
-    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question"):
+    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question"):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
@@ -3789,6 +3789,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo olive_oil` — Zaytun yog'i rasmi
 `/admin_photo registration` — Kelish tartibi rasmi
 `/admin_photo treatment` — Operatsiyasiz davolash rasmi
+`/admin_photo diet` — Ovqatlanish/parhez rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4075,6 +4076,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "treatment":
         d["treatment_photo_id"] = file_id
         await update.message.reply_text("✅ Operatsiyasiz davolash rasmi saqlandi!")
+    elif waiting == "diet":
+        d["diet_photo_id"] = file_id
+        await update.message.reply_text("✅ Ovqatlanish/parhez rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
@@ -4194,7 +4198,7 @@ FAQ_DATA = {
         ("🧲 Как подготовиться к МРТ?", "Специальная подготовка не требуется. Снимите металлические предметы. При МРТ с контрастом — не есть 4–6 часов до процедуры."),
         ("💊 Лечение без операции?", "q_no_surgery"),
         ("🚻 Палаты мужские и женские?", "Да, палаты раздельные. Женщин и мужчин размещают в разных корпусах."),
-        ("🍽 Есть ли питание?", "Да. Питание входит в программу лечения. Столовая работает по расписанию. Во время лечения — специальная диета."),
+        ("🍽 Есть ли питание?", "q_diet_food"),
         ("📅 Как записаться?", "Запись не обязательна — принимаем без брони. Но лучше сообщить заранее для резервирования места."),
         ("🕐 Режим работы?", "Пн–Сб: 08:00–18:00. Воскресенье: приём новых пациентов."),
     ],
@@ -4222,7 +4226,7 @@ FAQ_DATA = {
         ("🧲 МРТ ga qanday tayyorlanish kerak?", "Maxsus tayyorgarlik kerak emas. Metall buyumlarni yechib qo'ying. Kontrastli МРТ da — 4–6 soat oldin ovqat emas."),
         ("💊 Operatsiyasiz davolanish bormi?", "q_no_surgery"),
         ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli korpuslarda joylashadi."),
-        ("🍽 Ovqatlanish bormi?", "Ha. Ovqatlanish davolash dasturiga kiradi. Oshxona jadval bo'yicha ishlaydi. Davolash vaqtida — maxsus parhez."),
+        ("🍽 Ovqatlanish bormi?", "q_diet_food"),
         ("📅 Qanday yozilish kerak?", "Bron shart emas — bronsiz qabul qilamiz. Lekin joy band qilish uchun oldindan xabar berish yaxshiroq."),
         ("🕐 Ish vaqti?", "Du–Shan: 08:00–18:00. Yakshanba: yangi bemorlar qabuli."),
     ],
@@ -4240,7 +4244,7 @@ FAQ_DATA = {
         ("🧲 МРТ-ге қалай дайындалу керек?", "Арнайы дайындық қажет емес. Металл заттарды шешіңіз."),
         ("💊 Операциясыз емдеу бар ма?", "q_no_surgery"),
         ("🚻 Ер/әйел палаталары?", "Иә, палаталар бөлек. Әйелдер мен ерлер әртүрлі корпустарда орналасады."),
-        ("🍽 Тамақтану бар ма?", "Иә. Тамақтану емдеу бағдарламасына кіреді."),
+        ("🍽 Тамақтану бар ма?", "q_diet_food"),
         ("📅 Қалай жазылу керек?", "Бронь міндетті емес — бронсыз қабылдаймыз."),
         ("🕐 Жұмыс уақыты?", "Дс–Сб: 08:00–18:00. Жексенбі: жаңа науқастар қабылдауы."),
     ],
@@ -4667,6 +4671,74 @@ async def handle_faq_callbacks(query, context, data, lang):
             await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_delete_registration":
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        title = {
+            "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
+            "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
+            "kz": "❓ *Жиі қойылатын сұрақтар*\n\nСұрақты таңдаңыз:",
+        }[lang]
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown",
+                                       reply_markup=faq_keyboard(lang))
+
+    elif data == "q_diet_food":
+        d = load_data()
+        DIET_PHOTO_ID = d.get("diet_photo_id", "")
+        text = {
+            "ru": (
+                "🍽 <b>Питание и лечебный режим диеты в нашем центре</b>\n\n"
+                "Лечение в нашей клинике проводится исключительно естественным путём — с помощью <b>лечебного голодания, специальной диеты и целебных трав</b>. Поэтому привычного трёхразового питания у нас нет.\n\n"
+                "🟢 <b>Травы — наше основное питание:</b>\n"
+                "Целебные травы (отвары и бальзамы), которые выдаются пациентам, не только очищают организм, но и насыщают его витаминами и микроэлементами. Эти травы служат лечебным питанием.\n\n"
+                "📆 <b>Дни, когда разрешено питание:</b>\n"
+                "• <b>Суббота:</b> Разрешается 1-разовое питание в день.\n"
+                "• <b>Воскресенье:</b> Разрешается 2-разовое питание в день.\n\n"
+                "🥗 <b>Какая еда предоставляется?</b>\n"
+                "В разрешённые дни в столовой готовятся исключительно утверждённые врачами специальные <b>диетические блюда</b>.\n\n"
+                "<i>Естественное голодание и целебные травы — лучший способ разгрузить организм и запустить процесс обновления!</i>"
+            ),
+            "uz": (
+                "🍽 <b>Markazimizda ovqatlanish va shifobaxsh parhez tartibi</b>\n\n"
+                "Klinikamizda davolash mutlaqo tabiiy yo'l bilan — <b>ochlik, maxsus parhez va shifobaxsh giyohlar</b> yordamida olib boriladi. Shu sababli odatiy uch mahal ovqatlanish tartibi mavjud emas.\n\n"
+                "🟢 <b>Giyohlar — bizning asosiy taomimiz:</b>\n"
+                "Davolanish davomida beriladigan maxsus shifobaxsh giyohlar (qaynatma va malhamlar) organizmni tozalash bilan birga, kerakli vitaminlar bilan oziqlantiradi. Ya'ni, ushbu giyohlar bemor uchun shifobaxsh ovqat hisoblanadi.\n\n"
+                "📆 <b>Ovqatlanishga ruxsat berilgan kunlar:</b>\n"
+                "• <b>Shanba kuni:</b> Kuniga 1 mahal ovqatlanishga ruxsat beriladi.\n"
+                "• <b>Yakshanba kuni:</b> Kuniga 2 mahal ovqatlanishga ruxsat beriladi.\n\n"
+                "🥗 <b>Qanday taomlar beriladi?</b>\n"
+                "Ruxsat berilgan kunlarda klinikamiz oshxonasida shifokorlar tomonidan tasdiqlangan maxsus <b>parhez taomlar</b> tayyorlanadi.\n\n"
+                "<i>Tabiiy ochlik va giyohlar — tanangizni ortiqcha yuklamalardan xalos qilib, ichki a'zolaringizni qayta tiklashning eng samarali yo'lidir!</i>"
+            ),
+            "kz": (
+                "🍽 <b>Орталығымыздағы тамақтану және шипалы диета тәртібі</b>\n\n"
+                "Клиникамызда емдеу толықтай табиғи жолмен — <b>емдік аштық, арнайы диета және шипалы шөптер</b> көмегімен жүргізіледі. Сондықтан мұнда үйреншікті үш мезгіл тамақтану тәртібі жоқ.\n\n"
+                "🟢 <b>Шөптер — біздің негізгі тағамымыз:</b>\n"
+                "Емдеу барысында берілетін шипалы шөптер (қайнатпалар мен жақпамайлар) ағзаны тазартумен қатар, қажетті витаминдермен де қоректендіреді. Яғни, бұл шөптер науқас үшін шипалы тағам болып есептеледі.\n\n"
+                "📆 <b>Тамақтануға рұқсат берілген күндер:</b>\n"
+                "• <b>Сенбі күні:</b> Күніне 1 рет тамақтануға рұқсат.\n"
+                "• <b>Жексенбі күні:</b> Күніне 2 рет тамақтануға рұқсат.\n\n"
+                "🥗 <b>Қандай тағам беріледі?</b>\n"
+                "Рұқсат берілген күндері клиника асханасында дәрігерлер бекіткен арнайы <b>диеталық тағамдар</b> дайындалады.\n\n"
+                "<i>Табиғи аштық пен шипалы шөптер — ағзаны артық жүктемеден арылтып, ішкі мүшелерді жаңартудың ең тиімді жолы!</i>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_diet_question")]])
+        if DIET_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=DIET_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_diet_question":
         try:
             await query.message.delete()
         except Exception:
