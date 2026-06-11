@@ -927,7 +927,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=main_menu_keyboard(lang))
 
     # ── FAQ ──
-    elif data in ("menu_faq",) or data.startswith("faq_"):
+    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration"):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
@@ -4249,7 +4249,12 @@ DIAG_SERVICES = {
 
 def faq_keyboard(lang):
     faqs = FAQ_DATA.get(lang, FAQ_DATA["ru"])
-    buttons = []
+    kelish_label = {
+        "ru": "📅 Когда можно приехать? (Бронирование)",
+        "uz": "📅 Qachon kelish mumkin? (Bron qilish)",
+        "kz": "📅 Қашан келуге болады? (Брондау)",
+    }[lang]
+    buttons = [[InlineKeyboardButton(kelish_label, callback_data="m_kelish_tartibi")]]
     for i, (q, _) in enumerate(faqs):
         buttons.append([InlineKeyboardButton(q, callback_data=f"faq_{i}")])
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
@@ -4601,9 +4606,71 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
 
 
 async def handle_faq_callbacks(query, context, data, lang):
+    chat_id = query.message.chat_id
     faqs = FAQ_DATA.get(lang, FAQ_DATA["ru"])
 
-    if data == "menu_faq":
+    if data == "m_kelish_tartibi":
+        REGISTRATION_PHOTO_ID = ""  # data.json dan olish kerak bo'lsa: d.get("registration_photo_id","")
+        text = {
+            "ru": (
+                "📅 <b>Порядок приезда и бронирования мест в нашем центре</b>\n\n"
+                "Если вы планируете приехать в наш центр для восстановления здоровья, ознакомьтесь со следующей информацией:\n\n"
+                "✅ <b>Свободный график приезда:</b> Мы не назначаем пациентам фиксированную дату приезда. Вы можете <b>выбрать любой удобный для вас день</b> и покупать билеты на эту дату. В нашем центре места есть всегда — по прибытии вас сразу же оформят и разместят.\n\n"
+                "⏱ <b>Режим работы:</b>\n"
+                "• <b>Понедельник – Суббота:</b> Полноценный приём врачей и все лечебные процедуры.\n"
+                "• <b>Воскресенье:</b> Работает только отдел регистрации и размещения. Пациенты регистрируются и заселяются в палаты (лечение начинается с понедельника).\n\n"
+                "🧳 <b>Что взять с собой:</b> Паспорт и медицинские выписки/анализы (если имеются).\n\n"
+                "<i>Ждём вас в любой удобный для вас день! Счастливого пути.</i>"
+            ),
+            "uz": (
+                "📅 <b>Markazimizga kelish va joy band qilish (bron) tartibi</b>\n\n"
+                "Sog'ligingizni tiklash uchun markazimizga kelishni rejalashtirayotgan bo'lsangiz, quyidagi ma'lumotlar bilan tanishib chiqing:\n\n"
+                "✅ <b>Erkin kelish tartibi:</b> Biz bemorlarimiz uchun aniq kelish kunini belgilamaymiz. Siz o'zingizga qulay bo'lgan <b>xohlagan sanani tanlab kelaverishingiz mumkin</b>. Markazimizda joylar doimiy ravishda mavjud — kelgan kuningizda sizga darhol joy qilib beriladi.\n\n"
+                "⏱ <b>Ish tartibi:</b>\n"
+                "• <b>Dushanba – Shanba:</b> Shifokorlar qabuli va barcha muolajalar to'liq olib boriladi.\n"
+                "• <b>Yakshanba:</b> Faqat Registratsiya bo'limi ishlaydi. Yakshanba kuni kelgan bemorlar ro'yxatga olinib, xonalarga joylashtiriladi (muolajalar dushanbadan boshlanadi).\n\n"
+                "🧳 <b>Kelishda o'zingiz bilan oling:</b> Pasport/ID karta va tibbiy ko'rik tashxislari (agar bo'lsa).\n\n"
+                "<i>Sizga qulay sanada markazimizda kutib qolamiz! Safaringiz bexatar bo'lsin.</i>"
+            ),
+            "kz": (
+                "📅 <b>Орталығымызға келу және орын брондау тәртібі</b>\n\n"
+                "Денсаулығыңызды түзету үшін орталығымызға келуді жоспарлап отырсаңыз, келесі ақпаратпен танысып шығыңыз:\n\n"
+                "✅ <b>Еркін келу тәртібі:</b> Біз емделушілер үшін нақты келу күнін белгілемейміз. Сіз өзіңізге ыңғайлы <b>кез келген күнді таңдап келе бере аласыз</b>. Орталығымызда орындар әрдайым дайын — келген күні сізді бірден орналастырамыз.\n\n"
+                "⏱ <b>Жұмыс кестесі:</b>\n"
+                "• <b>Дүйсенбі – Сенбі:</b> Дәрігерлер қабылдауы және барлық емдік шаралар толықтай жүргізіледі.\n"
+                "• <b>Жексенбі:</b> Тек тіркеу бөлімі жұмыс істейді. Жексенбі күні келген емделушілер тіркеліп, палаталарға орналастырылады (емдеу дүйсенбіден басталады).\n\n"
+                "🧳 <b>Өзіңізбен ала келіңіз:</b> Жеке куәлік (паспорт) және медициналық тексеру қорытындылары (егер бар болса).\n\n"
+                "<i>Өзіңізге ыңғайлы кез келген күні орталығымызда күтеміз! Жолыңыз болсын.</i>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_registration")]])
+        if REGISTRATION_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=REGISTRATION_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_registration":
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        title = {
+            "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
+            "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
+            "kz": "❓ *Жиі қойылатын сұрақтар*\n\nСұрақты таңдаңыз:",
+        }[lang]
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown",
+                                       reply_markup=faq_keyboard(lang))
+
+    elif data == "menu_faq":
         title = {
             "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
             "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
