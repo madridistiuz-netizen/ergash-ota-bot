@@ -1557,7 +1557,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                           "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1656,7 +1656,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1718,7 +1718,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1778,7 +1778,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",               "uz": "Rastyajka",                            "kz": "Растяжка"}[lang],                               "t_stretch"),
             ({"ru": "Ударно-волновая терапия","uz": "Zarb to'lqinli terapiya",              "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
-            ({"ru": "Криолиполиз",            "uz": "Kriolipoliz",                          "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+            ({"ru": "Криолиполиз",            "uz": "Kriolipoliz",                          "kz": "Криолиполиз"}[lang],                            "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1838,7 +1838,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",                   "kz": "Растяжка"}[lang],                     "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",     "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                         "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                 "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                 "kz": "Криолиполиз"}[lang],                  "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1898,7 +1898,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                     "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -1958,7 +1958,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                     "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -2033,7 +2033,82 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
             ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                     "muo_robospine"),
-            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "t_cryo"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "t_cryo":
+        CRYO_PHOTO_ID = d.get("cryo_photo_id", "")
+        text = {
+            "ru": (
+                "❄️ <b>Криолиполиз</b>\n\n"
+                "Самая современная технология для безопасной и безоперационной коррекции фигуры, а также избавления от лишних жировых отложений.\n\n"
+                "<b>Принцип работы и основные преимущества процедуры:</b>\n"
+                "• Жировые клетки в проблемных зонах (живот, бока, бедра) замораживаются контролируемым холодом (от -5°C до -10°C);\n"
+                "• Замороженные клетки разрушаются (липолиз) и естественным путем выводятся из организма;\n"
+                "• Абсолютно безопасна для кожи, сосудов и окружающих тканей;\n"
+                "• Улучшает обмен веществ и способствует общему оздоровлению.\n\n"
+                "⚠️ <b>Примечание:</b> Эта процедура не входит в общую стоимость проживания (в стоимость палат).\n\n"
+                "💰 <b>Стоимость процедуры:</b> 1 сеанс — <b>100 000 сум</b>"
+            ),
+            "uz": (
+                "❄️ <b>Kriolipoliz</b>\n\n"
+                "Tana shaklini xavfsiz va jarrohliksiz korreksiya qilish hamda ortiqcha yog' qatlamlaridan xalos bo'lish uchun qo'llaniladigan eng zamonaviy texnologiya.\n\n"
+                "<b>Muolajaning ishlash prinsipi va asosiy foydalari:</b>\n"
+                "• Muammoli sohalardagi (qorin, bel, son) yog' hujayralari nazorat ostidagi sovuq harorat (-5°C dan -10°C gacha) bilan muzlatiladi;\n"
+                "• Muzlatilgan yog' hujayralari parchalanadi (lipoliz) va organizmdan tabiiy yo'l bilan chiqib ketadi;\n"
+                "• Teriga va uning atrofidagi to'qimalarga hech qanday zarar yetkazmaydi;\n"
+                "• Moddalar almashinuvini yaxshilab, umumiy sog'lomlashishga yordam beradi.\n\n"
+                "⚠️ <b>Eslatma:</b> Ushbu muolaja xonalar to'lovi (umumiy to'lov) ichiga kiritilmagan.\n\n"
+                "💰 <b>Muolaja narxi:</b> 1 seans — <b>100 000 so'm</b>"
+            ),
+            "kz": (
+                "❄️ <b>Криолиполиз</b>\n\n"
+                "Дене бітімін қауіпсіз және отасыз түзетуге, сондай-ақ артық май қабаттарынан арылуға арналған ең заманауи технология.\n\n"
+                "<b>Ем-шараның жұмыс істеу принципі мен негізгі пайдасы:</b>\n"
+                "• Проблемалық аймақтардағы (іш, бел, сан) май жасушалары бақыланатын суық температурамен (-5°C-тан -10°C-қа дейін) мұздатылады;\n"
+                "• Мұздатылған май жасушалары ыдырап (липолиз), ағзадан табиғи жолмен толықтай шығарылады;\n"
+                "• Теріге, тамырларға және айналадағы тіндерге ешқандай зақым келтірмейді;\n"
+                "• Зат алмасуды жақсартып, жалпы сауығуға ықпал етеді.\n\n"
+                "⚠️ <b>Ескерту:</b> Бұл ем-шара палаталардың жалпы құнына (жалпы төлемге) кірмейді.\n\n"
+                "💰 <b>Ем-шара бағасы:</b> 1 сеанс — <b>100 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_cryo")]])
+        if CRYO_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=CRYO_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_cryo":
+        await query.message.delete()
+        title = {
+            "ru": "🔵 <b>Доп. процедуры</b>\n\nВыберите:",
+            "uz": "🔵 <b>Qo'shimcha muolajalar</b>\n\nTanlang:",
+            "kz": "🔵 <b>Қосымша процедуралар</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Nuga-best",                                                                                                     "muo_nugabest"),
+            ("Seragem",                                                                                                       "muo_seragem"),
+            ({"ru": "Второе сердце",           "uz": "Ikkinchi yurak",          "kz": "Екінші жүрек"}[lang],                 "t_foot_massage"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",           "kz": "Жалпы массаж"}[lang],                 "t_general_massage"),
+            ({"ru": "Биоэнергетический массаж","uz": "Bioenergiya massaji",      "kz": "Биоэнергетикалық массаж"}[lang],     "t_silver_glove"),
+            ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",             "kz": "Лимфодренаж"}[lang],                  "t_lymph"),
+            ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
+            ("Robospine",                                                                                                     "muo_robospine"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "t_cryo"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
@@ -2041,7 +2116,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data in (
         "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
-        "muo_robospine", "muo_kriyo",
+        "muo_robospine",
     ):
         soon_text = {
             "ru": "🔄 Информация будет добавлена в ближайшее время...",
@@ -3480,6 +3555,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo lymph` — Limfadrenaj rasmi
 `/admin_photo stretch` — Rastyajka rasmi
 `/admin_photo shockwave` — Zarb to'lqinli terapiya rasmi
+`/admin_photo cryo` — Kriolipoliz rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3748,6 +3824,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "shockwave":
         d["shockwave_photo_id"] = file_id
         await update.message.reply_text("✅ Zarb to'lqinli terapiya rasmi saqlandi!")
+    elif waiting == "cryo":
+        d["cryo_photo_id"] = file_id
+        await update.message.reply_text("✅ Kriolipoliz rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
