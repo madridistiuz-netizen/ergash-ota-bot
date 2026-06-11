@@ -927,7 +927,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=main_menu_keyboard(lang))
 
     # ── FAQ ──
-    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration"):
+    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question"):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
@@ -3787,6 +3787,8 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo fitobar` — Fito-Bar rasmi
 `/admin_photo almond_oil` — Bodom yog'i rasmi
 `/admin_photo olive_oil` — Zaytun yog'i rasmi
+`/admin_photo registration` — Kelish tartibi rasmi
+`/admin_photo treatment` — Operatsiyasiz davolash rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4067,6 +4069,12 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "olive_oil":
         d["olive_oil_photo_id"] = file_id
         await update.message.reply_text("✅ Zaytun yog'i rasmi saqlandi!")
+    elif waiting == "registration":
+        d["registration_photo_id"] = file_id
+        await update.message.reply_text("✅ Kelish tartibi rasmi saqlandi!")
+    elif waiting == "treatment":
+        d["treatment_photo_id"] = file_id
+        await update.message.reply_text("✅ Operatsiyasiz davolash rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
@@ -4184,7 +4192,7 @@ FAQ_DATA = {
         )),
         ("💰 Как формируется цена?", "Цена — за 1 день/1 человека. Включает: проживание, лечение, физиотерапию, УЗИ, анализы, МРТ 1.5Т или МСКТ (1 орган)."),
         ("🧲 Как подготовиться к МРТ?", "Специальная подготовка не требуется. Снимите металлические предметы. При МРТ с контрастом — не есть 4–6 часов до процедуры."),
-        ("💊 Лечение без операции?", "Да. Клиника специализируется на *консервативном лечении* — без операций, с использованием натуральных методов и физиотерапии."),
+        ("💊 Лечение без операции?", "q_no_surgery"),
         ("🚻 Палаты мужские и женские?", "Да, палаты раздельные. Женщин и мужчин размещают в разных корпусах."),
         ("🍽 Есть ли питание?", "Да. Питание входит в программу лечения. Столовая работает по расписанию. Во время лечения — специальная диета."),
         ("📅 Как записаться?", "Запись не обязательна — принимаем без брони. Но лучше сообщить заранее для резервирования места."),
@@ -4212,7 +4220,7 @@ FAQ_DATA = {
             "Kelish va ketish vaqtingizni hamda xona turini tanlashda ushbu qoidalarga e'tibor berishingizni so'raymiz."
         )),
         ("🧲 МРТ ga qanday tayyorlanish kerak?", "Maxsus tayyorgarlik kerak emas. Metall buyumlarni yechib qo'ying. Kontrastli МРТ da — 4–6 soat oldin ovqat emas."),
-        ("💊 Operatsiyasiz davolanish bormi?", "Ha. Klinika *konservativ davolash* ga ixtisoslashgan — operatsiyasiz, tabiiy usullar va fizioterapiya bilan."),
+        ("💊 Operatsiyasiz davolanish bormi?", "q_no_surgery"),
         ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli korpuslarda joylashadi."),
         ("🍽 Ovqatlanish bormi?", "Ha. Ovqatlanish davolash dasturiga kiradi. Oshxona jadval bo'yicha ishlaydi. Davolash vaqtida — maxsus parhez."),
         ("📅 Qanday yozilish kerak?", "Bron shart emas — bronsiz qabul qilamiz. Lekin joy band qilish uchun oldindan xabar berish yaxshiroq."),
@@ -4230,7 +4238,7 @@ FAQ_DATA = {
         )),
         ("💰 Баға қалай қалыптасады?", "Баға — 1 күн/1 адам үшін. Кіреді: тұру, емдеу, физиотерапия, УДЗ, анализдер, МРТ 1.5Т немесе МСКТ."),
         ("🧲 МРТ-ге қалай дайындалу керек?", "Арнайы дайындық қажет емес. Металл заттарды шешіңіз."),
-        ("💊 Операциясыз емдеу бар ма?", "Иә. Клиника *консервативті емдеуге* маманданған — операциясыз, табиғи әдістермен."),
+        ("💊 Операциясыз емдеу бар ма?", "q_no_surgery"),
         ("🚻 Ер/әйел палаталары?", "Иә, палаталар бөлек. Әйелдер мен ерлер әртүрлі корпустарда орналасады."),
         ("🍽 Тамақтану бар ма?", "Иә. Тамақтану емдеу бағдарламасына кіреді."),
         ("📅 Қалай жазылу керек?", "Бронь міндетті емес — бронсыз қабылдаймыз."),
@@ -4255,8 +4263,9 @@ def faq_keyboard(lang):
         "kz": "📅 Қашан келуге болады? (Брондау)",
     }[lang]
     buttons = [[InlineKeyboardButton(kelish_label, callback_data="m_kelish_tartibi")]]
-    for i, (q, _) in enumerate(faqs):
-        buttons.append([InlineKeyboardButton(q, callback_data=f"faq_{i}")])
+    for i, (q, a) in enumerate(faqs):
+        cb = a if isinstance(a, str) and a.startswith("q_") else f"faq_{i}"
+        buttons.append([InlineKeyboardButton(q, callback_data=cb)])
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
     buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
     return InlineKeyboardMarkup(buttons)
@@ -4610,7 +4619,7 @@ async def handle_faq_callbacks(query, context, data, lang):
     faqs = FAQ_DATA.get(lang, FAQ_DATA["ru"])
 
     if data == "m_kelish_tartibi":
-        REGISTRATION_PHOTO_ID = ""  # data.json dan olish kerak bo'lsa: d.get("registration_photo_id","")
+        REGISTRATION_PHOTO_ID = d.get("registration_photo_id", "") if (d := load_data()) else ""
         text = {
             "ru": (
                 "📅 <b>Порядок приезда и бронирования мест в нашем центре</b>\n\n"
@@ -4658,6 +4667,74 @@ async def handle_faq_callbacks(query, context, data, lang):
             await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_delete_registration":
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        title = {
+            "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
+            "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
+            "kz": "❓ *Жиі қойылатын сұрақтар*\n\nСұрақты таңдаңыз:",
+        }[lang]
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown",
+                                       reply_markup=faq_keyboard(lang))
+
+    elif data == "q_no_surgery":
+        d = load_data()
+        TREATMENT_PHOTO_ID = d.get("treatment_photo_id", "")
+        text = {
+            "ru": (
+                "🌱 <b>Безоперационное и естественное лечение в нашей клинике</b>\n\n"
+                "Главное преимущество и уникальность нашей клиники — лечение многих заболеваний, при которых обычно рекомендуют операцию, абсолютно естественным путём, без ножа.\n\n"
+                "✅ <b>Мы лечим следующие заболевания БЕЗ ОПЕРАЦИИ:</b>\n"
+                "• 🫚 Желчнокаменная болезнь (камни в желчном пузыре);\n"
+                "• 🪨 Камни, песок и соли в почках;\n"
+                "• 🫧 Полипы и кисты;\n"
+                "• 🩺 Миомы.\n\n"
+                "🌿 <b>Метод лечения:</b> Исключительно натуральные травы (целебные отвары, мази) и специальная строгая диета, на стыке народной медицины и современных технологий.\n\n"
+                "⏳ <b>Длительность лечения:</b> Определяется индивидуально после осмотра врача. Курс — <b>не менее 18–21 дня</b>.\n\n"
+                "<i>Восстановите здоровье без операций, с помощью исцеляющей силы природы!</i>"
+            ),
+            "uz": (
+                "🌱 <b>Klinikamizda operatsiyasiz va tabiiy davolash</b>\n\n"
+                "Klinikamizning eng asosiy afzalligi — ko'plab jarrohlik tavsiya etilgan kasalliklarni pichoq tekkizmasdan, butunlay tabiiy yo'l bilan davolashdir.\n\n"
+                "✅ <b>Biz quyidagi kasalliklarni operatsiyasiz davolaymiz:</b>\n"
+                "• 🫚 O't pufagi tosh kasalliklari;\n"
+                "• 🪨 Buyrakdagi toshlar va qumlar (tuzlar);\n"
+                "• 🫧 Poliplar va kistalar;\n"
+                "• 🩺 Miomalar.\n\n"
+                "🌿 <b>Davolash usuli:</b> Mutlaqo tabiiy giyohlar (shifobaxsh qaynatmalar, malhamlar) va maxsus qat'iy parhez yo'li bilan, xalq tabobati hamda zamonaviy tibbiyot uyg'unligida.\n\n"
+                "⏳ <b>Davolanish muddati:</b> Shifokor ko'rigidan so'ng individual belgilanadi. Kurs — <b>18–21 kundan kam emas</b>.\n\n"
+                "<i>Sog'ligingizni pichoq tekkizmasdan, tabiat in'om etgan giyohlar bilan tiklang!</i>"
+            ),
+            "kz": (
+                "🌱 <b>Клиникамызда отасыз (операциясыз) және табиғи емдеу</b>\n\n"
+                "Клиникамыздың ең басты артықшылығы — әдетте операция ұсынылатын көптеген ауруларды пышақсыз, мүлдем табиғи жолмен емдеу.\n\n"
+                "✅ <b>Біз келесі ауруларды ОТАУСЫЗ емдейміз:</b>\n"
+                "• 🫚 Өт қабындағы тас аурулары;\n"
+                "• 🪨 Бүйректегі тастар, құмдар мен тұздар;\n"
+                "• 🫧 Полиптер мен кисталар;\n"
+                "• 🩺 Миомалар.\n\n"
+                "🌿 <b>Емдеу әдісі:</b> Толықтай табиғи шөптер (шипалы қайнатпалар, жақпамайлар) және арнайы қатаң диета, халық медицинасы мен заманауи ғылымның ұштасуымен.\n\n"
+                "⏳ <b>Емдеу мерзімі:</b> Дәрігер тексеруінен кейін жеке белгіленеді. Курс — <b>кем дегенде 18–21 күн</b>.\n\n"
+                "<i>Денсаулығыңызды отасыз, табиғат берген шипалы шөптермен қалыпқа келтіріңіз!</i>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_surgery_question")]])
+        if TREATMENT_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=TREATMENT_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_surgery_question":
         try:
             await query.message.delete()
         except Exception:
