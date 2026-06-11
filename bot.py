@@ -1550,7 +1550,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         items = [
             ("Nuga-best",                                                                                           "muo_nugabest"),
             ("Seragem",                                                                                             "muo_seragem"),
-            ({"ru": "Релакс массаж точек ног", "uz": "Relaksatsion oyoq nuqtalari massaji", "kz": "Аяқ нүктелерінің релаксациялық массажы"}[lang], "t_foot_massage"),
+            ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
             ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
@@ -1649,7 +1649,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         items = [
             ("Nuga-best",                                                                                                        "muo_nugabest"),
             ("Seragem",                                                                                                          "muo_seragem"),
-            ({"ru": "Релакс массаж точек ног", "uz": "Relaksatsion oyoq nuqtalari massaji", "kz": "Аяқ нүктелерінің релаксациялық массажы"}[lang], "t_foot_massage"),
+            ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
             ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
@@ -1711,7 +1711,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         items = [
             ("Nuga-best",                                                                                                        "muo_nugabest"),
             ("Seragem",                                                                                                          "muo_seragem"),
-            ({"ru": "Релакс массаж точек ног", "uz": "Relaksatsion oyoq nuqtalari massaji", "kz": "Аяқ нүктелерінің релаксациялық массажы"}[lang], "t_foot_massage"),
+            ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
             ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
