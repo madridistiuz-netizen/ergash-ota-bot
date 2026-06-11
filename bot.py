@@ -1555,7 +1555,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж", "uz": "Bioenergiya massaji", "kz": "Биоэнергетикалық массаж"}[lang],                           "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                           "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
         ]
@@ -1654,7 +1654,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж", "uz": "Bioenergiya massaji", "kz": "Биоэнергетикалық массаж"}[lang],                           "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
         ]
@@ -1716,7 +1716,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж", "uz": "Bioenergiya massaji", "kz": "Биоэнергетикалық массаж"}[lang],                           "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",             "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                         "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
         ]
@@ -1776,7 +1776,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж", "uz": "Bioenergiya massaji", "kz": "Биоэнергетикалық массаж"}[lang],                           "t_silver_glove"),
             ({"ru": "Лимфодренаж",            "uz": "Limfadrenaj",                          "kz": "Лимфодренаж"}[lang],                            "t_lymph"),
             ({"ru": "Растяжка",               "uz": "Rastyajka",                            "kz": "Растяжка"}[lang],                               "t_stretch"),
-            ({"ru": "Ударно-волновая терапия","uz": "Zarb to'lqinli terapiya",              "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия","uz": "Zarb to'lqinli terapiya",              "kz": "Соққы-толқынды терапия"}[lang],                 "t_shockwave"),
             ("Robospine",                                                                                                        "muo_robospine"),
             ({"ru": "Криолиполиз",            "uz": "Kriolipoliz",                          "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
         ]
@@ -1836,7 +1836,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж","uz": "Bioenergiya massaji",         "kz": "Биоэнергетикалық массаж"}[lang],      "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                 "kz": "Лимфодренаж"}[lang],                  "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                   "kz": "Растяжка"}[lang],                     "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",     "kz": "Соққы-толқынды терапия"}[lang],       "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya",     "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                         "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",                 "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
         ]
@@ -1896,7 +1896,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж","uz": "Bioenergiya massaji",      "kz": "Биоэнергетикалық массаж"}[lang],     "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",             "kz": "Лимфодренаж"}[lang],                  "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                     "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
         ]
@@ -1956,7 +1956,82 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ({"ru": "Биоэнергетический массаж","uz": "Bioenergiya massaji",      "kz": "Биоэнергетикалық массаж"}[lang],     "t_silver_glove"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",             "kz": "Лимфодренаж"}[lang],                  "t_lymph"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
-            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "muo_uwt"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
+            ("Robospine",                                                                                                     "muo_robospine"),
+            ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "t_shockwave":
+        SHOCKWAVE_PHOTO_ID = d.get("shockwave_photo_id", "")
+        text = {
+            "ru": (
+                "⚡️ <b>Ударно-волновая терапия (УВТ)</b>\n\n"
+                "Один из самых эффективных современных методов лечения заболеваний опорно-двигательного аппарата с помощью высокоэнергетических акустических (звуковых) волн.\n\n"
+                "<b>Основные преимущества и лечебный эффект процедуры:</b>\n"
+                "• Расщепляет и растворяет вредные солевые отложения и кальцинаты в суставах и сухожилиях;\n"
+                "• Быстро снимает боль при пяточной шпоре, остеохондрозе и радикулите;\n"
+                "• Усиливает кровообращение и микроциркуляцию в тканях, ускоряя регенерацию;\n"
+                "• Устраняет хронические воспаления и восстанавливает подвижность суставов.\n\n"
+                "⚠️ <b>Примечание:</b> Эта процедура не входит в общую стоимость проживания (в стоимость палат).\n\n"
+                "💰 <b>Стоимость процедуры:</b> 1 сеанс — <b>80 000 сум</b>"
+            ),
+            "uz": (
+                "⚡️ <b>Zarb to'lqinli terapiya (UVT)</b>\n\n"
+                "Yuqori energiyali akustik (tovush) to'lqinlar yordamida tayanch-harakat tizimi kasalliklarini davolovchi eng samarali zamonaviy usullardan biri.\n\n"
+                "<b>Muolajaning asosiy afzalliklari va shifobaxsh ta'siri:</b>\n"
+                "• Bo'g'imlar va paylarda to'planib qolgan zararli tuzlar va kalsionatlarni parchalab, eritib yuboradi;\n"
+                "• Tovon shporasi, osteoxondroz va radikulit og'riqlarini tez fursatda qoldiradi;\n"
+                "• To'qimalarda qon aylanishini va mikrosirkulyatsiyani kuchaytirib, tiklanish jarayonini tezlashtiradi;\n"
+                "• Surunkali yallig'lanishlarni bartaraf etib, bo'g'imlar harakatchanligini tiklaydi.\n\n"
+                "⚠️ <b>Eslatma:</b> Ushbu muolaja xonalar to'lovi (umumiy to'lov) ichiga kiritilmagan.\n\n"
+                "💰 <b>Muolaja narxi:</b> 1 seans — <b>80 000 so'm</b>"
+            ),
+            "kz": (
+                "⚡️ <b>Соққы-толқынды терапия (СВТ)</b>\n\n"
+                "Жоғары энергиялы акустикалық (дыбыс) толқындар көмегімен тірек-қимыл аппараты ауруларын емдейтін ең тиімді заманауи әдістердің бірі.\n\n"
+                "<b>Ем-шараның негізгі артықшылықтары мен емдік әсері:</b>\n"
+                "• Буындар мен сіңірлерде жиналып қалған зиянды тұздар мен кальцинаттарды ыдыратып, ерітіп жібереді;\n"
+                "• Өкше шпорасы, остеохондроз және радикулит ауырсынуларын тез арада басады;\n"
+                "• Тіндердегі қан айналымы мен микроциркуляцияны күшейтіп, жазылу процесін тездетеді;\n"
+                "• Созылмалы қабынуды жойып, буындардың қозғалғыштығын қалпына келтіреді.\n\n"
+                "⚠️ <b>Ескерту:</b> Бұл ем-шара палаталардың жалпы құнына (жалпы төлемге) кірмейді.\n\n"
+                "💰 <b>Ем-шара бағасы:</b> 1 сеанс — <b>80 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_shockwave")]])
+        if SHOCKWAVE_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=SHOCKWAVE_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_shockwave":
+        await query.message.delete()
+        title = {
+            "ru": "🔵 <b>Доп. процедуры</b>\n\nВыберите:",
+            "uz": "🔵 <b>Qo'shimcha muolajalar</b>\n\nTanlang:",
+            "kz": "🔵 <b>Қосымша процедуралар</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Nuga-best",                                                                                                     "muo_nugabest"),
+            ("Seragem",                                                                                                       "muo_seragem"),
+            ({"ru": "Второе сердце",           "uz": "Ikkinchi yurak",          "kz": "Екінші жүрек"}[lang],                 "t_foot_massage"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",           "kz": "Жалпы массаж"}[lang],                 "t_general_massage"),
+            ({"ru": "Биоэнергетический массаж","uz": "Bioenergiya massaji",      "kz": "Биоэнергетикалық массаж"}[lang],     "t_silver_glove"),
+            ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",             "kz": "Лимфодренаж"}[lang],                  "t_lymph"),
+            ({"ru": "Растяжка",                "uz": "Rastyajka",               "kz": "Растяжка"}[lang],                     "t_stretch"),
+            ({"ru": "Ударно-волновая терапия", "uz": "Zarb to'lqinli terapiya", "kz": "Соққы-толқынды терапия"}[lang],       "t_shockwave"),
             ("Robospine",                                                                                                     "muo_robospine"),
             ({"ru": "Криолиполиз",             "uz": "Kriolipoliz",             "kz": "Криолиполиз"}[lang],                  "muo_kriyo"),
         ]
@@ -1966,7 +2041,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data in (
         "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
-        "muo_uwt", "muo_robospine", "muo_kriyo",
+        "muo_robospine", "muo_kriyo",
     ):
         soon_text = {
             "ru": "🔄 Информация будет добавлена в ближайшее время...",
@@ -3404,6 +3479,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo bioenergy_massage` — Bioenergiya massaji rasmi
 `/admin_photo lymph` — Limfadrenaj rasmi
 `/admin_photo stretch` — Rastyajka rasmi
+`/admin_photo shockwave` — Zarb to'lqinli terapiya rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3669,6 +3745,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "stretch":
         d["stretch_photo_id"] = file_id
         await update.message.reply_text("✅ Rastyajka rasmi saqlandi!")
+    elif waiting == "shockwave":
+        d["shockwave_photo_id"] = file_id
+        await update.message.reply_text("✅ Zarb to'lqinli terapiya rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
