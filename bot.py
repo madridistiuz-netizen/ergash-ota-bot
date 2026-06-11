@@ -1532,7 +1532,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         items = [
             ("Malham",                                                                          "mal_malham"),
             ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],       "m_fitobar"),
-            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],     "mal_bodom"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],     "m_bodom"),
             ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang], "mal_chuda"),
         ]
@@ -2182,7 +2182,83 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         items = [
             ("Malham",                                                                              "mal_malham"),
             ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
-            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "mal_bodom"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "m_bodom"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "mal_zaytun"),
+            ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "m_bodom":
+        ALMOND_OIL_PHOTO_ID = d.get("almond_oil_photo_id", "")
+        text = {
+            "ru": (
+                "🌱 <b>Целебные свойства миндального масла (Рекомендации Ибн Сины)</b>\n\n"
+                "<i>«Миндальное масло — один из эликсиров вечной молодости» — Абу Али ибн Сина.</i>\n\n"
+                "<b>Польза при наружном применении (Массаж и растирание):</b>\n"
+                "• <b>Уход за кожей:</b> Разглаживает морщины, подтягивает кожу, делает её гладкой и чистой. Устраняет пятна, веснушки и следы от ран.\n"
+                "• <b>Нервная система:</b> При массаже лица и головы улучшает кровообращение, питает нервные волокна и успокаивает. Незаменимо при реабилитации после инсульта.\n"
+                "• <b>Глаза и уши:</b> Повышает остроту зрения. При боли и шуме в ушах закапывают по 1 капле.\n\n"
+                "<b>Польза при приёме внутрь (По 1 ч. ложке перед едой):</b>\n"
+                "• Измельчает и выводит камни из почек, мочевого и желчного пузыря;\n"
+                "• Выводит соли, накопившиеся в суставах и позвоночнике;\n"
+                "• Устраняет воспалительные процессы во внутренних органах.\n\n"
+                "💰 <b>Цена продукта:</b> <b>48 000 сум</b>"
+            ),
+            "uz": (
+                "🌱 <b>Bodom yog'ining shifobaxsh xislatlari (Ibn Sino tavsiyalari)</b>\n\n"
+                "<i>«Bodom moyi — mangu yoshlik eliksirlaridan biridir» — Abu Ali ibn Sino.</i>\n\n"
+                "<b>Tashqi qo'llashdagi foydalari (Massaj va surkash orqali):</b>\n"
+                "• <b>Yuz va tana parvarishi:</b> Ajinlarni yozadi, terini tarang, silliq va tiniq qiladi. Dog', sepkil va yara izlarini yo'qotadi.\n"
+                "• <b>Asab va miya faoliyati:</b> Yuz va bosh qismiga surtilsa, qon aylanishini yaxshilaydi, asab tolalarini oziqlantiradi. Insultdan keyingi falajliklarni davolashda beqiyosdir.\n"
+                "• <b>Ko'z va quloq:</b> Ko'rish quvvatini oshiradi. Quloq og'riganda 1 tomchi tomiziladi.\n\n"
+                "<b>Ichishga tavsiyasidagi foydalari (Ovqatdan oldin 1 choy qoshiq):</b>\n"
+                "• Buyrak, qovuq va o't pufagidagi toshlarni maydalab eritadi;\n"
+                "• Bo'g'imlar va umurtqa pog'onasidagi tuzlarni yo'qotadi;\n"
+                "• Ichki a'zolardagi yallig'lanish jarayonlarini bartaraf etadi.\n\n"
+                "💰 <b>Mahsulot narxi:</b> <b>48 000 so'm</b>"
+            ),
+            "kz": (
+                "🌱 <b>Бадам майының шипалық қасиеттері (Ибн Синаның кеңестері)</b>\n\n"
+                "<i>«Бадам майы — мәңгілік жастық эликсирлерінің бірі» — Әбу Әли ибн Сина.</i>\n\n"
+                "<b>Сырттай қолданудың пайдасы (Массаж және жағу арқылы):</b>\n"
+                "• <b>Тері күтімі:</b> Әжімдерді жазады, теріні тартып тегіс етеді. Дақтарды, секпілдерді және жара іздерін кетіреді.\n"
+                "• <b>Жүйке жүйесі:</b> Бет пен басты массаждағанда қан айналымын жақсартады, жүйке талшықтарын қоректендіреді. Инсульттан кейінгі сал ауруын емдеуде таптырмас.\n"
+                "• <b>Көз және құлақ:</b> Көру қабілетін арттырады. Құлақ ауырғанда 1 тамшыдан тамызылады.\n\n"
+                "<b>Ішке қабылдаудың пайдасы (Тамақтану алдында 1 шай қасық):</b>\n"
+                "• Бүйрек, қуық және өт қабындағы тастарды уатып ерітеді;\n"
+                "• Буындар мен омыртқадағы тұздарды жояды;\n"
+                "• Ішкі мүшелердегі қабыну процестерін басады.\n\n"
+                "💰 <b>Өнім бағасы:</b> <b>48 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_almond")]])
+        if ALMOND_OIL_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=ALMOND_OIL_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_almond":
+        await query.message.delete()
+        title = {
+            "ru": "🟢 <b>Малхам и травы</b>\n\nВыберите:",
+            "uz": "🟢 <b>Малхам va o'tlar</b>\n\nTanlang:",
+            "kz": "🟢 <b>Малхам және шөптер</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Malham",                                                                              "mal_malham"),
+            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "m_bodom"),
             ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "mal_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
         ]
@@ -2191,7 +2267,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
 
     elif data in (
-        "mal_malham", "mal_bodom", "mal_zaytun", "mal_chuda",
+        "mal_malham", "mal_zaytun", "mal_chuda",
         "muo_robospine",
     ):
         soon_text = {
@@ -3633,6 +3709,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo shockwave` — Zarb to'lqinli terapiya rasmi
 `/admin_photo cryo` — Kriolipoliz rasmi
 `/admin_photo fitobar` — Fito-Bar rasmi
+`/admin_photo almond_oil` — Bodom yog'i rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3907,6 +3984,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "fitobar":
         d["fitobar_photo_id"] = file_id
         await update.message.reply_text("✅ Fito-Bar rasmi saqlandi!")
+    elif waiting == "almond_oil":
+        d["almond_oil_photo_id"] = file_id
+        await update.message.reply_text("✅ Bodom yog'i rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
