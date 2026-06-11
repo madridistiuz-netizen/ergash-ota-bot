@@ -790,7 +790,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Видео",
             "📜 Сертификаты",
             "📖 История клиники",
-            "🌿 Malham va muolajalar",
+            "🌿 Малхам и процедуры",
             "⬅️ Назад"
         ),
         "uz": (
@@ -812,7 +812,7 @@ def clinic_submenu_keyboard(lang):
             "🎥 Бейнелер",
             "📜 Сертификаттар",
             "📖 Клиника тарихы",
-            "🌿 Malham және процедуралар",
+            "🌿 Малхам и процедуры",
             "⬅️ Артқа"
         ),
     }[lang]
@@ -1508,9 +1508,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── Shifobaxsh malhamlar va muolajalar ──
     elif data == "malham_va_muolajalar":
         title = {
-            "ru": "🌿 *Malham va muolajalar*\n\nВыберите раздел:",
+            "ru": "🌿 *Малхам и процедуры*\n\nВыберите раздел:",
             "uz": "🌿 *Malham va muolajalar*\n\nBo'limni tanlang:",
-            "kz": "🌿 *Malham және процедуралар*\n\nБөлімді таңдаңыз:",
+            "kz": "🌿 *Малхам и процедуры*\n\nБөлімді таңдаңыз:",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         mal_label  = {"ru": "🟢 Malham va tabiiy yog'lar", "uz": "🟢 Malham va tabiiy yog'lar", "kz": "🟢 Malham және табиғи майлар"}[lang]
@@ -1551,7 +1551,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Nuga-best",                                                                                           "muo_nugabest"),
             ("Seragem",                                                                                             "muo_seragem"),
             ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
-            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "t_general_massage"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
@@ -1650,7 +1650,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Nuga-best",                                                                                                        "muo_nugabest"),
             ("Seragem",                                                                                                          "muo_seragem"),
             ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
-            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "t_general_massage"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
@@ -1712,7 +1712,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Nuga-best",                                                                                                        "muo_nugabest"),
             ("Seragem",                                                                                                          "muo_seragem"),
             ({"ru": "Второе сердце", "uz": "Ikkinchi yurak", "kz": "Екінші жүрек"}[lang], "t_foot_massage"),
-            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "muo_massaj"),
+            ({"ru": "Общий массаж",            "uz": "Umumiy massaj",                       "kz": "Жалпы массаж"}[lang],                           "t_general_massage"),
             ({"ru": "Серебряные перчатки",     "uz": "Kumush qulqob",                       "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
             ({"ru": "Лимфодренаж",             "uz": "Limfadrenaj",                         "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
             ({"ru": "Растяжка",                "uz": "Rastyajka",                           "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
@@ -1724,9 +1724,69 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
         await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
 
+    elif data == "t_general_massage":
+        GENERAL_MASSAGE_PHOTO_ID = d.get("general_massage_photo_id", "")
+        text = {
+            "ru": (
+                "💆‍♂️ <b>Общий массаж</b>\n\n"
+                "Прекрасная оздоровительная процедура, направленная на расслабление мышц всего тела, улучшение кровообращения и лимфотока, снижение стресса и повышение гибкости суставов.\n\n"
+                "🎁 <b>Отличная возможность:</b> Эта процедура включена в стоимость проживания во всех типах палат (<b>Стандарт, Полулюкс, Люкс и VIP</b>) нашей клиники! При оплате 10 дней проживания вы получаете 6 процедур бесплатно.\n\n"
+                "💰 <b>Стоимость дополнительного сеанса (вне пакета):</b> 1 сеанс — <b>56 000 сум</b>"
+            ),
+            "uz": (
+                "💆‍♂️ <b>Umumiy massaj</b>\n\n"
+                "Butun tana mushaklarini bo'shashtirish, qon va limfa aylanishini yaxshilash, stressni kamaytirish hamda bo'g'imlar egasuvchanligini oshirish uchun ajoyib sog'lomlashtirish muolajasidir.\n\n"
+                "🎁 <b>Ajoyib imkoniyat:</b> Ushbu muolaja klinikamizdagi <b>Standart, Yarim lyuks, Lyuks va VIP</b> xonalar umumiy to'lovi ichiga kiritilgan! 10 kunlik to'lovga 6 ta muolaja bepul qo'shib beriladi.\n\n"
+                "💰 <b>Paketdan tashqari qo'shimcha olish narxi:</b> 1 seans — <b>56 000 so'm</b>"
+            ),
+            "kz": (
+                "💆‍♂️ <b>Жалпы массаж</b>\n\n"
+                "Бүкіл дене бұлшықеттерін босаңсытуға, қан мен лимфа айналымын жақсартуға, күйзелісті азайтуға және буындардың икемділігін арттыруға арналған тамаша сауықтыру ем-шарасы.\n\n"
+                "🎁 <b>Керемет мүмкіндік:</b> Бұл ем-шара клиникамыздағы <b>Стандарт, Жартылай люкс, Люкс және VIP</b> палаталарының жалпы құнына қосылған! 10 күндік төлем жасағанда 6 ем-шара тегін беріледі.\n\n"
+                "💰 <b>Пакеттен тыс қосымша алу бағасы:</b> 1 сеанс — <b>56 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_general_massage")]])
+        if GENERAL_MASSAGE_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=GENERAL_MASSAGE_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_general_massage":
+        await query.message.delete()
+        title = {
+            "ru": "🔵 <b>Доп. процедуры</b>\n\nВыберите:",
+            "uz": "🔵 <b>Qo'shimcha muolajalar</b>\n\nTanlang:",
+            "kz": "🔵 <b>Қосымша процедуралар</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Nuga-best",                                                                                                        "muo_nugabest"),
+            ("Seragem",                                                                                                          "muo_seragem"),
+            ({"ru": "Второе сердце",          "uz": "Ikkinchi yurak",                       "kz": "Екінші жүрек"}[lang],                           "t_foot_massage"),
+            ({"ru": "Общий массаж",           "uz": "Umumiy massaj",                        "kz": "Жалпы массаж"}[lang],                           "t_general_massage"),
+            ({"ru": "Серебряные перчатки",    "uz": "Kumush qulqob",                        "kz": "Күміс қолғап"}[lang],                           "muo_kumush"),
+            ({"ru": "Лимфодренаж",            "uz": "Limfadrenaj",                          "kz": "Лимфодренаж"}[lang],                            "muo_limfa"),
+            ({"ru": "Растяжка",               "uz": "Rastyajka",                            "kz": "Растяжка"}[lang],                               "muo_rastyajka"),
+            ({"ru": "Ударно-волновая терапия","uz": "Zarb to'lqinli terapiya",              "kz": "Соққы-толқынды терапия"}[lang],                 "muo_uwt"),
+            ("Robospine",                                                                                                        "muo_robospine"),
+            ({"ru": "Криолиполиз",            "uz": "Kriolipoliz",                          "kz": "Криолиполиз"}[lang],                            "muo_kriyo"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
     elif data in (
         "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
-        "muo_massaj", "muo_kumush",
+        "muo_kumush",
         "muo_limfa", "muo_rastyajka", "muo_uwt", "muo_robospine", "muo_kriyo",
     ):
         soon_text = {
@@ -3161,6 +3221,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo nuga_best` — Nuga-Best rasmi
 `/admin_photo seragem` — Seragem rasmi
 `/admin_photo foot_massage` — Oyoq nuqtalari massaji rasmi
+`/admin_photo general_massage` — Umumiy massaj rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3414,6 +3475,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "foot_massage":
         d["foot_massage_photo_id"] = file_id
         await update.message.reply_text("✅ Oyoq massaji rasmi saqlandi!")
+    elif waiting == "general_massage":
+        d["general_massage_photo_id"] = file_id
+        await update.message.reply_text("✅ Umumiy massaj rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
