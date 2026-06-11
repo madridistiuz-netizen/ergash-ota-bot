@@ -1790,19 +1790,19 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "ru": (
                 "⚡️ <b>Биоэнергетический массаж</b>\n\n"
                 "Передовая восточная процедура с использованием специальных биоперчаток, которая помогает очистить энергетические каналы тела, улучшить кровообращение, снять боль и обновить клетки.\n\n"
-                "🎁 <b>Отличная возможность:</b> Эта процедура включена в общую стоимость проживания только в <b>Стандартных (Средних)</b> палатах нашей клиники! При оплате 10 дней проживания вы получаете 6 процедур бесплатно.\n\n"
+                "🎁 <b>Отличная возможность:</b> Эта процедура включена в общую стоимость проживания только в палатах <b>Д/Средний</b> нашей клиники! При оплате 10 дней проживания вы получаете 6 процедур бесплатно.\n\n"
                 "💰 <b>Стоимость дополнительного сеанса (вне пакета):</b> 1 сеанс — <b>56 000 сум</b>"
             ),
             "uz": (
                 "⚡️ <b>Bioenergiya massaji</b>\n\n"
                 "Maxsus bioqo'lqoplar yordamida tana energiya kanallarini tozalash, qon aylanishini yaxshilash, og'riqlarni qoldirish va hujayralarni yangilashga yordam beruvchi ilg'or sharqona muolajadir.\n\n"
-                "🎁 <b>Ajoyib imkoniyat:</b> Ushbu muolaja klinikamizdagi faqat <b>O'rtamiyona (Standart)</b> xonalar umumiy to'lovi ichiga kiritilgan! 10 kunlik to'lovga 6 ta muolaja bepul qo'shib beriladi.\n\n"
+                "🎁 <b>Ajoyib imkoniyat:</b> Ushbu muolaja klinikamizdagi faqat <b>D/O'rta miyona</b> xonalar to'lovi ichiga kiritilgan! 10 kunlik to'lovga 6 ta muolaja bepul qo'shib beriladi.\n\n"
                 "💰 <b>Paketdan tashqari qo'shimcha olish narxi:</b> 1 seans — <b>56 000 so'm</b>"
             ),
             "kz": (
                 "⚡️ <b>Биоэнергетикалық массаж</b>\n\n"
                 "Дене қуат (энергия) арналарын тазартуға, қан айналымын жақсартуға, ауырсынуды басуға және жасушаларды жаңартуға көмектесетін арнайы биоқолғаптармен жасалатын озық шығыс ем-шарасы.\n\n"
-                "🎁 <b>Керемет мүмкіндік:</b> Бұл ем-шара клиникамыздағы тек <b>Орташа (Стандартты)</b> палаталардың жалпы құнына қосылған! 10 күндік төлем жасағанда 6 ем-шара тегін беріледі.\n\n"
+                "🎁 <b>Керемет мүмкіндік:</b> Бұл ем-шара клиникамыздағы тек <b>Д/Орташа</b> палаталардың құнына қосылған! 10 күндік төлем жасағанда 6 ем-шара тегін беріледі.\n\n"
                 "💰 <b>Пакеттен тыс қосымша алу бағасы:</b> 1 сеанс — <b>56 000 сум</b>"
             ),
         }[lang]
