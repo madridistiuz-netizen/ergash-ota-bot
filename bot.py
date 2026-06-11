@@ -1533,7 +1533,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Malham",                                                                          "mal_malham"),
             ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],       "m_fitobar"),
             ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],     "m_bodom"),
-            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],   "m_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang], "mal_chuda"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
@@ -2183,7 +2183,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Malham",                                                                              "mal_malham"),
             ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
             ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "m_bodom"),
-            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "mal_zaytun"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "m_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
@@ -2259,7 +2259,83 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ("Malham",                                                                              "mal_malham"),
             ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
             ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "m_bodom"),
-            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "mal_zaytun"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "m_zaytun"),
+            ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif data == "m_zaytun":
+        OLIVE_OIL_PHOTO_ID = d.get("olive_oil_photo_id", "")
+        text = {
+            "ru": (
+                "🫒 <b>Целебные свойства оливкового масла</b>\n\n"
+                "Чем дольше хранится оливковое масло, тем выше его целебная сила. Оно сохраняет свои свойства до 400 лет.\n\n"
+                "<b>Основные лечебные свойства:</b>\n"
+                "• <b>Пищеварение и кишечник:</b> Лечит заболевания кишечника, уничтожает паразитов. Мягко устраняет запоры.\n"
+                "• <b>Печень и почки:</b> Очищает печень от токсинов и омолаживает её. Расщепляет и выводит камни из почек и мочевого пузыря.\n"
+                "• <b>Суставы и сосуды:</b> Помогает при болях в суставах и ревматизме, предотвращает судороги.\n"
+                "• <b>Женское здоровье:</b> Широко используется в гинекологии в виде лечебных тампонов.\n\n"
+                "💡 <b>Лечебные рецепты:</b>\n"
+                "1. <b>При гриппе и простуде:</b> Смешать 1 ст. ложку масла с 1 ч. ложкой мёда. Принимать 3 раза в день за 30 минут до еды. При насморке — 2–3 капли в нос.\n"
+                "2. <b>При аденоме:</b> Мелко нарезанную капусту и зелень сельдерея заправить 1 ст. ложкой оливкового масла и употреблять перед едой.\n\n"
+                "💰 <b>Цена продукта:</b> <b>42 000 сум</b>"
+            ),
+            "uz": (
+                "🫒 <b>Zaytun yog'ining shifobaxsh xislatlari</b>\n\n"
+                "Zaytun yog'i qanchalik uzoq saqlansa, uning shifobaxshlik quvvati shunchalik ortib boradi va 400 yilgacha o'z kuchini yo'qotmaydi.\n\n"
+                "<b>Asosiy shifobaxsh xususiyatlari:</b>\n"
+                "• <b>Hazm va ichaklar:</b> Ichak kasalliklariga shifobaxsh, me'dadagi parazitlarni o'ldiradi. Qabziyatni bartaraf etadi.\n"
+                "• <b>Jigar va buyrak:</b> Jigarni tozalaydi va yoshartiradi. Buyrak hamda qovuqdagi toshlarni maydalab tushiradi.\n"
+                "• <b>A'zolar va bo'g'imlar:</b> Bo'g'im og'riqlari va revmatizmni davolaydi, tomir tortishishining oldini oladi.\n"
+                "• <b>Ayollar salomatligida:</b> Ginekologiyada shifobaxsh tampon sifatida keng qo'llaniladi.\n\n"
+                "💡 <b>Shifobaxsh retseptlar:</b>\n"
+                "1. <b>Gripp va shamollashda:</b> 1 osh qoshiq zaytun yog'ini 1 choy qoshiq asal bilan aralashtirib, kuniga 3 mahal ovqatdan 30 daqiqa oldin ichiladi. Tumovda burunga 2–3 tomchi.\n"
+                "2. <b>Adenomada:</b> Mayda to'g'ralgan karam va kashnichga 1 osh qoshiq zaytun yog'i aralashtirib, ovqatdan oldin iste'mol qilinadi.\n\n"
+                "💰 <b>Mahsulot narxi:</b> <b>42 000 so'm</b>"
+            ),
+            "kz": (
+                "🫒 <b>Зәйтүн майының шипалық қасиеттері</b>\n\n"
+                "Зәйтүн майы неғұрлым ұзақ сақталса, оның шипалық күші соғұрлым арта түседі. Ол өзінің қасиетін 400 жылға дейін жоғалтпайды.\n\n"
+                "<b>Негізгі емдік қасиеттері:</b>\n"
+                "• <b>Ас қорыту және ішек:</b> Ішек ауруларын емдейді, паразиттерді жояды. Іш қатуды тиімді басады.\n"
+                "• <b>Бауыр және бүйрек:</b> Бауырды тазартып жасартады. Бүйрек пен қуықтағы тастарды уатып түсіреді.\n"
+                "• <b>Буындар мен тамырлар:</b> Буын аурулары мен ревматизмді емдейді, бұлшықет тартылуының алдын алады.\n"
+                "• <b>Әйелдер денсаулығы:</b> Гинекологияда шипалы тампондар ретінде кеңінен қолданылады.\n\n"
+                "💡 <b>Шипалық рецептер:</b>\n"
+                "1. <b>Тұмау мен суық тиюде:</b> 1 ас қасық майды 1 шай қасық балмен араластырып, күніне 3 рет тамақтанудан 30 минут бұрын ішіңіз. Тұмауда мұрынға 2–3 тамшы.\n"
+                "2. <b>Аденомада:</b> Ұсақталған қырыққабат пен балдыркөкке 1 ас қасық зәйтүн майын қосып, тамақтанар алдында жеңіз.\n\n"
+                "💰 <b>Өнім бағасы:</b> <b>42 000 сум</b>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_olive")]])
+        if OLIVE_OIL_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=OLIVE_OIL_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_olive":
+        await query.message.delete()
+        title = {
+            "ru": "🟢 <b>Малхам и травы</b>\n\nВыберите:",
+            "uz": "🟢 <b>Малхам va o'tlar</b>\n\nTanlang:",
+            "kz": "🟢 <b>Малхам және шөптер</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Malham",                                                                              "mal_malham"),
+            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "m_bodom"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "m_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
         ]
         buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
@@ -2267,7 +2343,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
 
     elif data in (
-        "mal_malham", "mal_zaytun", "mal_chuda",
+        "mal_malham", "mal_chuda",
         "muo_robospine",
     ):
         soon_text = {
@@ -3710,6 +3786,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo cryo` — Kriolipoliz rasmi
 `/admin_photo fitobar` — Fito-Bar rasmi
 `/admin_photo almond_oil` — Bodom yog'i rasmi
+`/admin_photo olive_oil` — Zaytun yog'i rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3987,6 +4064,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "almond_oil":
         d["almond_oil_photo_id"] = file_id
         await update.message.reply_text("✅ Bodom yog'i rasmi saqlandi!")
+    elif waiting == "olive_oil":
+        d["olive_oil_photo_id"] = file_id
+        await update.message.reply_text("✅ Zaytun yog'i rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
