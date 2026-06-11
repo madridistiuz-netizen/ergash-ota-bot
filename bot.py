@@ -1531,7 +1531,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         items = [
             ("Malham",                                                                          "mal_malham"),
-            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],       "mal_fitobar"),
+            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],       "m_fitobar"),
             ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],     "mal_bodom"),
             ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],   "mal_zaytun"),
             ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang], "mal_chuda"),
@@ -2114,8 +2114,84 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
         await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
 
+    elif data == "m_fitobar":
+        FITOBAR_PHOTO_ID = d.get("fitobar_photo_id", "")
+        text = {
+            "ru": (
+                "🌱 <b>Целебный Фито-Бар нашей клиники</b>\n\n"
+                "В каждом отделении клиники организованы уголки Фито-Бара, где ежедневно 3–4 раза завариваются свежие травяные чаи. Все чаи предоставляются <b>бесплатно и в неограниченном количестве!</b>\n\n"
+                "⚠️ <b>Рекомендация врача:</b> Поскольку чаи обладают сильным лечебным эффектом, рекомендуется пить их 2–3 раза в день по 200 мл.\n\n"
+                "<b>6 видов целебных чаев в нашем Фито-Баре:</b>\n"
+                "1️⃣ 🟢 <b>Желчегонный и печеночный чай</b> — очищает печень от токсинов, стимулирует отток желчи и улучшает пищеварение.\n"
+                "2️⃣ 🟡 <b>Чай для похудения</b> — ускоряет обмен веществ, способствует расщеплению жиров и помогает снизить вес.\n"
+                "3️⃣ 🔵 <b>Почечный чай</b> — мочегонный эффект, выводит соли, снимает отёки и воспаления в почках.\n"
+                "4️⃣ 🟤 <b>Грудной чай (от бронхита)</b> — очищает дыхательные пути, способствует отхождению мокроты и укрепляет лёгкие.\n"
+                "5️⃣ 🔴 <b>Антипаразитарный чай</b> — безопасно очищает организм от паразитов и продуктов их жизнедеятельности.\n"
+                "6️⃣ 🟣 <b>Успокоительный чай</b> — снимает стресс, нормализует сон и устраняет усталость.\n\n"
+                "🌿 <i>Используйте силу природы для вашего здоровья!</i>"
+            ),
+            "uz": (
+                "🌱 <b>Klinikamizning Shifobaxsh Fito-Bari</b>\n\n"
+                "Klinikamizning har bir bo'limida Fito-Bar burchaklari tashkil etilgan. U yerda har kuni 3–4 mahal yangi giyohli choylar damlab qo'yiladi. Barcha choylar <b>bepul va cheklanmagan miqdorda!</b>\n\n"
+                "⚠️ <b>Shifokor tavsiyasi:</b> Choylar kuchli shifobaxsh ta'sirga ega bo'lgani uchun kuniga 2–3 mahal, 200 ml dan ichish tavsiya etiladi.\n\n"
+                "<b>Fito-barimizdagi 6 xil shifobaxsh choylar:</b>\n"
+                "1️⃣ 🟢 <b>O't va jigar choyi</b> — o't haydovchi, jigarni toksinlardan tozalovchi va hazm tizimini yaxshilovchi.\n"
+                "2️⃣ 🟡 <b>Ozdiruvchi choy</b> — moddalar almashinuvini tezlashtiruvchi, tana yog'larini erituvchi.\n"
+                "3️⃣ 🔵 <b>Buyrak choyi</b> — siydik haydovchi, buyrakdagi tuz va shishlarni haydovchi.\n"
+                "4️⃣ 🟤 <b>Bronxit choyi</b> — nafas yo'llarini tozalovchi, balg'am ko'chiruvchi va o'pkani mustahkamlovchi.\n"
+                "5️⃣ 🔴 <b>Gijja choyi</b> — organizmni parazitlar va ularning toksinlaridan xavfsiz tozalovchi.\n"
+                "6️⃣ 🟣 <b>Asab choyi</b> — tinchlantiruvchi, uyquni yaxshilovchi va charchoqni oluvchi.\n\n"
+                "🌿 <i>Sog'ligingiz uchun fito-barimizdan unumli foydalaning!</i>"
+            ),
+            "kz": (
+                "🌱 <b>Клиникамыздың шипалы Фито-Бары</b>\n\n"
+                "Клиникамыздың әрбір бөлімшесінде Фито-Бар бұрыштары ұйымдастырылған. Онда күн сайын 3–4 рет жаңадан демделген емдік шөп шайлары қойылады. Барлық шайлар <b>тегін және шектеусіз!</b>\n\n"
+                "⚠️ <b>Дәрігер кеңесі:</b> Шайлардың шипалық әсері күшті болғандықтан, күніне 2–3 рет, 200 мл-ден ішу ұсынылады.\n\n"
+                "<b>Фито-бардағы 6 түрлі шипалы шай:</b>\n"
+                "1️⃣ 🟢 <b>Өт және бауыр шайы</b> — өт айдайды, бауырды токсиндерден тазартады, ас қорытуды жақсартады.\n"
+                "2️⃣ 🟡 <b>Арықтату шайы</b> — зат алмасуды тездетеді, денедегі майларды ерітеді.\n"
+                "3️⃣ 🔵 <b>Бүйрек шайы</b> — несеп айдаушы, тұздар мен ісінуді кетіреді, қабынуға қарсы.\n"
+                "4️⃣ 🟤 <b>Бронхит шайы</b> — тыныс жолдарын тазартады, қақырық түсіреді, өкпені нығайтады.\n"
+                "5️⃣ 🔴 <b>Антипаразиттік шай</b> — ағзаны паразиттерден қауіпсіз тазартады.\n"
+                "6️⃣ 🟣 <b>Жүйке жүйесін тыныштандыру шайы</b> — күйзелісті басады, ұйқыны жақсартады.\n\n"
+                "🌿 <i>Денсаулығыңыз үшін фито-барымыздан пайдаланыңыз!</i>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_fitobar")]])
+        if FITOBAR_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=FITOBAR_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_fitobar":
+        await query.message.delete()
+        title = {
+            "ru": "🟢 <b>Малхам и травы</b>\n\nВыберите:",
+            "uz": "🟢 <b>Малхам va o'tlar</b>\n\nTanlang:",
+            "kz": "🟢 <b>Малхам және шөптер</b>\n\nТаңдаңыз:",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        items = [
+            ("Malham",                                                                              "mal_malham"),
+            ({"ru": "Фито бар",         "uz": "Fito bar",      "kz": "Фито бар"}[lang],           "m_fitobar"),
+            ({"ru": "Миндальное масло", "uz": "Bodom yog'i",   "kz": "Бадам майы"}[lang],         "mal_bodom"),
+            ({"ru": "Оливковое масло",  "uz": "Zaytun yog'i",  "kz": "Зәйтүн майы"}[lang],       "mal_zaytun"),
+            ({"ru": "Чудо мазь",        "uz": "Chuda maz",     "kz": "Ғажайып жақпа май"}[lang],  "mal_chuda"),
+        ]
+        buttons = [[InlineKeyboardButton(label, callback_data=cb)] for label, cb in items]
+        buttons.append([InlineKeyboardButton(back_label, callback_data="malham_va_muolajalar")])
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(buttons))
+
     elif data in (
-        "mal_malham", "mal_fitobar", "mal_bodom", "mal_zaytun", "mal_chuda",
+        "mal_malham", "mal_bodom", "mal_zaytun", "mal_chuda",
         "muo_robospine",
     ):
         soon_text = {
@@ -3556,6 +3632,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo stretch` — Rastyajka rasmi
 `/admin_photo shockwave` — Zarb to'lqinli terapiya rasmi
 `/admin_photo cryo` — Kriolipoliz rasmi
+`/admin_photo fitobar` — Fito-Bar rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -3827,6 +3904,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "cryo":
         d["cryo_photo_id"] = file_id
         await update.message.reply_text("✅ Kriolipoliz rasmi saqlandi!")
+    elif waiting == "fitobar":
+        d["fitobar_photo_id"] = file_id
+        await update.message.reply_text("✅ Fito-Bar rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
