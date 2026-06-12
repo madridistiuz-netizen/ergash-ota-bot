@@ -4199,7 +4199,6 @@ FAQ_DATA = {
         ("💊 Лечение без операции?", "q_no_surgery"),
         ("🚻 Палаты мужские и женские?", "Да, палаты раздельные. Женщин и мужчин размещают в разных палатах."),
         ("🍽 Есть ли питание?", "q_diet_food"),
-        ("📅 Как записаться?", "Запись не обязательна — принимаем без брони. Но лучше сообщить заранее для резервирования места."),
         ("🕐 Режим работы?", "Пн–Сб: 08:00–18:00. Воскресенье: приём новых пациентов."),
     ],
     "uz": [
@@ -4227,7 +4226,6 @@ FAQ_DATA = {
         ("💊 Operatsiyasiz davolanish bormi?", "q_no_surgery"),
         ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli xonalarda joylashadi."),
         ("🍽 Ovqatlanish bormi?", "q_diet_food"),
-        ("📅 Qanday yozilish kerak?", "Bron shart emas — bronsiz qabul qilamiz. Lekin joy band qilish uchun oldindan xabar berish yaxshiroq."),
         ("🕐 Ish vaqti?", "Du–Shan: 08:00–18:00. Yakshanba: yangi bemorlar qabuli."),
     ],
     "kz": [
@@ -4245,7 +4243,6 @@ FAQ_DATA = {
         ("💊 Операциясыз емдеу бар ма?", "q_no_surgery"),
         ("🚻 Ер/әйел палаталары?", "Иә, палаталар бөлек. Әйелдер мен ерлер әртүрлі палаталарда орналасады."),
         ("🍽 Тамақтану бар ма?", "q_diet_food"),
-        ("📅 Қалай жазылу керек?", "Бронь міндетті емес — бронсыз қабылдаймыз."),
         ("🕐 Жұмыс уақыты?", "Дс–Сб: 08:00–18:00. Жексенбі: жаңа науқастар қабылдауы."),
     ],
 }
