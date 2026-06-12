@@ -927,7 +927,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=main_menu_keyboard(lang))
 
     # ── FAQ ──
-    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question"):
+    elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question", "q_work_hours", "back_delete_work_hours"):
         await handle_faq_callbacks(query, context, data, lang)
 
     # ── Booking ──
@@ -3790,6 +3790,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo registration` — Kelish tartibi rasmi
 `/admin_photo treatment` — Operatsiyasiz davolash rasmi
 `/admin_photo diet` — Ovqatlanish/parhez rasmi
+`/admin_photo work_hours` — Ish vaqti rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4079,6 +4080,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "diet":
         d["diet_photo_id"] = file_id
         await update.message.reply_text("✅ Ovqatlanish/parhez rasmi saqlandi!")
+    elif waiting == "work_hours":
+        d["work_hours_photo_id"] = file_id
+        await update.message.reply_text("✅ Ish vaqti rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
@@ -4199,7 +4203,7 @@ FAQ_DATA = {
         ("💊 Лечение без операции?", "q_no_surgery"),
         ("🚻 Палаты мужские и женские?", "Да, палаты раздельные. Женщин и мужчин размещают в разных палатах."),
         ("🍽 Есть ли питание?", "q_diet_food"),
-        ("🕐 Режим работы?", "Пн–Сб: 08:00–18:00. Воскресенье: приём новых пациентов."),
+        ("🕐 Режим работы?", "q_work_hours"),
     ],
     "uz": [
         ("📅 Davolanish muddati?", (
@@ -4226,7 +4230,7 @@ FAQ_DATA = {
         ("💊 Operatsiyasiz davolanish bormi?", "q_no_surgery"),
         ("🚻 Erkaklar va ayollar palatalari?", "Ha, palatalar alohida. Ayollar va erkaklar turli xonalarda joylashadi."),
         ("🍽 Ovqatlanish bormi?", "q_diet_food"),
-        ("🕐 Ish vaqti?", "Du–Shan: 08:00–18:00. Yakshanba: yangi bemorlar qabuli."),
+        ("🕐 Ish vaqti?", "q_work_hours"),
     ],
     "kz": [
         ("📅 Емдеу мерзімі?", (
@@ -4243,7 +4247,7 @@ FAQ_DATA = {
         ("💊 Операциясыз емдеу бар ма?", "q_no_surgery"),
         ("🚻 Ер/әйел палаталары?", "Иә, палаталар бөлек. Әйелдер мен ерлер әртүрлі палаталарда орналасады."),
         ("🍽 Тамақтану бар ма?", "q_diet_food"),
-        ("🕐 Жұмыс уақыты?", "Дс–Сб: 08:00–18:00. Жексенбі: жаңа науқастар қабылдауы."),
+        ("🕐 Жұмыс уақыты?", "q_work_hours"),
     ],
 }
 
@@ -4668,6 +4672,71 @@ async def handle_faq_callbacks(query, context, data, lang):
             await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_delete_registration":
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        title = {
+            "ru": "❓ *Часто задаваемые вопросы*\n\nВыберите вопрос:",
+            "uz": "❓ *Ko'p so'raladigan savollar*\n\nSavolni tanlang:",
+            "kz": "❓ *Жиі қойылатын сұрақтар*\n\nСұрақты таңдаңыз:",
+        }[lang]
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown",
+                                       reply_markup=faq_keyboard(lang))
+
+    elif data == "q_work_hours":
+        d = load_data()
+        WORK_HOURS_PHOTO_ID = d.get("work_hours_photo_id", "")
+        text = {
+            "ru": (
+                "⏱ <b>Режим работы и часы приёма нашей клиники</b>\n\n"
+                "Наш центр работает каждый день без перерыва, создавая максимальное удобство для пациентов:\n\n"
+                "📆 <b>Понедельник – Суббота (Основные рабочие дни):</b>\n"
+                "• <b>Часы работы:</b> с 08:00 до 18:00.\n"
+                "• В эти дни проводятся осмотры врачей, диагностика и все виды процедур в полном объёме.\n\n"
+                "🔴 <b>Воскресенье:</b> Несмотря на то что воскресенье является выходным днём для наших врачей, для пациентов, приезжающих из дальних регионов и из-за рубежа, <b>отдел регистрации работает</b>.\n"
+                "• Вновь прибывшие пациенты встречаются, регистрируются и размещаются в палатах.\n"
+                "• ✨ <b>Важное преимущество:</b> Чтобы не терять время, для новых пациентов, приехавших в воскресенье, <b>проводятся процедуры первого дня!</b>\n\n"
+                "<i>Приезжайте в любой удобный для вас день — мы всегда готовы помочь вам выздороветь!</i>"
+            ),
+            "uz": (
+                "⏱ <b>Klinikamizning ish tartibi va qabul vaqtlari</b>\n\n"
+                "Markazimiz bemorlarga qulaylik yaratish maqsadida haftaning har kuni uzluksiz xizmat ko'rsatadi:\n\n"
+                "📆 <b>Dushanba – Shanba (Asosiy ish kunlari):</b>\n"
+                "• <b>Ish vaqti:</b> 08:00 dan 18:00 gacha.\n"
+                "• Ushbu kunlarda shifokorlar ko'rigi, diagnostika va barcha turdagi muolajalar to'liq hajmda olib boriladi.\n\n"
+                "🔴 <b>Yakshanba:</b> Yakshanba shifokorlarimiz uchun dam olish kuni bo'lishiga qaramay, uzoq viloyatlar va chet eldan keladigan bemorlarimiz uchun <b>Registratsiya bo'limi ishlaydi</b>.\n"
+                "• Kelgan yangi bemorlar kutib olinadi, ro'yxatdan o'tkaziladi va xonalarga joylashtiriladi.\n"
+                "• ✨ <b>Muhim afzalligi:</b> Vaqt yo'qotmaslik maqsadida yakshanba kuni kelgan yangi bemorlar uchun <b>birinchi kunning muolajalari o'tkaziladi!</b>\n\n"
+                "<i>O'zingizga qulay kunda kelishingiz mumkin, sizni sog'lomlashtirishga doim tayyormiz!</i>"
+            ),
+            "kz": (
+                "⏱ <b>Клиникамыздың жұмыс тәртібі мен қабылдау уақыттары</b>\n\n"
+                "Орталығымыз науқастарға қолайлылық жасау мақсатында аптаның әр күні үздіксіз қызмет көрсетеді:\n\n"
+                "📆 <b>Дүйсенбі – Сенбі (Негізгі жұмыс күндері):</b>\n"
+                "• <b>Жұмыс уақыты:</b> 08:00-ден 18:00-ге дейін.\n"
+                "• Бұл күндері дәрігерлер қарауы, диагностика және барлық ем-шаралар толық көлемде жүргізіледі.\n\n"
+                "🔴 <b>Жексенбі:</b> Жексенбі дәрігерлеріміз үшін демалыс күні болғанымен, алыс аймақтар мен шет елден келетін науқастарымыз үшін <b>Тіркеу бөлімі жұмыс істейді</b>.\n"
+                "• Жаңа келген науқастар қарсы алынады, тіркеледі және палаталарға орналастырылады.\n"
+                "• ✨ <b>Маңызды артықшылығы:</b> Уақытты жоғалтпау мақсатында жексенбі күні келген жаңа науқастар үшін <b>бірінші күннің ем-шаралары жүргізіледі!</b>\n\n"
+                "<i>Өзіңізге ыңғайлы күні келіңіз — сізді сауықтыруға әрдайым дайынбыз!</i>"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_delete_work_hours")]])
+        if WORK_HOURS_PHOTO_ID:
+            await query.message.delete()
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=WORK_HOURS_PHOTO_ID,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=kb,
+            )
+        else:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_delete_work_hours":
         try:
             await query.message.delete()
         except Exception:
