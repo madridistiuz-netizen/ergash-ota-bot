@@ -656,9 +656,7 @@ def main_menu_keyboard(lang):
         [InlineKeyboardButton(labels["guide"],       callback_data="menu_guide")],
         [InlineKeyboardButton(labels["faq"],         callback_data="menu_faq")],
         [InlineKeyboardButton(labels["booking"],     callback_data="menu_booking")],
-        [InlineKeyboardButton(labels["transfer"],    callback_data="menu_transfer")],
         [InlineKeyboardButton(labels["weekend"],     callback_data="menu_weekend")],
-        [InlineKeyboardButton(labels["operator"],    callback_data="menu_operator")],
     ])
 
 
@@ -4271,7 +4269,19 @@ def faq_keyboard(lang):
     for i, (q, a) in enumerate(faqs):
         cb = a if isinstance(a, str) and a.startswith("q_") else f"faq_{i}"
         buttons.append([InlineKeyboardButton(q, callback_data=cb)])
+    transfer_label = {
+        "ru": "🚗 Добраться до клиники",
+        "uz": "🚗 Klinikaga yetib olish",
+        "kz": "🚗 Клиникаға жету",
+    }[lang]
+    operator_label = {
+        "ru": "📞 Оператор",
+        "uz": "📞 Operator",
+        "kz": "📞 Оператор",
+    }[lang]
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+    buttons.append([InlineKeyboardButton(transfer_label, callback_data="menu_transfer")])
+    buttons.append([InlineKeyboardButton(operator_label, callback_data="menu_operator")])
     buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
     return InlineKeyboardMarkup(buttons)
 
