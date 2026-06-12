@@ -742,7 +742,7 @@ def guide_keyboard(lang):
         "ru": (
             "1️⃣ Порядок размещения",
             "2️⃣ Первый день лечения",
-            "3️⃣ Процедуры и день",
+            "3️⃣ Лечение и порядок приёма Malxam",
             "4️⃣ Инфраструктура",
             "5️⃣ Правила поведения",
             "6️⃣ Что купить домой",
@@ -751,7 +751,7 @@ def guide_keyboard(lang):
         "uz": (
             "1️⃣ Joylashish tartibi",
             "2️⃣ Birinchi kun muolaja tartibi",
-            "3️⃣ Protseduralar va kun",
+            "3️⃣ Davolanish va Malxam ichish tartibi",
             "4️⃣ Infrastruktura",
             "5️⃣ Qoidalar",
             "6️⃣ Uyga tafsiyaoma",
@@ -759,8 +759,8 @@ def guide_keyboard(lang):
         ),
         "kz": (
             "1️⃣ Орналасу тәртібі",
-            "2️⃣ Первый день лечения",
-            "3️⃣ Процедуралар және күн",
+            "2️⃣ Бірінші күн ем тәртібі",
+            "3️⃣ Емдеу және Malxam ішу тәртібі",
             "4️⃣ Инфрақұрылым",
             "5️⃣ Ережелер",
             "6️⃣ Үйге ұсыным",
@@ -770,7 +770,7 @@ def guide_keyboard(lang):
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="guide_arrival")],
         [InlineKeyboardButton(labels[1], callback_data="guide_malham")],
-        [InlineKeyboardButton(labels[2], callback_data="guide_procedures")],
+        [InlineKeyboardButton(labels[2], callback_data="guide_step3")],
         [InlineKeyboardButton(labels[3], callback_data="guide_infrastructure")],
         [InlineKeyboardButton(labels[4], callback_data="guide_rules")],
         [InlineKeyboardButton(labels[5], callback_data="guide_shopping")],
@@ -1155,6 +1155,205 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton(back_label, callback_data="guide_malham_step2")],
             ])
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+        elif section == "step3":
+            # 1-QADAM: Ertalabki navbat
+            d2 = load_data()
+            photo = d2.get("guide_step3_p1_photo", "")
+            next_label = {"ru": "➡️ Далее (2/4)", "uz": "➡️ Keyingi (2/4)", "kz": "➡️ Келесі (2/4)"}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            text = {
+                "ru": (
+                    "🕒 <b>Шаг 1: Утренняя очередь и обследования (08:00)</b>\n\n"
+                    "Ваш второй день в клинике, процесс приёма Malxam и дополнительные процедуры:\n"
+                    "• <b>Лаборатория и УЗИ:</b> Пациенты занимают очередь в отделе регистрации утром в 08:00 для сдачи лабораторных анализов и прохождения УЗИ.\n"
+                    "• <b>Процедурная книжка:</b> Вы сможете получать все дополнительные процедуры, разрешённые и назначенные врачом в процедурной книжке."
+                ),
+                "uz": (
+                    "🕒 <b>1-Qadam: Ertalabki navbat va Tekshiruvlar (Soat 08:00)</b>\n\n"
+                    "Klinikadagi ikkinchi kuningiz — Malxam ichish jarayoni va qo'shimcha muolajalar:\n"
+                    "• <b>Laboratoriya va UZI:</b> Bemorlar laboratoriya tahlillari hamda UZI (EHO) ko'rigidan o'tish uchun ertalab soat 08:00 da Registratsiya bo'limidan navbat olib ko'rikdan o'tadi.\n"
+                    "• <b>Muolaja daftarchasi:</b> Muolaja daftarchada shifokor tomonidan ruxsat etilgan va buyurilgan barcha qo'shimcha muolajalarni olishingiz mumkin bo'ladi."
+                ),
+                "kz": (
+                    "🕒 <b>1-Қадам: Таңғы кезек және тексерулер (Сағат 08:00)</b>\n\n"
+                    "Клиникадағы екінші күніңіз — Malxam ішу процесі және қосымша ем-шаралар:\n"
+                    "• <b>Лаборатория және УЗИ:</b> Емделушілер зертханалық талдаулар мен УЗИ тексеруінен өту үшін таңғы сағат 08:00-де Тіркеу бөлімінен кезек алып тексеруден өтеді.\n"
+                    "• <b>Емдеу кітапшасы:</b> Дәрігер рұқсат еткен және тағайындаған барлық қосымша ем-шараларды емдеу кітапшасы арқылы алуыңызға болады."
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_step3_s2")],
+                [InlineKeyboardButton(back_label, callback_data="menu_guide")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
+        elif section == "step3_s2":
+            # 2-QADAM: Malxam ichish va rangli kartochkalar
+            d2 = load_data()
+            photo = d2.get("guide_step3_p2_photo", "")
+            next_label = {"ru": "➡️ Далее (3/4)", "uz": "➡️ Keyingi (3/4)", "kz": "➡️ Келесі (3/4)"}[lang]
+            back_label = {"ru": "⬅️ Назад (1/4)", "uz": "⬅️ Orqaga (1/4)", "kz": "⬅️ Артқа (1/4)"}[lang]
+            foreign_label = {"ru": "🌍 Иностранные граждане", "uz": "🌍 Chet el fuqarolari", "kz": "🌍 Шет ел азаматтары"}[lang]
+            local_label   = {"ru": "🇺🇿 Граждане Узбекистана", "uz": "🇺🇿 O'zbekiston fuqarolari", "kz": "🇺🇿 Өзбекстан азаматтары"}[lang]
+            text = {
+                "ru": (
+                    "🌈 <b>Шаг 2: Порядок приёма Malxam и цветные карточки</b>\n\n"
+                    "Второй день — это основной день, когда начинается приём Malxam.\n\n"
+                    "⚠️ <b>САМОЕ ВАЖНОЕ ПРАВИЛО:</b> Перед приёмом Malxam <b>как минимум 1.5 часа абсолютно ничего нельзя есть (быть натощак)!</b> Это максимально увеличивает эффект Malxam.\n\n"
+                    "• 💳 После оплаты вам выдаются специальные <b>цветные карточки</b>.\n"
+                    "• 🗓 Время приёма Malxam и последовательность цветов меняются по дням недели. Вы заходите строго по цвету и номеру вашей карточки.\n\n"
+                    "👇 Ознакомьтесь с графиком по кнопкам ниже:"
+                ),
+                "uz": (
+                    "🌈 <b>2-Qadam: Malxam ichish tartibi va Rangli kartochkalar</b>\n\n"
+                    "Ikkinchi kun — Malxam ichish boshlanadigan asosiy kun hisoblanadi.\n\n"
+                    "⚠️ <b>ENG MUHIM QOIDA:</b> Malxam ichishdan oldin <b>kamida 1.5 soat davomida mutlaqo hech narsa yemaslik (och qoringa bo'lish) kerak!</b> Bu Malxamning ta'sirini maksimal darajada oshiradi.\n\n"
+                    "• 💳 To'lovni amalga oshirganingizdan so'ng, qo'lingizga maxsus <b>rangli kartochkalar</b> beriladi.\n"
+                    "• 🗓 Malxam ichish vaqtlari va ranglar ketma-ketligi haftaning kunlariga qarab o'zgarib turadi. Siz kartochkangizning rangi va raqamiga qarab o'z vaqtingizda kirasiz.\n\n"
+                    "👇 Quyidagi tugmalar orqali grafik va aniq vaqtlar bilan tanishing:"
+                ),
+                "kz": (
+                    "🌈 <b>2-Қадам: Malxam ішу тәртібі және түрлі-түсті карточкалар</b>\n\n"
+                    "Екінші күн — Malxam ішу басталатын негізгі күн болып саналады.\n\n"
+                    "⚠️ <b>ЕҢ МАҢЫЗДЫ ЕРЕЖЕ:</b> Malxam ішер алдында <b>кем дегенде 1.5 сағат бұрын мүлдем ештеңе жемеу керек (аш қарында болу шарт)!</b> Бұл Malxam-ның әсерін барынша арттырады.\n\n"
+                    "• 💳 Төлем жасағаннан кейін қолыңызға арнайы <b>түрлі-түсті карточкалар</b> беріледі.\n"
+                    "• 🗓 Malxam ішу уақыты мен түстердің реттілігі апта күндеріне байланысты өзгеріп тұрады. Карточкаңыздың түсі мен нөміріне сәйкес өз уақытыңызда кіресіз.\n\n"
+                    "👇 Төмендегі түймелер арқылы кестемен танысыңыз:"
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(foreign_label, callback_data="guide_step3_foreign")],
+                [InlineKeyboardButton(local_label,   callback_data="guide_step3_local")],
+                [InlineKeyboardButton(next_label,    callback_data="guide_step3_s3")],
+                [InlineKeyboardButton(back_label,    callback_data="guide_step3")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
+        elif section == "step3_foreign":
+            # 2a: Chet el fuqarolari grafigi
+            d2 = load_data()
+            photo = d2.get("guide_step3_foreign_photo", "")
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            next_label = {"ru": "➡️ Далее (3/4)", "uz": "➡️ Keyingi (3/4)", "kz": "➡️ Келесі (3/4)"}[lang]
+            text = {
+                "ru": "🌍 <b>График для иностранных граждан</b>\n\nИностранные граждане принимают Malxam начиная с <b>10:00</b> утра согласно цвету своей карточки.",
+                "uz": "🌍 <b>Chet el fuqarolari uchun grafik</b>\n\nChet el fuqarolari Malxamni ertalab soat <b>10:00</b> dan boshlab kartochkalarining rangi bo'yicha ichadi.",
+                "kz": "🌍 <b>Шет ел азаматтары үшін кесте</b>\n\nШет ел азаматтары Malxam-ды таңғы сағат <b>10:00</b>-ден бастап карточкаларының түсіне сәйкес ішеді.",
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label,  callback_data="guide_step3_s3")],
+                [InlineKeyboardButton(back_label,  callback_data="guide_step3_s2")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
+        elif section == "step3_local":
+            # 2b: O'zbekiston fuqarolari grafigi
+            d2 = load_data()
+            photo = d2.get("guide_step3_local_photo", "")
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            next_label = {"ru": "➡️ Далее (3/4)", "uz": "➡️ Keyingi (3/4)", "kz": "➡️ Келесі (3/4)"}[lang]
+            text = {
+                "ru": "🇺🇿 <b>График для граждан Узбекистана</b>\n\nГраждане Узбекистана принимают Malxam начиная с <b>13:00 или 14:00</b> согласно цвету своей карточки.",
+                "uz": "🇺🇿 <b>O'zbekiston fuqarolari uchun grafik</b>\n\nO'zbekiston fuqarolari Malxamni soat <b>13:00 yoki 14:00</b> dan boshlab kartochkalarining rangi bo'yicha ichadi.",
+                "kz": "🇺🇿 <b>Өзбекстан азаматтары үшін кесте</b>\n\nӨзбекстан азаматтары Malxam-ды сағат <b>13:00 немесе 14:00</b>-ден бастап карточкаларының түсіне сәйкес ішеді.",
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label,  callback_data="guide_step3_s3")],
+                [InlineKeyboardButton(back_label,  callback_data="guide_step3_s2")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
+        elif section == "step3_s3":
+            # 3-QADAM: Grelka va klizma
+            d2 = load_data()
+            photo = d2.get("guide_step3_p3_photo", "")
+            next_label = {"ru": "➡️ Далее (4/4)", "uz": "➡️ Keyingi (4/4)", "kz": "➡️ Келесі (4/4)"}[lang]
+            back_label = {"ru": "⬅️ Назад (2/4)", "uz": "⬅️ Orqaga (2/4)", "kz": "⬅️ Артқа (2/4)"}[lang]
+            text = {
+                "ru": (
+                    "🔥 <b>Шаг 3: Самые важные золотые правила после Malxam!</b>\n\n"
+                    "Режим после приёма Malxam — часть лечения, дающая наивысший результат. Строго соблюдайте:\n\n"
+                    "1️⃣ 🛏 <b>Применение грелки (Самый важный этап):</b> Сразу после приёма Malxam необходимо пройти в палату и <b>как минимум 1,5–2 часа лежать неподвижно, приложив грелку к правому подреберью (область печени)</b>.\n"
+                    "2️⃣ 🩺 <b>Процедура клизмы:</b> После грелки — не спеша отправляйтесь в клизменную комнату для очистительной процедуры.\n"
+                    "3️⃣ 🚶‍♂️ <b>После процедур:</b> Рекомендуется вести активный образ жизни, принимать назначенные процедуры и пить травяные чаи в фито-баре."
+                ),
+                "uz": (
+                    "🔥 <b>3-Qadam: Malxamdan keyingi eng muhim oltin qoidalar!</b>\n\n"
+                    "Malxamni ichib bo'lgandan keyingi tartib — davolanishning eng yuqori natija beradigan qismi. Qat'iy amal qiling:\n\n"
+                    "1️⃣ 🛏 <b>Grelka qo'yish (Eng muhim joyi):</b> Malxamni ichgach, darhol xonangizga borib, <b>kamida 1.5–2 soat davomida o'ng qovurg'a ostiga (jigar sohasiga) grelka qo'yib</b> qimirlamay yotishingiz shart.\n"
+                    "2️⃣ 🩺 <b>Klizma muolajasi:</b> Grelkada yotib bo'lgandan keyin, klizma xonasiga borib navbatdagi tozalash muolajasini olasiz.\n"
+                    "3️⃣ 🚶‍♂️ <b>Muolajadan so'ng:</b> Kun davomida faol harakatda bo'lish, qo'shimcha muolajalarni olish va fito-bardagi giyohli choylarni ichib yurish tavsiya etiladi."
+                ),
+                "kz": (
+                    "🔥 <b>3-Қадам: Malxamдан кейінгі ең маңызды алтын ережелер!</b>\n\n"
+                    "Malxam ішкеннен кейінгі күтім — емнің ең жоғары нәтиже беретін бөлігі. Қатаң сақтаңыз:\n\n"
+                    "1️⃣ 🛏 <b>Грелка басу (Ең маңызды кезең):</b> Malxam ішкен бойда бірден бөлмеңізге барып, <b>кем дегенде 1,5–2 сағат бойы оң жақ қабырға астына (бауыр тұсына) грелка басып</b> қозғалмай жатуыңыз шарт.\n"
+                    "2️⃣ 🩺 <b>Клизма ем-шарасы:</b> Грелкамен жатып болғаннан кейін — клизма бөлмесіне барып кезекті тазарту ем-шарасын аласыз.\n"
+                    "3️⃣ 🚶‍♂️ <b>Ем-шарадан кейін:</b> Күн бойы белсенді қозғалыста болу, тағайындалған ем-шараларды алу және фито-бардағы шөп шайларын ішу ұсынылады."
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(next_label, callback_data="guide_step3_s4")],
+                [InlineKeyboardButton(back_label, callback_data="guide_step3_s2")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
+        elif section == "step3_s4":
+            # 4-QADAM: Navbat orasidagi bo'sh vaqt
+            d2 = load_data()
+            photo = d2.get("guide_step3_p4_photo", "")
+            guide_label = {"ru": "📖 К руководству", "uz": "📖 Qo'llanmaga", "kz": "📖 Нұсқаулыққа"}[lang]
+            back_label  = {"ru": "⬅️ Назад (3/4)", "uz": "⬅️ Orqaga (3/4)", "kz": "⬅️ Артқа (3/4)"}[lang]
+            text = {
+                "ru": (
+                    "⏳ <b>Шаг 4: Эффективное использование времени между очередями</b>\n\n"
+                    "• 🕒 Процедура выдачи Malxam начинается утром в 10:00. Сначала пьют те, кто уезжает, затем начинается последовательность цветов.\n"
+                    "• 🔔 Если по вашей карточке очередь выпадает на середину дня, используйте свободное время с пользой!\n"
+                    "• 💆‍♂️ В этот промежуток вы можете принимать другие назначенные процедуры (Массаж, Нуга Бест, Серагем и т.д.) или отдыхать в Фито-баре с травяным чаем."
+                ),
+                "uz": (
+                    "⏳ <b>4-Qadam: Navbat orasidagi bo'sh vaqtdan unumli foydalanish</b>\n\n"
+                    "• 🕒 Malxam berish jarayoni ertalab soat 10:00 dan boshlanadi. Birinchi bo'lib ketuvchilar ichadi, keyin ranglar ketma-ketligi boshlanadi.\n"
+                    "• 🔔 Agar kartochkangiz bo'yicha navbatingiz tushdan keyin bo'lsa, ungacha bo'sh vaqtingizdan unumli foydalaning!\n"
+                    "• 💆‍♂️ Shifokor buyurgan qo'shimcha muolajalarni (Massaj, Nuga Best, Seragem va h.k.) olishingiz yoki Fito-barda shifobaxsh choylardan ichib dam olishingiz mumkin."
+                ),
+                "kz": (
+                    "⏳ <b>4-Қадам: Кезек арасындағы бос уақытты тиімді пайдалану</b>\n\n"
+                    "• 🕒 Malxam беру процесі таңғы сағат 10:00-де басталады. Алдымен кететіндер ішеді, содан кейін түстердің реттілігі басталады.\n"
+                    "• 🔔 Егер карточкаңыз бойынша кезегіңіз түстен кейін болса, оған дейінгі уақытты тиімді пайдаланыңыз!\n"
+                    "• 💆‍♂️ Дәрігер тағайындаған қосымша ем-шараларды (Массаж, Нуга Бест, Серагем т.б.) алуыңызға немесе Фито-бардағы шөп шайларын ішіп демалуыңызға болады."
+                ),
+            }[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(guide_label, callback_data="menu_guide")],
+                [InlineKeyboardButton(back_label,  callback_data="guide_step3_s3")],
+            ])
+            await query.message.delete()
+            if photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
         elif section == "shopping":
             text = {
@@ -3789,6 +3988,12 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo treatment` — Operatsiyasiz davolash rasmi
 `/admin_photo diet` — Ovqatlanish/parhez rasmi
 `/admin_photo work_hours` — Ish vaqti rasmi
+`/admin_photo guide_step3_p1` — 3-bo'lim 1-qadam rasmi
+`/admin_photo guide_step3_p2` — 3-bo'lim 2-qadam rasmi
+`/admin_photo guide_step3_foreign` — Chet el fuqarolari grafigi
+`/admin_photo guide_step3_local` — O'zbekiston fuqarolari grafigi
+`/admin_photo guide_step3_p3` — 3-bo'lim 3-qadam rasmi
+`/admin_photo guide_step3_p4` — 3-bo'lim 4-qadam rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4081,6 +4286,24 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "work_hours":
         d["work_hours_photo_id"] = file_id
         await update.message.reply_text("✅ Ish vaqti rasmi saqlandi!")
+    elif waiting == "guide_step3_p1":
+        d["guide_step3_p1_photo"] = file_id
+        await update.message.reply_text("✅ 3-bo'lim 1-qadam rasmi saqlandi!")
+    elif waiting == "guide_step3_p2":
+        d["guide_step3_p2_photo"] = file_id
+        await update.message.reply_text("✅ 3-bo'lim 2-qadam rasmi saqlandi!")
+    elif waiting == "guide_step3_foreign":
+        d["guide_step3_foreign_photo"] = file_id
+        await update.message.reply_text("✅ Chet el fuqarolari grafik rasmi saqlandi!")
+    elif waiting == "guide_step3_local":
+        d["guide_step3_local_photo"] = file_id
+        await update.message.reply_text("✅ O'zbekiston fuqarolari grafik rasmi saqlandi!")
+    elif waiting == "guide_step3_p3":
+        d["guide_step3_p3_photo"] = file_id
+        await update.message.reply_text("✅ 3-bo'lim 3-qadam rasmi saqlandi!")
+    elif waiting == "guide_step3_p4":
+        d["guide_step3_p4_photo"] = file_id
+        await update.message.reply_text("✅ 3-bo'lim 4-qadam rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
