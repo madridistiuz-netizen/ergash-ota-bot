@@ -2959,20 +2959,31 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ── Shifokor ──
     elif data == "menu_doctor":
-        doc = d["doctor"]
-        name = doc[f"name_{lang}"]
-        title_text = doc[f"title_{lang}"]
         text = {
-            "ru": f"👨‍⚕️ *Главный врач*\n\n🩺 {name}\n\n{title_text}",
-            "uz": f"👨‍⚕️ *Bosh shifokor*\n\n🩺 {name}\n\n{title_text}",
-            "kz": f"👨‍⚕️ *Бас дәрігер*\n\n🩺 {name}\n\n{title_text}",
+            "ru": "👨‍⚕️ <b>Главный врач клиники — Бердикул Эргашев (Эргаш Ота)</b>\n\nВрач с многолетним опытом, академик народной медицины и автор целебной книги 'Eng shirin lazzat — salomatlik'. Под руководством Эргаш Ота в нашей клинике налажено безоперационное, естественное лечение заболеваний печени, желчного пузыря, желудочно-кишечного тракта и многих других хронических недугов с помощью десятков видов натуральных трав и специального Malxam.",
+            "uz": "👨‍⚕️ <b>Klinika Bosh shifokori — Berdiqul Ergashev (Ergash Ota)</b>\n\nKo'p yillik tajribaga ega shifokor, xalq tabobati akademigi hamda shifobaxsh 'Eng shirin lazzat — salomatlik' kitobi muallifi. Ergash Ota rahbarligida klinikamizda o'nlab turdagi tabiiy giyohlar va maxsus Malxam yordamida jigar, o't pufagi, oshqozon-ichak hamda boshqa ko'plab surunkali kasalliklarni jarrohliksiz, tabiiy yo'llar bilan davolash yo'lga qo'yilgan.",
+            "kz": "👨‍⚕️ <b>Клиниканың Бас дәрігері — Бердіқұл Эргашев (Эргаш Ота)</b>\n\nКөпжылдық тәжірибесі бар дәрігер, халық медицинасының академигі және шипалы 'Eng shirin lazzat — salomatlik' кітабының авторы. Эргаш Отаның жетекшілігімен клиникамызда ондаған табиғи шөптер мен арнайы Malxam көмегімен бауыр, өт қабы, асқазан-ішек және басқа да көптеген созылмалы ауруларды отасыз, табиғи жолдармен емдеу жолға қойылған.",
         }[lang]
-        if doc.get("photo_id"):
-            await context.bot.send_photo(chat_id=chat_id, photo=doc["photo_id"], caption=text, parse_mode="Markdown")
-            await query.edit_message_reply_markup(reply_markup=back_keyboard(lang))
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
+        CHIEF_DOCTOR_PHOTO_ID = d.get("doctor", {}).get("photo_id", "")
+        await query.message.delete()
+        if CHIEF_DOCTOR_PHOTO_ID:
+            await context.bot.send_photo(chat_id=chat_id, photo=CHIEF_DOCTOR_PHOTO_ID,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
         else:
-            await query.edit_message_text(text, parse_mode="Markdown",
-                                          reply_markup=back_keyboard(lang))
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data == "back_to_about_menu":
+        await query.message.delete()
+        title = {
+            "ru": "🏥 Информация о клинике:",
+            "uz": "🏥 Klinika haqida:",
+            "kz": "🏥 Клиника туралы:",
+        }[lang]
+        await context.bot.send_message(chat_id=chat_id, text=title,
+                                       reply_markup=clinic_submenu_keyboard(lang))
 
     # ── Jamoa ──
     elif data == "menu_staff":
