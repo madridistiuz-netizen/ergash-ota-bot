@@ -1398,6 +1398,249 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except Exception:
                     pass
 
+    # ── guide_step3 uchun yangi qisqa alias callbacklar ──
+    elif data in ("g_step_1", "g_step_2", "g_step_3", "g_step_4",
+                  "g_graph_foreigner", "g_graph_citizen", "back_to_guide_main"):
+        if data == "back_to_guide_main":
+            title = {
+                "ru": "📖 *Руководство пациента*\n\nВыберите раздел:",
+                "uz": "📖 *Bemor uchun qo'llanma*\n\nBo'limni tanlang:",
+                "kz": "📖 *Науқас нұсқаулығы*\n\nБөлімді таңдаңыз:",
+            }[lang]
+            try:
+                await query.message.delete()
+            except Exception:
+                pass
+            await context.bot.send_message(chat_id=chat_id, text=title,
+                                           parse_mode="Markdown", reply_markup=guide_keyboard(lang))
+            return
+        # Alias map → mavjud handlerlarga yo'naltirish
+        alias_map = {
+            "g_step_1":        "guide_step3",
+            "g_step_2":        "guide_step3_s2",
+            "g_step_3":        "guide_step3_s3",
+            "g_step_4":        "guide_step3_s4",
+            "g_graph_foreigner": "guide_step3_foreign",
+            "g_graph_citizen":   "guide_step3_local",
+        }
+        # callback_data ni almashtirb, mavjud guide_ handler ni qayta chaqiramiz
+        import types as _types
+        fake_query = query
+        # data ni o'zgartirib, guide_ handler logikasini to'g'ridan bajaramiz
+        mapped = alias_map[data]
+        section = mapped.replace("guide_", "")
+        d2 = load_data()
+        photo_key_map = {
+            "step3":          "guide_step3_p1_photo",
+            "step3_s2":       "guide_step3_p2_photo",
+            "step3_foreign":  "guide_step3_foreign_photo",
+            "step3_local":    "guide_step3_local_photo",
+            "step3_s3":       "guide_step3_p3_photo",
+            "step3_s4":       "guide_step3_p4_photo",
+        }
+        photo = d2.get(photo_key_map.get(section, ""), "")
+
+        back_l  = {"ru": "⬅️ Назад",    "uz": "⬅️ Orqaga",  "kz": "⬅️ Артқа"}[lang]
+        next_l  = {"ru": "➡️ Далее",    "uz": "➡️ Keyingi", "kz": "➡️ Келесі"}[lang]
+        guide_l = {"ru": "🔝 К руководству", "uz": "🔝 Qo'llanmaga", "kz": "🔝 Нұсқаулыққа"}[lang]
+
+        texts = {
+            "step3": {
+                "ru": "🕒 <b>Шаг 1: Утренняя очередь и обследования (08:00)</b>\n\nВаш второй день в клинике, процесс приема Malxam и дополнительные процедуры:\n• <b>Лаборатория и УЗИ:</b> Пациенты занимают очередь в отделе регистрации утром в 08:00 для сдачи лабораторных анализов и прохождения УЗИ.\n• <b>Процедурная книжка:</b> Вы сможете получать все дополнительные процедуры, разрешенные и назначенные врачом в процедурной книжке.",
+                "uz": "🕒 <b>1-Qadam: Ertalabki navbat va Tekshiruvlar (Soat 08:00)</b>\n\nKlinikadagi ikkinchi kuningiz Malxam ichish jarayoni va qo'shimcha muolajalar:\n• <b>Laboratoriya va UZI:</b> Bemorlar laboratoriya tahlillari hamda UZI (EHO) ko'rigidan o'tish uchun ertalab soat 08:00 da Registratsiya bo'limidan navbat olib ko'rikdan o'tadi.\n• <b>Muolaja daftarchasi:</b> Muolaja daftarchada shifokor tomonidan ruxsat etilgan va buyurilgan barcha qo'shimcha muolajalarni olishingiz mumkin bo'ladi.",
+                "kz": "🕒 <b>1-Қадам: Таңғы кезек және тексерулер (Сағат 08:00)</b>\n\nКлиникадағы екінші күніңіз, Malxam ішу процесі және қосымша ем-шаралар:\n• <b>Лаборатория және UZI:</b> Емделушілер зертханалық талдаулар мен UZI тексеруінен өту үшін таңғы сағат 08:00-де Тіркеу бөлімінен кезек алып, тексеруден өтеді.\n• <b>Емдеу кітапшасы:</b> Дәрігер рұқсат еткен және тағайындаған барлық қосымша ем-шараларды емдеу кітапшасы арқылы алуыңызға болады.",
+            },
+            "step3_s2": {
+                "ru": "🌈 <b>Шаг 2: Порядок приема Malxam и цветные карточки</b>\n\nВторой день — это основной день, когда начинается прием Malxam.\n\n⚠️ <b>САМОЕ ВАЖНОЕ ПРАВИЛО:</b> Перед приемом Malxam <b>как минимум 1.5 часа (полтора часа) абсолютно ничего нельзя есть (быть натощак)!</b> Это максимально увеличивает эффект Malxam.\n\n• 💳 После оплаты вам выдаются специальные <b>цветные карточки</b>.\n• 🗓 Время приема Malxam и последовательность цветов меняются в зависимости от дней недели. Вы заходите на прием Malxam строго в свое время, в соответствии с цветом и номером вашей карточки.\n\n👇 Ознакомьтесь с графиком и точным временем с помощью кнопок ниже:",
+                "uz": "🌈 <b>2-Qadam: Malxam ichish tartibi va Rangli kartochkalar</b>\n\nIkkinchi kun — Malxam ichish boshlanadigan asosiy kun hisoblanadi.\n\n⚠️ <b>ENG MUHIM QOIDA:</b> Malxam ichishdan oldin <b>kamida 1.5 soat (bir yarim soat) davomida mutlaqo hech narsa yemaslik (och qoringa bo'lish) kerak!</b> Bu Malxamning ta'sirini maksimal darajada oshiradi.\n\n• 💳 To'lovni amalga oshirganingizdan so'ng, qo'lingizga maxsus <b>rangli kartochkalar</b> beriladi.\n• 🗓 Malxam ichish vaqtlari va ranglar ketma-ketligi haftaning kunlariga qarab o'zgarib turadi. Siz qo'lingizdagi kartochkaning rangiga va undagi raqamiga qarab o'z vaqtingizda Malxam ichishga kirasiz.\n\n👇 Quyidagi tugmalar orqali o'zingizga tegishli grafik va aniq vaqtlar bilan tanishing:",
+                "kz": "🌈 <b>2-Қадам: Malxam ішу тәртібі және түрлі-түсті карточкалар</b>\n\nЕкінші күн — Malxam ішу басталатын негізгі күн болып саналады.\n\n⚠️ <b>ЕҢ МАҢЫЗДЫ ЕРЕЖЕ:</b> Malxam ішер алдында <b>кем дегенде 1.5 сағат (бір жарым сағат) бұрын мүлдем ештеңе жемеу керек (аш қарында болу шарт)!</b> Бұл Malxam-ның әсерін барынша арттырады.\n\n• 💳 Төлем жасағаннан кейін қолыңызға арнайы <b>түрлі-түсті карточкалар</b> беріледі.\n• 🗓 Malxam ішу уақыты мен түстердің реттілігі апта күндеріне байланысты өзгеріп тұрады. Сіз қолыңыздағы карточканың түсі мен ондағы нөмірге сәйкес өз уақытыңызда Malxam ішуге кіресіз.\n\n👇 Төмендегі түймелер арқылы өзіңізге қатысты кестемен және нақты уақытпен танысыңыз:",
+            },
+            "step3_foreign": {
+                "ru": "✈️ <b>Временный график приема Malxam для иностранных граждан</b>\n\n• 🕒 Иностранные граждане начинают прием Malxam <b>с 10:00 часов</b>.",
+                "uz": "✈️ <b>Chet el fuqarolari uchun Malxam ichish vaqtinchalik grafigi</b>\n\n• 🕒 Chet el fuqarolari Malxam ichishni <b>soat 10:00 dan</b> boshlab ichishadi.",
+                "kz": "✈️ <b>Шет ел азаматтарына арналған Malxam ішудің уақытша кестесі</b>\n\n• 🕒 Шет ел азаматтары Malxam ішуді <b>сағат 10:00-ден</b> бастайды.",
+            },
+            "step3_local": {
+                "ru": "🇺🇿 <b>Временный график приема Malxam для граждан Узбекистана</b>\n\n• 🕒 Для граждан Узбекистана время приема Malxam начинается <b>с 13:00 или 14:00 часов</b>.",
+                "uz": "🇺🇿 <b>O'zbekiston fuqarolari uchun Malxam ichish vaqtinchalik grafigi</b>\n\n• 🕒 O'zbekiston fuqarolari uchun Malxam ichish vaqtlarining boshlanishi: <b>soat 13:00 yoki 14:00 dan</b> boshlanadi.",
+                "kz": "🇺🇿 <b>Өзбекстан азаматтарына арналған Malxam ішудің уақытша кестесі</b>\n\n• 🕒 Өзбекстан азаматтары үшін Malxam ішу уақыты <b>сағат 13:00 немесе 14:00-ден</b> басталады.",
+            },
+            "step3_s3": {
+                "ru": "🔥 <b>Шаг 3: Самые важные золотые правила после Malxam!</b>\n\nРежим после приема Malxam — это часть лечения, дающая наивысший результат, поэтому строго соблюдайте следующие правила:\n\n1️⃣ 🛏 <b>Применение грелки (Самый важный этап):</b> Сразу после приема Malxam необходимо пройти в свою палату и <b>как минимум от 1,5 до 2 часов лежать неподвижно, приложив грелку к правому подреберью (в область печени)</b>.\n2️⃣ 🩺 <b>Процедура клизмы:</b> После того как вы полежали с грелкой, не спеша отправляйтесь в клизменную комнату для прохождения следующей очистительной процедуры.\n3️⃣ 🚶‍♂️ <b>После процедур:</b> После клизмы рекомендуется вести активный образ жизни в течение дня, принимать дополнительные назначенные процедуры и пить травяные чаи в фито-баре.",
+                "uz": "🔥 <b>3-Qadam: Malxamdan keyingi eng muhim oltin qoidalar!</b>\n\nMalxamni ichib bo'lgandan keyingi tartib davolanishning eng yuqori natija beradigan qismidir, shuning uchun quyidagilarga qat'iy amal qiling:\n\n1️⃣ 🛏 <b>Grelka qo'yish (Eng muhim joyi):</b> Malxamni ichgach, darhol xonangizga borib, <b>kamida 1 yarim yoki 2 soat davomida o'ng qovurg'a ostiga (jigar sohasiga) grelka qo'yib</b>, qimirlamay yotishingiz shart.\n2️⃣ 🩺 <b>Klizma muolajasi:</b> Grelkada yotib bo'lgandan keyin, shoshmasdan klizma xonasiga borib, navbatdagi tozalash muolajasini olasiz.\n3️⃣ 🚶‍♂️ <b>Muolajadan so'ng:</b> Klizmadan keyin kun davomida faol harakatda bo'lish, qo'shimcha belgilangan muolajalarni olish hamda fito-bardagi giyohli choylarni ichib yurish tavsiya etiladi.",
+                "kz": "🔥 <b>3-Қадам: Malxamдан кейінгі ең маңызды алтын ережелер!</b>\n\nMalxamды ішкеннен кейінгі күтім — емнің ең жоғары нәтиже беретін бөлігі, сондықтан мына ережелерді қатаң сақтаңыз:\n\n1️⃣ 🛏 <b>Грелка басу (Ең маңызды кезең):</b> Malxamды ішкен бойда бірден бөлмеңізге барып, <b>кем дегенде 1,5 - 2 сағат бойы оң жақ қабырға астына (бауыр тұсына) grelka басып</b>, қозғалмай жатуыңыз шарт.\n2️⃣ 🩺 <b>Клизма ем-шарасы:</b> Грелкамен жатып болғаннан кейін, асықпай клизма бөлмесіне барып, кезекті тазарту ем-шарасын аласыз.\n3️⃣ 🚶‍♂️ <b>Ем-шарадан кейін:</b> Клизмадан кейін күн бойы белсенді қозғалыста болу, қосымша тағайындалған емдерді алу және фито-бардағы шөп шайларын ішіп жүру ұсынылады.",
+            },
+            "step3_s4": {
+                "ru": "⏳ <b>Шаг 4: Эффективное использование времени между очередями</b>\n\n• 🕒 Процедура выдачи Malxam начинается утром в 10:00. Сначала пьют те, кто уезжает, затем начинается последовательность цветов.\n• 🔔 Если по вашей карточке очередь на прием Malxam выпадает на середину дня (после обеда), используйте свободное время с пользой!\n• <b>Процедуры:</b> В этот промежуток времени вы можете спокойно проходить другие дополнительные процедуры, назначенные врачом (Массаж, Нуга Бест, Серагем и т.д.), или отдыхать в Фито-баре, попивая свежезаваренный травяной чай.",
+                "uz": "⏳ <b>4-Qadam: Navbat orasidagi bo'sh vaqtdan unumli foydalanish</b>\n\n• 🕒 Malxam berish jarayoni ertalab soat 10:00 dan boshlanadi. Birinchi bo'lib ketuvchilar ichadi, keyin ranglar ketma-ketligi boshlanadi.\n• 🔔 Agar sizning kartochkangiz bo'yicha Malxam ichish navbatingiz kunning yarmida (tushdan keyin) bo'lsa, ungacha bo'sh vaqtingizdan unumli foydalaning!\n• 💆‍♂️ Ungacha bo'lgan vaqt oralig'ida shifokor buyurgan boshqa qo'shimcha muolajalarni (Massaj, Nuga Best, Seragem va h.k.) olishingiz yoki Fito-barda shifobaxsh choylardan ichib dam olishingiz mumkin.",
+                "kz": "⏳ <b>4-Қадам: Кезек арасындағы бос уақытты тиімді пайдалану</b>\n\n• 🕒 Malxam беру процесі таңғы сағат 10:00-де басталады. Алдымен кететін адамдар ішеді, содан кейін түстердің реттілігі басталады.\n• 🔔 Егер сіздің карточкаңыз бойынша Malxam ішу кезегіңіз күннің екінші жартысына (түстен кейін) сәйкес келсе, оған дейінгі бос уақытты тиімді пайдаланыңыз!\n• <b>Ем-шаралар:</b> Бұл уақыт аралығында дәрігер тағайындаған басқа да қосымша ем-шараларды (Массаж, Нуга Бест, Seragem т.б.) емін-еркін алуыңызға немесе Фито-бардағы шөп шайларын ішіп демалуыңызға болады.",
+            },
+        }
+        text = texts.get(section, {}).get(lang, "")
+
+        # Keyboard
+        if section == "step3":
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(f"{next_l} (2/4)", callback_data="g_step_2")],
+                [InlineKeyboardButton(back_l, callback_data="menu_guide")],
+            ])
+        elif section == "step3_s2":
+            foreign_l = {"ru": "✈️ Иностр. граждане", "uz": "✈️ Chet el fuqarolari", "kz": "✈️ Шет ел азаматтары"}[lang]
+            local_l   = {"ru": "🇺🇿 Граждане Узбекистана", "uz": "🇺🇿 O'zbekiston fuqarolari", "kz": "🇺🇿 Өзбекстан азаматтары"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(foreign_l, callback_data="g_graph_foreigner")],
+                [InlineKeyboardButton(local_l,   callback_data="g_graph_citizen")],
+                [InlineKeyboardButton(f"{next_l} (3/4)", callback_data="g_step_3"),
+                 InlineKeyboardButton(f"⬅️ (1/4)", callback_data="g_step_1")],
+            ])
+        elif section in ("step3_foreign", "step3_local"):
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(f"{next_l} (3/4)", callback_data="g_step_3")],
+                [InlineKeyboardButton(back_l, callback_data="g_step_2")],
+            ])
+        elif section == "step3_s3":
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(f"{next_l} (4/4)", callback_data="g_step_4")],
+                [InlineKeyboardButton(f"⬅️ (2/4)", callback_data="g_step_2")],
+            ])
+        elif section == "step3_s4":
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(guide_l, callback_data="back_to_guide_main")],
+                [InlineKeyboardButton(f"⬅️ (3/4)", callback_data="g_step_3")],
+            ])
+        else:
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_l, callback_data="menu_guide")]])
+
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    # ── Infratuzilma ──
+    elif data == "guide_infrastructure":
+        d2 = load_data()
+        INFRA_MENU_PHOTO = d2.get("infra_menu_photo", "")
+        text = {
+            "ru": "🏢 <b>Территория клиники и Корпуса</b>\n\nЧтобы не заблудиться и легко найти нужные процедурные кабинеты, выберите интересующий корпус:",
+            "uz": "🏢 <b>Klinikamiz hududi va Korpuslar</b>\n\nAdashib ketmasligingiz va kerakli muolaja xonalarini osongina topishingiz uchun kerakli korpusni tanlang:",
+            "kz": "🏢 <b>Клиника аумағы мен Корпустар</b>\n\nАдасып кетпей, керекті ем-шара бөлмелерін оңай табу үшін қажетті корпусты таңдаңыз:",
+        }[lang]
+        back_label  = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        main_label  = {"ru": "🏢 Главный корпус", "uz": "🏢 Asosiy korpus", "kz": "🏢 Бас корпус"}[lang]
+        m_label     = {"ru": "🏥 Корпус М", "uz": "🏥 M korpus", "kz": "🏥 М корпусы"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(main_label, callback_data="infra_main_building")],
+            [InlineKeyboardButton(m_label,    callback_data="infra_m_building")],
+            [InlineKeyboardButton(back_label, callback_data="back_to_guide_main")],
+        ])
+        await query.message.delete()
+        if INFRA_MENU_PHOTO:
+            await context.bot.send_photo(chat_id=chat_id, photo=INFRA_MENU_PHOTO,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data == "infra_main_building":
+        d2 = load_data()
+        back_label   = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        klizma_label = {"ru": "🚿 Клизменный кабинет", "uz": "🚿 Klizma xonasi", "kz": "🚿 Клизма бөлмесі"}[lang]
+        fizio_label  = {"ru": "⚡ Физиокабинет", "uz": "⚡ Fiziokabinetlar", "kz": "⚡ Физиокабинеттер"}[lang]
+        massaj_label = {"ru": "💆 Массажный кабинет", "uz": "💆 Massaj xonasi", "kz": "💆 Массаж бөлмесі"}[lang]
+        nurse_label  = {"ru": "🏥 Процедурный кабинет (медсёстры)", "uz": "🏥 Muolaja xonasi (hamshiralar)", "kz": "🏥 Процедуралық бөлме (медбикелер)"}[lang]
+        text = {
+            "ru": "🏢 <b>Главный корпус — расположение кабинетов</b>\n\nВыберите кабинет, чтобы узнать его местонахождение:",
+            "uz": "🏢 <b>Asosiy korpus — xonalar joylashuvi</b>\n\nXona joylashuvini bilish uchun tanlang:",
+            "kz": "🏢 <b>Бас корпус — бөлмелердің орналасуы</b>\n\nОрналасуын білу үшін бөлмені таңдаңыз:",
+        }[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(klizma_label, callback_data="infra_room_klizma")],
+            [InlineKeyboardButton(fizio_label,  callback_data="infra_room_fizio")],
+            [InlineKeyboardButton(massaj_label, callback_data="infra_room_massaj")],
+            [InlineKeyboardButton(nurse_label,  callback_data="infra_room_nurse")],
+            [InlineKeyboardButton(back_label,   callback_data="guide_infrastructure")],
+        ])
+        await query.message.delete()
+        main_photo = d2.get("infra_main_photo", "")
+        if main_photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=main_photo,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data == "infra_m_building":
+        d2 = load_data()
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        text = {
+            "ru": "🏥 <b>Корпус М — расположение и информация</b>\n\nЗдесь расположены палаты М/Люкс и М/VIP, а также специализированные процедурные кабинеты корпуса М.",
+            "uz": "🏥 <b>M korpus — joylashuv va ma'lumot</b>\n\nBu yerda M/Lyuks va M/VIP xonalari hamda M korpusining maxsus muolaja xonalari joylashgan.",
+            "kz": "🏥 <b>М корпусы — орналасуы және ақпарат</b>\n\nМұнда М/Люкс және М/VIP палаталары, сондай-ақ М корпусының арнайы процедуралық бөлмелері орналасқан.",
+        }[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(back_label, callback_data="guide_infrastructure")],
+        ])
+        await query.message.delete()
+        m_photo = d2.get("infra_m_building_photo", "")
+        if m_photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=m_photo,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data in ("infra_room_klizma", "infra_room_fizio", "infra_room_massaj", "infra_room_nurse"):
+        d2 = load_data()
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        room_map = {
+            "infra_room_klizma": {
+                "photo_key": "infra_klizma_photo",
+                "text": {
+                    "ru": "🚿 <b>Клизменный кабинет</b>\n\nКлизменный кабинет находится в главном корпусе. После приема Malxam и грелки обязательно посетите этот кабинет для очистительной процедуры.",
+                    "uz": "🚿 <b>Klizma xonasi</b>\n\nKlizma xonasi asosiy korpusda joylashgan. Malxam ichib, grelka qo'yib bo'lgandan keyin tozalash muolajasi uchun shu xonaga boring.",
+                    "kz": "🚿 <b>Клизма бөлмесі</b>\n\nКлизма бөлмесі бас корпуста орналасқан. Malxam ішіп, грелка басқаннан кейін тазарту ем-шарасы үшін осы бөлмеге барыңыз.",
+                },
+            },
+            "infra_room_fizio": {
+                "photo_key": "infra_fizio_photo",
+                "text": {
+                    "ru": "⚡ <b>Физиотерапевтические кабинеты</b>\n\nФизиокабинеты расположены в главном корпусе. Здесь проводятся назначенные врачом физиотерапевтические процедуры.",
+                    "uz": "⚡ <b>Fizioterapiya xonalari</b>\n\nFizioxonalar asosiy korpusda joylashgan. Bu yerda shifokor tomonidan buyurilgan fizioterapiya muolajalari olib boriladi.",
+                    "kz": "⚡ <b>Физиотерапия бөлмелері</b>\n\nФизиобөлмелер бас корпуста орналасқан. Мұнда дәрігер тағайындаған физиотерапиялық ем-шаралар жүргізіледі.",
+                },
+            },
+            "infra_room_massaj": {
+                "photo_key": "infra_massaj_photo",
+                "text": {
+                    "ru": "💆 <b>Массажный кабинет</b>\n\nМассажный кабинет находится в главном корпусе. Принимаются все виды массажа, назначенные врачом.",
+                    "uz": "💆 <b>Massaj xonasi</b>\n\nMassaj xonasi asosiy korpusda joylashgan. Shifokor buyurgan barcha massaj turlari qabul qilinadi.",
+                    "kz": "💆 <b>Массаж бөлмесі</b>\n\nМассаж бөлмесі бас корпуста орналасқан. Дәрігер тағайындаған барлық массаж түрлері қабылданады.",
+                },
+            },
+            "infra_room_nurse": {
+                "photo_key": "infra_nurse_photo",
+                "text": {
+                    "ru": "🏥 <b>Процедурный кабинет (медсёстры)</b>\n\nПроцедурный кабинет находится в главном корпусе. Здесь медсёстры выполняют все назначенные инъекции и процедуры по книжке.",
+                    "uz": "🏥 <b>Muolaja xonasi (hamshiralar)</b>\n\nMuolaja xonasi asosiy korpusda joylashgan. Bu yerda hamshiralar daftarchada belgilangan barcha ukol va muolajalarni bajaradi.",
+                    "kz": "🏥 <b>Процедуралық бөлме (медбикелер)</b>\n\nПроцедуралық бөлме бас корпуста орналасқан. Мұнда медбикелер кітапшада белгіленген барлық инъекция мен ем-шараларды жүзеге асырады.",
+                },
+            },
+        }
+        room = room_map[data]
+        text = room["text"][lang]
+        photo = d2.get(room["photo_key"], "")
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="infra_main_building")]])
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
     # ── Uyga tafsiyaoma — quyi bo'limlar ──
     elif data == "info_qoidalar":
         text = {
@@ -3994,6 +4237,13 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo guide_step3_local` — O'zbekiston fuqarolari grafigi
 `/admin_photo guide_step3_p3` — 3-bo'lim 3-qadam rasmi
 `/admin_photo guide_step3_p4` — 3-bo'lim 4-qadam rasmi
+`/admin_photo infra_menu` — Infratuzilma menyu rasmi
+`/admin_photo infra_main` — Asosiy korpus rasmi
+`/admin_photo infra_m_building` — M korpus rasmi
+`/admin_photo infra_klizma` — Klizma xonasi rasmi
+`/admin_photo infra_fizio` — Fizioxona rasmi
+`/admin_photo infra_massaj` — Massaj xonasi rasmi
+`/admin_photo infra_nurse` — Muolaja xonasi rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4052,7 +4302,54 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Noto'g'ri format")
         return
 
-    if text.startswith("/admin_photo") and not text.startswith("/admin_photo_clear"):
+    if text.startswith("/admin_photo_del"):
+        parts = text.split()
+        if len(parts) < 2:
+            await update.message.reply_text(
+                "Format: /admin_photo_del <kalit>\n"
+                "Misol: /admin_photo_del guide_step3_foreign\n\n"
+                "O'chirish mumkin bo'lgan kalitlar:\n"
+                "`guide_step3_foreign` — Chet el grafigi\n"
+                "`guide_step3_local` — O'zbekiston grafigi\n"
+                "`guide_step3_p1` → `guide_step3_p4` — Qadamlar rasmlari\n"
+                "`nuga_best_photo_id`, `seragem_photo_id` va boshqalar"
+            )
+            return
+        key = parts[1]
+        # Single-key foto lar uchun mapping
+        key_map = {
+            "guide_step3_foreign":  "guide_step3_foreign_photo",
+            "guide_step3_local":    "guide_step3_local_photo",
+            "guide_step3_p1":       "guide_step3_p1_photo",
+            "guide_step3_p2":       "guide_step3_p2_photo",
+            "guide_step3_p3":       "guide_step3_p3_photo",
+            "guide_step3_p4":       "guide_step3_p4_photo",
+            "nuga_best":            "nuga_best_photo_id",
+            "seragem":              "seragem_photo_id",
+            "foot_massage":         "foot_massage_photo_id",
+            "general_massage":      "general_massage_photo_id",
+            "bioenergy_massage":    "bioenergy_massage_photo_id",
+            "lymph":                "lymph_photo_id",
+            "stretch":              "stretch_photo_id",
+            "shockwave":            "shockwave_photo_id",
+            "cryo":                 "cryo_photo_id",
+            "fitobar":              "fitobar_photo_id",
+            "almond_oil":           "almond_oil_photo_id",
+            "olive_oil":            "olive_oil_photo_id",
+            "registration":         "registration_photo_id",
+            "treatment":            "treatment_photo_id",
+            "diet":                 "diet_photo_id",
+            "work_hours":           "work_hours_photo_id",
+        }
+        d = load_data()
+        data_key = key_map.get(key, key)
+        if data_key in d:
+            del d[data_key]
+            save_data(d)
+            await update.message.reply_text(f"✅ `{key}` rasmi o'chirildi!")
+        else:
+            await update.message.reply_text(f"❌ `{key}` topilmadi yoki allaqachon bo'sh.")
+        return
         parts = text.split()
         if len(parts) < 2:
             await update.message.reply_text("Format: /admin_photo clinic|ward|samarkand|bukhara|doctor")
@@ -4304,6 +4601,27 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "guide_step3_p4":
         d["guide_step3_p4_photo"] = file_id
         await update.message.reply_text("✅ 3-bo'lim 4-qadam rasmi saqlandi!")
+    elif waiting == "infra_menu":
+        d["infra_menu_photo"] = file_id
+        await update.message.reply_text("✅ Infratuzilma menyu rasmi saqlandi!")
+    elif waiting == "infra_main":
+        d["infra_main_photo"] = file_id
+        await update.message.reply_text("✅ Asosiy korpus rasmi saqlandi!")
+    elif waiting == "infra_m_building":
+        d["infra_m_building_photo"] = file_id
+        await update.message.reply_text("✅ M korpus rasmi saqlandi!")
+    elif waiting == "infra_klizma":
+        d["infra_klizma_photo"] = file_id
+        await update.message.reply_text("✅ Klizma xonasi rasmi saqlandi!")
+    elif waiting == "infra_fizio":
+        d["infra_fizio_photo"] = file_id
+        await update.message.reply_text("✅ Fizioxona rasmi saqlandi!")
+    elif waiting == "infra_massaj":
+        d["infra_massaj_photo"] = file_id
+        await update.message.reply_text("✅ Massaj xonasi rasmi saqlandi!")
+    elif waiting == "infra_nurse":
+        d["infra_nurse_photo"] = file_id
+        await update.message.reply_text("✅ Muolaja xonasi rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
@@ -5593,6 +5911,7 @@ def main():
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
+    app.add_handler(CommandHandler("admin_photo_del", admin_handler))
     app.add_handler(CommandHandler("admin_staff_add", admin_handler))
     app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
