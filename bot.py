@@ -744,7 +744,7 @@ def guide_keyboard(lang):
             "2️⃣ Первый день лечения",
             "3️⃣ Лечение и порядок приёма Malxam",
             "4️⃣ Инфраструктура",
-            "5️⃣ Правила поведения",
+            "⚠️ Важные правила",
             "6️⃣ Что купить домой",
             "⬅️ Назад",
         ),
@@ -753,7 +753,7 @@ def guide_keyboard(lang):
             "2️⃣ Birinchi kun muolaja tartibi",
             "3️⃣ Davolanish va Malxam ichish tartibi",
             "4️⃣ Infrastruktura",
-            "5️⃣ Qoidalar",
+            "⚠️ Muhim qoidalar",
             "6️⃣ Uyga tafsiyaoma",
             "⬅️ Orqaga",
         ),
@@ -762,7 +762,7 @@ def guide_keyboard(lang):
             "2️⃣ Бірінші күн ем тәртібі",
             "3️⃣ Емдеу және Malxam ішу тәртібі",
             "4️⃣ Инфрақұрылым",
-            "5️⃣ Ережелер",
+            "⚠️ Маңызды ережелер",
             "6️⃣ Үйге ұсыным",
             "⬅️ Артқа",
         ),
@@ -772,7 +772,7 @@ def guide_keyboard(lang):
         [InlineKeyboardButton(labels[1], callback_data="guide_malham")],
         [InlineKeyboardButton(labels[2], callback_data="guide_step3")],
         [InlineKeyboardButton(labels[3], callback_data="guide_infrastructure")],
-        [InlineKeyboardButton(labels[4], callback_data="guide_rules")],
+        [InlineKeyboardButton(labels[4], callback_data="guide_muhim_qoidalar")],
         [InlineKeyboardButton(labels[5], callback_data="guide_shopping")],
         [InlineKeyboardButton(labels[6], callback_data="back_main")],
     ])
@@ -1405,6 +1405,56 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await context.bot.send_message(chat_id=chat_id, text=text,
                                                parse_mode="HTML", reply_markup=kb)
+
+        elif section == "muhim_qoidalar":
+            text = {
+                "uz": (
+                    "⚠️ <b>Muhim qoidalar</b>\n\n"
+                    "Hurmatli bemorlar! Siz klinikaga qabul qilinayotganda quyidagi tartib-qoidalarga rozilik bildirgan holda tilxat yozgansiz:\n\n"
+                    "• Siz klinika hududidan <b>100 metr uzoqlashmaslik</b> majburiyatini olgansiz.\n"
+                    "• Klinikadan uzoqlashish klinika tartib-qoidalariga <b>zid</b> hisoblanadi.\n\n"
+                    "⚠️ <b>Eslatib o'tamiz:</b>\n"
+                    "Agar siz klinika hududidan tashqariga chiqishingiz zarur bo'lganda:\n\n"
+                    "1️⃣ Birinchi navbatda <b>klinika rahbariyati roziligi</b> bilan chiqishingizga ruxsat beriladi.\n"
+                    "2️⃣ Xonangiz kalitini o'zingiz bilan olib chiqishingiz <b>qat'iyan man etiladi</b>.\n\n"
+                    "Bunday holatda siz:\n"
+                    "— Xona kalitini <b>binoning mas'ul xodimi xonasiga topshirishingiz</b> shart.\n\n"
+                    "<i>Ushbu tartib barcha bemorlar uchun majburiy hisoblanadi.</i>"
+                ),
+                "ru": (
+                    "⚠️ <b>Важные правила</b>\n\n"
+                    "Уважаемые пациенты! При поступлении в клинику вы подписали согласие со следующими правилами:\n\n"
+                    "• Вы взяли на себя обязательство <b>не удаляться от территории клиники более чем на 100 метров</b>.\n"
+                    "• Удаление от клиники считается <b>нарушением</b> внутреннего распорядка.\n\n"
+                    "⚠️ <b>Напоминаем:</b>\n"
+                    "Если вам необходимо выйти за пределы территории клиники:\n\n"
+                    "1️⃣ Выход разрешён только с <b>согласия руководства клиники</b>.\n"
+                    "2️⃣ Брать ключ от палаты с собой <b>строго запрещено</b>.\n\n"
+                    "В таком случае вы обязаны:\n"
+                    "— <b>Сдать ключ от палаты ответственному сотруднику здания</b>.\n\n"
+                    "<i>Данный порядок является обязательным для всех пациентов.</i>"
+                ),
+                "kz": (
+                    "⚠️ <b>Маңызды ережелер</b>\n\n"
+                    "Құрметті науқастар! Клиникаға қабылданған кезде сіз мына ережелерге келісіп, тілхат жаздыңыз:\n\n"
+                    "• Сіз клиника аумағынан <b>100 метрден артық ұзамау</b> міндеттемесін алдыңыз.\n"
+                    "• Клиникадан ұзау клиника тәртіп ережелеріне <b>қайшы</b> келеді.\n\n"
+                    "⚠️ <b>Ескертеміз:</b>\n"
+                    "Егер клиника аумағынан шығуыңыз қажет болса:\n\n"
+                    "1️⃣ Ең алдымен <b>клиника басшылығының рұқсатымен</b> ғана шығуға болады.\n"
+                    "2️⃣ Палата кілтін өзіңізбен алып шығу <b>қатаң тыйым салынады</b>.\n\n"
+                    "Мұндай жағдайда сіз:\n"
+                    "— Палата кілтін <b>ғимараттың жауапты қызметкері бөлмесіне тапсыруыңыз</b> шарт.\n\n"
+                    "<i>Бұл тәртіп барлық науқастар үшін міндетті болып табылады.</i>"
+                ),
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            try:
+                await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+            except Exception:
+                await query.message.delete()
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
         elif section == "rules":
             text = {
