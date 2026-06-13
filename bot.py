@@ -3869,19 +3869,29 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": "🧲 Diagnostika turini tanlang:",
             "kz": "🧲 Диагностика түрін таңдаңыз:",
         }[lang]
-        await query.edit_message_text(title, reply_markup=diagnostics_keyboard(lang))
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        await context.bot.send_message(chat_id=chat_id, text=title, reply_markup=diagnostics_keyboard(lang))
 
     elif data == "diag_mrt15":
         logger.info(f"diag_mrt15 handler ishga tushdi, lang={lang}")
         lines = "\n".join([f"• {x}" for x in d["mrt_15"]])
-        title = {"ru": "🧲 *МРТ 1.5Т — цены:*", "uz": "🧲 *МРТ 1.5Т — narxlar:*", "kz": "🧲 *МРТ 1.5Т — бағалар:*"}[lang]
+        title = {"ru": "🧲 <b>МРТ 1.5Т — цены:</b>", "uz": "🧲 <b>МРТ 1.5Т — narxlar:</b>", "kz": "🧲 <b>МРТ 1.5Т — бағалар:</b>"}[lang]
         call_label = {"ru": "📞 МРТ 1.5Т — позвонить", "uz": "📞 МРТ 1.5Т — telefon qilish", "kz": "📞 МРТ 1.5Т — қоңырау шалу"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(call_label, callback_data="call_mrt15")],
             [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
         ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        text = f"{title}\n\n{lines}"
+        photo = d.get("diag_mrt15_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_mrt3t":
         title = {"ru": "🧲 МРТ 3Т — выберите группу:", "uz": "🧲 МРТ 3Т — guruhni tanlang:", "kz": "🧲 МРТ 3Т — топты таңдаңыз:"}[lang]
@@ -3890,7 +3900,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = InlineKeyboardMarkup(
             groups_kb + [[InlineKeyboardButton(call_label, callback_data="call_mrt3t")]]
         )
-        await query.edit_message_text(title, reply_markup=kb)
+        photo = d.get("diag_mrt3t_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=title, reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=title, reply_markup=kb)
 
     elif data.startswith("mrt3t_"):
         idx = int(data[6:])
@@ -3904,110 +3919,162 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(call_label, callback_data="call_mrt3t")],
             [InlineKeyboardButton(back_label, callback_data="diag_mrt3t")],
         ])
-        await query.edit_message_text(f"🧲 *МРТ 3Т — {group_name}:*\n\n{lines}",
-                                      parse_mode="Markdown", reply_markup=kb)
+        photo_key = f"diag_mrt3t_{idx}_photo"
+        photo = d.get(photo_key, "")
+        text = f"🧲 <b>МРТ 3Т — {group_name}:</b>\n\n{lines}"
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_mskt256":
         lines = "\n".join([f"• {x}" for x in d["mskt_256"]])
-        title = {"ru": "🖥 *МСКТ 256 — цены:*", "uz": "🖥 *МСКТ 256 — narxlar:*", "kz": "🖥 *МСКТ 256 — бағалар:*"}[lang]
+        title = {"ru": "🖥 <b>МСКТ 256 — цены:</b>", "uz": "🖥 <b>МСКТ 256 — narxlar:</b>", "kz": "🖥 <b>МСКТ 256 — бағалар:</b>"}[lang]
         call_label = {"ru": "📞 МСКТ 256 — позвонить", "uz": "📞 МСКТ 256 — telefon qilish", "kz": "📞 МСКТ 256 — қоңырау шалу"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(call_label, callback_data="call_mskt256")],
             [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
         ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        text = f"{title}\n\n{lines}"
+        photo = d.get("diag_mskt256_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_mskt128":
         lines = "\n".join([f"• {x}" for x in d["mskt_128"]])
-        title = {"ru": "🖥 *МСКТ 128 — цены:*", "uz": "🖥 *МСКТ 128 — narxlar:*", "kz": "🖥 *МСКТ 128 — бағалар:*"}[lang]
+        title = {"ru": "🖥 <b>МСКТ 128 — цены:</b>", "uz": "🖥 <b>МСКТ 128 — narxlar:</b>", "kz": "🖥 <b>МСКТ 128 — бағалар:</b>"}[lang]
         call_label = {"ru": "📞 МСКТ 128 — позвонить", "uz": "📞 МСКТ 128 — telefon qilish", "kz": "📞 МСКТ 128 — қоңырау шалу"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(call_label, callback_data="call_mskt128")],
             [InlineKeyboardButton(back_label, callback_data="menu_diagnostics")],
         ])
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=kb)
+        text = f"{title}\n\n{lines}"
+        photo = d.get("diag_mskt128_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "call_mrt15":
-        text = "📞 *МРТ 1.5Т*\n\n☎️ +998664556015"
+        text = "📞 <b>МРТ 1.5Т</b>\n\n☎️ +998664556015"
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="diag_mrt15")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        await query.message.delete()
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "call_mrt3t":
-        text = "📞 *МРТ 3Т*\n\n☎️ +998557010756"
+        text = "📞 <b>МРТ 3Т</b>\n\n☎️ +998557010756"
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="diag_mrt3t")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        await query.message.delete()
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "call_mskt" or data == "call_mskt256":
-        text = "📞 *МСКТ 256*\n\n☎️ +998664556007"
+        text = "📞 <b>МСКТ 256</b>\n\n☎️ +998664556007"
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="diag_mskt256")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        await query.message.delete()
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "call_mskt128":
-        text = "📞 *МСКТ 128*\n\n☎️ +998664556007"
+        text = "📞 <b>МСКТ 128</b>\n\n☎️ +998664556007"
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="diag_mskt128")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        await query.message.delete()
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_other":
         lines = "\n".join([f"• {x}" for x in d["other_diagnostics"]])
-        title = {"ru": "📡 *УЗИ — цены:*", "uz": "📡 *УЗИ — narxlar:*", "kz": "📡 *УДЗ — бағалар:*"}[lang]
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        title = {"ru": "📡 <b>УЗИ — цены:</b>", "uz": "📡 <b>УЗИ — narxlar:</b>", "kz": "📡 <b>УДЗ — бағалар:</b>"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        photo = d.get("diag_other_photo", "")
+        text = f"{title}\n\n{lines}"
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_mammografiya":
         text = {
             "ru": (
-                "🩺 *Маммография*\n\n"
-                "💰 *Цена:* 250 000 сум\n\n"
+                "🩺 <b>Маммография</b>\n\n"
+                "💰 <b>Цена:</b> 250 000 сум\n\n"
                 "Рентгенологическое исследование молочных желёз для ранней диагностики."
             ),
             "uz": (
-                "🩺 *Mammografiya*\n\n"
-                "💰 *Narx:* 250 000 so'm\n\n"
+                "🩺 <b>Mammografiya</b>\n\n"
+                "💰 <b>Narx:</b> 250 000 so'm\n\n"
                 "Ko'krak bezlarini erta aniqlash uchun rentgenologik tekshiruv."
             ),
             "kz": (
-                "🩺 *Маммография*\n\n"
-                "💰 *Баға:* 250 000 сум\n\n"
+                "🩺 <b>Маммография</b>\n\n"
+                "💰 <b>Баға:</b> 250 000 сум\n\n"
                 "Сүт бездерін ерте анықтауға арналған рентгенологиялық зерттеу."
             ),
         }[lang]
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        photo = d.get("diag_mammografiya_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_fibroskan":
         text = {
             "ru": (
-                "🫀 *Фибросканирование печени*\n\n"
-                "💰 *Цена:* 220 000 сум\n\n"
+                "🫀 <b>Фибросканирование печени</b>\n\n"
+                "💰 <b>Цена:</b> 220 000 сум\n\n"
                 "Безболезненное исследование состояния печени без биопсии.\n\n"
                 "⏱ Длительность: 15–20 минут\n"
                 "📋 Подготовка: натощак (4–6 часов)"
             ),
             "uz": (
-                "🫀 *Jigar fibroskan tekshiruvi*\n\n"
-                "💰 *Narx:* 220 000 so'm\n\n"
+                "🫀 <b>Jigar fibroskan tekshiruvi</b>\n\n"
+                "💰 <b>Narx:</b> 220 000 so'm\n\n"
                 "Biopsiysiz jigar holatini og'riqsiz tekshirish.\n\n"
                 "⏱ Davomiyligi: 15–20 daqiqa\n"
                 "📋 Tayyorgarlik: och qorin (4–6 soat)"
             ),
             "kz": (
-                "🫀 *Бауырды фибросканерлеу*\n\n"
-                "💰 *Баға:* 220 000 сум\n\n"
+                "🫀 <b>Бауырды фибросканерлеу</b>\n\n"
+                "💰 <b>Баға:</b> 220 000 сум\n\n"
                 "Биопсиясыз бауыр жағдайын ауырусыз тексеру.\n\n"
                 "⏱ Ұзақтығы: 15–20 минут\n"
                 "📋 Дайындық: аш қарын (4–6 сағат)"
             ),
         }[lang]
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        photo = d.get("diag_fibroskan_photo", "")
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "diag_lab":
         lines = "\n".join([f"• {x}" for x in d["lab"]])
-        title = {"ru": "🔬 *Лаборатория — цены:*", "uz": "🔬 *Laboratoriya — narxlar:*", "kz": "🔬 *Зертхана — бағалар:*"}[lang]
-        await query.edit_message_text(f"{title}\n\n{lines}", parse_mode="Markdown", reply_markup=back_keyboard(lang))
+        title = {"ru": "🔬 <b>Лаборатория — цены:</b>", "uz": "🔬 <b>Laboratoriya — narxlar:</b>", "kz": "🔬 <b>Зертхана — бағалар:</b>"}[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_diagnostics")]])
+        photo = d.get("diag_lab_photo", "")
+        text = f"{title}\n\n{lines}"
+        await query.message.delete()
+        if photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     # ── Klinikaga yetib olish ──
     elif data == "menu_transfer":
@@ -4283,6 +4350,19 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo infra_fizio` — Fizioxona rasmi
 `/admin_photo infra_massaj` — Massaj xonasi rasmi
 `/admin_photo infra_nurse` — Muolaja xonasi rasmi
+`/admin_photo diag_mrt15` — MRT 1.5T rasmi
+`/admin_photo diag_mrt3t` — MRT 3T asosiy rasmi
+`/admin_photo diag_mrt3t_0` — MRT 3T 1-guruh rasmi
+`/admin_photo diag_mrt3t_1` — MRT 3T 2-guruh rasmi
+`/admin_photo diag_mrt3t_2` — MRT 3T 3-guruh rasmi
+`/admin_photo diag_mrt3t_3` — MRT 3T 4-guruh rasmi
+`/admin_photo diag_mrt3t_4` — MRT 3T 5-guruh rasmi
+`/admin_photo diag_mskt256` — MSKT 256 rasmi
+`/admin_photo diag_mskt128` — MSKT 128 rasmi
+`/admin_photo diag_other` — UZI rasmi
+`/admin_photo diag_mammografiya` — Mammografiya rasmi
+`/admin_photo diag_fibroskan` — Fibroskan rasmi
+`/admin_photo diag_lab` — Laboratoriya rasmi
 `/admin_photo korpus_m_yangi` — korpus rasmi
 `/admin_photo xona_m_yangi_0` — xona rasmi
 
@@ -4661,6 +4741,45 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif waiting == "infra_nurse":
         d["infra_nurse_photo"] = file_id
         await update.message.reply_text("✅ Muolaja xonasi rasmi saqlandi!")
+    elif waiting == "diag_mrt15":
+        d["diag_mrt15_photo"] = file_id
+        await update.message.reply_text("✅ MRT 1.5T rasmi saqlandi!")
+    elif waiting == "diag_mrt3t":
+        d["diag_mrt3t_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T asosiy rasmi saqlandi!")
+    elif waiting == "diag_mrt3t_0":
+        d["diag_mrt3t_0_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T — 1-guruh rasmi saqlandi!")
+    elif waiting == "diag_mrt3t_1":
+        d["diag_mrt3t_1_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T — 2-guruh rasmi saqlandi!")
+    elif waiting == "diag_mrt3t_2":
+        d["diag_mrt3t_2_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T — 3-guruh rasmi saqlandi!")
+    elif waiting == "diag_mrt3t_3":
+        d["diag_mrt3t_3_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T — 4-guruh rasmi saqlandi!")
+    elif waiting == "diag_mrt3t_4":
+        d["diag_mrt3t_4_photo"] = file_id
+        await update.message.reply_text("✅ MRT 3T — 5-guruh rasmi saqlandi!")
+    elif waiting == "diag_mskt256":
+        d["diag_mskt256_photo"] = file_id
+        await update.message.reply_text("✅ MSKT 256 rasmi saqlandi!")
+    elif waiting == "diag_mskt128":
+        d["diag_mskt128_photo"] = file_id
+        await update.message.reply_text("✅ MSKT 128 rasmi saqlandi!")
+    elif waiting == "diag_other":
+        d["diag_other_photo"] = file_id
+        await update.message.reply_text("✅ UZI rasmi saqlandi!")
+    elif waiting == "diag_mammografiya":
+        d["diag_mammografiya_photo"] = file_id
+        await update.message.reply_text("✅ Mammografiya rasmi saqlandi!")
+    elif waiting == "diag_fibroskan":
+        d["diag_fibroskan_photo"] = file_id
+        await update.message.reply_text("✅ Fibroskan rasmi saqlandi!")
+    elif waiting == "diag_lab":
+        d["diag_lab_photo"] = file_id
+        await update.message.reply_text("✅ Laboratoriya rasmi saqlandi!")
     elif waiting.startswith("korpus_"):
         korpus_id = waiting.replace("korpus_", "")
         korpuslar = d.get("korpuslar", [])
