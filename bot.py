@@ -4550,7 +4550,20 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Endi rasmni yuboring — `{parts[1]}` uchun saqlanadi!")
         return
 
-    if text.startswith("/admin_staff_add"):
+    if text.startswith("/admin_reset_rules"):
+        d = load_data()
+        if "guide" not in d:
+            d["guide"] = {}
+        d["guide"]["rules"] = {
+            "ru": "RESET",
+            "uz": "RESET",
+            "kz": "RESET",
+        }
+        save_data(d)
+        await update.message.reply_text("✅ guide.rules data.json dan tozalandi. Endi tugma yangi matnni ko'rsatadi.")
+        return
+
+
         parts = text.replace("/admin_staff_add ", "").split("|")
         if len(parts) < 2:
             await update.message.reply_text("Format: /admin_staff_add Ism Familiya|Lavozim")
@@ -6143,7 +6156,7 @@ def main():
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
     app.add_handler(CommandHandler("admin_photo_del", admin_handler))
-    app.add_handler(CommandHandler("admin_staff_add", admin_handler))
+    app.add_handler(CommandHandler("admin_reset_rules", admin_handler))
     app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
     app.add_handler(CommandHandler("broadcast", admin_handler))
