@@ -1672,36 +1672,48 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "info_qoidalar":
         text = {
             "uz": (
-                "🏥 *'Ergash ota' tibbiyot markazining shifokor tavsiyalari*\n\n"
-                "Hurmatli bemor! Markazimizda davolanish kursini yakunlaganingiz bilan tabriklaymiz. "
-                "Sog'ligingizni tiklash va natijani mustahkamlash uchun uy sharoitida 14 kundan 24 kungacha "
-                "qat'iy parhez saqlashingiz zarur.\n\n"
-                "⚠️ *Eng muhim qoidalar:*\n"
-                "• Dastlabki 3 kun davomida umuman non iste'mol qilmang!\n"
-                "• Jismoniy og'ir ishlar qilish va og'ir yuk ko'tarish mumkin emas."
+                "📋 <b>Klinika ichki tartib-qoidalari</b>\n\n"
+                "Hurmatli bemorlar! Siz klinikaga qabul qilinayotganda quyidagi tartib-qoidalarga rozilik bildirgan holda tilxat yozgansiz:\n\n"
+                "• Siz klinika hududidan <b>100 metr uzoqlashmaslik</b> majburiyatini olgansiz.\n"
+                "• Klinikadan uzoqlashish klinika tartib-qoidalariga <b>zid</b> hisoblanadi.\n\n"
+                "⚠️ <b>Eslatib o'tamiz:</b>\n"
+                "Agar siz klinika hududidan tashqariga chiqishingiz zarur bo'lganda:\n\n"
+                "1️⃣ Birinchi navbatda <b>klinika rahbariyati roziligi</b> bilan chiqishingizga ruxsat beriladi.\n"
+                "2️⃣ Xonangiz kalitini o'zingiz bilan olib chiqishingiz <b>qat'iyan man etiladi</b>.\n\n"
+                "Bunday holatda siz:\n"
+                "— Xona kalitini <b>binoning mas'ul xodimi xonasiga topshirishingiz</b> shart.\n\n"
+                "<i>Ushbu tartib barcha bemorlar uchun majburiy hisoblanadi.</i>"
             ),
             "ru": (
-                "🏥 *Рекомендации врача центра «Эргаш ота»*\n\n"
-                "Уважаемый пациент! Поздравляем с завершением курса лечения в нашем центре. "
-                "Для восстановления здоровья и закрепления результата необходимо строго соблюдать "
-                "диету в домашних условиях от 14 до 24 дней.\n\n"
-                "⚠️ *Важные правила:*\n"
-                "• В первые 3 дня полностью исключите хлеб!\n"
-                "• Тяжёлый физический труд и подъём тяжестей запрещены."
+                "📋 <b>Внутренние правила клиники</b>\n\n"
+                "Уважаемые пациенты! При поступлении в клинику вы подписали согласие со следующими правилами:\n\n"
+                "• Вы взяли на себя обязательство <b>не удаляться от территории клиники более чем на 100 метров</b>.\n"
+                "• Удаление от клиники считается <b>нарушением</b> внутреннего распорядка.\n\n"
+                "⚠️ <b>Напоминаем:</b>\n"
+                "Если вам необходимо выйти за пределы территории клиники:\n\n"
+                "1️⃣ Выход разрешён только с <b>согласия руководства клиники</b>.\n"
+                "2️⃣ Брать ключ от палаты с собой <b>строго запрещено</b>.\n\n"
+                "В таком случае вы обязаны:\n"
+                "— <b>Сдать ключ от палаты ответственному сотруднику здания</b>.\n\n"
+                "<i>Данный порядок является обязательным для всех пациентов.</i>"
             ),
             "kz": (
-                "🏥 *«Эргаш ота» орталығы дәрігерінің ұсыныстары*\n\n"
-                "Құрметті науқас! Орталығымызда емдеу курсын аяқтағаныңызбен құттықтаймыз. "
-                "Денсаулықты қалпына келтіру және нәтижені бекіту үшін үй жағдайында 14 күннен 24 күнге дейін "
-                "қатаң диета сақтауыңыз қажет.\n\n"
-                "⚠️ *Маңызды ережелер:*\n"
-                "• Алғашқы 3 күн нан мүлдем жемеңіз!\n"
-                "• Ауыр дене жұмысы және ауыр зат көтеру мүмкін емес."
+                "📋 <b>Клиниканың ішкі тәртіп ережелері</b>\n\n"
+                "Құрметті науқастар! Клиникаға қабылданған кезде сіз мына ережелерге келісіп, тілхат жаздыңыз:\n\n"
+                "• Сіз клиника аумағынан <b>100 метрден артық ұзамау</b> міндеттемесін алдыңыз.\n"
+                "• Клиникадан ұзау клиника тәртіп ережелеріне <b>қайшы</b> келеді.\n\n"
+                "⚠️ <b>Ескертеміз:</b>\n"
+                "Егер клиника аумағынан шығуыңыз қажет болса:\n\n"
+                "1️⃣ Ең алдымен <b>клиника басшылығының рұқсатымен</b> ғана шығуға болады.\n"
+                "2️⃣ Палата кілтін өзіңізбен алып шығу <b>қатаң тыйым салынады</b>.\n\n"
+                "Мұндай жағдайда сіз:\n"
+                "— Палата кілтін <b>ғимараттың жауапты қызметкері бөлмесіне тапсыруыңыз</b> шарт.\n\n"
+                "<i>Бұл тәртіп барлық науқастар үшін міндетті болып табылады.</i>"
             ),
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "info_taqiq":
         text = {
