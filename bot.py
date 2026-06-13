@@ -1406,6 +1406,65 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(chat_id=chat_id, text=text,
                                                parse_mode="HTML", reply_markup=kb)
 
+        elif section == "rules":
+            text = {
+                "uz": (
+                    "5️⃣ <b>Umumiy qoidalar</b>\n\n"
+                    "👗 <b>Kiyim:</b>\n"
+                    "• Qulay, erkin kiyim\n"
+                    "• Massaj uchun — alohida to'plam (yog' ketmaydi!)\n\n"
+                    "🚌 <b>Shaharga chiqish:</b>\n"
+                    "• Ruxsat beriladi, lekin protsedura rejimini saqlang\n\n"
+                    "🕐 <b>Kun tartibi:</b>\n"
+                    "• Tushlik tanaffus — taxminan (resepshnga aniqlang)\n"
+                    "• Payshanba — qisqa kun\n"
+                    "• Musiqali kech: Payshanba va Yakshanba 21:00 da\n\n"
+                    "🛏 <b>Xona tozalash:</b>\n"
+                    "• Xodimlar tomonidan amalga oshiriladi\n\n"
+                    "⚠️ <b>Muhim:</b>\n"
+                    "O'zbekistonda hayot sur'ati boshqacha — sabr-toqatli bo'ling! 🌿"
+                ),
+                "ru": (
+                    "5️⃣ <b>Общие правила</b>\n\n"
+                    "👗 <b>Одежда:</b>\n"
+                    "• Удобная, свободная одежда\n"
+                    "• Для массажа — отдельный комплект (масло не отстирывается!)\n\n"
+                    "🚌 <b>Выход в город:</b>\n"
+                    "• Разрешается, но соблюдайте режим процедур\n\n"
+                    "🕐 <b>Распорядок дня:</b>\n"
+                    "• Обеденный перерыв — уточните на ресепшене\n"
+                    "• Четверг — короткий день\n"
+                    "• Музыкальный вечер: Четверг и Воскресенье в 21:00\n\n"
+                    "🛏 <b>Уборка номера:</b>\n"
+                    "• Производится персоналом\n\n"
+                    "⚠️ <b>Важно:</b>\n"
+                    "В Узбекистане темп жизни другой — будьте терпеливы! 🌿"
+                ),
+                "kz": (
+                    "5️⃣ <b>Жалпы ережелер</b>\n\n"
+                    "👗 <b>Киім:</b>\n"
+                    "• Ыңғайлы, еркін киім\n"
+                    "• Массаж үшін — бөлек жиынтық (май кетпейді!)\n\n"
+                    "🚌 <b>Қалаға шығу:</b>\n"
+                    "• Рұқсат етіледі, бірақ процедура режимін сақтаңыз\n\n"
+                    "🕐 <b>Күн тәртібі:</b>\n"
+                    "• Түскі үзіліс — ресепшеннен нақтылаңыз\n"
+                    "• Бейсенбі — қысқа күн\n"
+                    "• Музыкалы кеш: Бейсенбі және Жексенбі 21:00-де\n\n"
+                    "🛏 <b>Бөлмені тазалау:</b>\n"
+                    "• Қызметкерлер жүзеге асырады\n\n"
+                    "⚠️ <b>Маңызды:</b>\n"
+                    "Өзбекстанда өмір қарқыны басқаша — шыдамды болыңыз! 🌿"
+                ),
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            try:
+                await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+            except Exception:
+                await query.message.delete()
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+
         else:
             # Boshqa bo'limlar
             section_data = guide_data_all.get(section, {})
