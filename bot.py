@@ -2976,7 +2976,24 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                            parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_to_about_menu":
-        await query.message.delete()
+        # Jamoa albom rasmlari va matnini o'chirish
+        media_ids = context.user_data.pop("team_media_ids", [])
+        text_id   = context.user_data.pop("team_text_id", None)
+        for mid in media_ids:
+            try:
+                await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+            except Exception:
+                pass
+        if text_id:
+            try:
+                await context.bot.delete_message(chat_id=chat_id, message_id=text_id)
+            except Exception:
+                pass
+        # Agar bu holatda eski menyu xabari hali o'chmagan bo'lsa
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
         title = {
             "ru": "🏥 Информация о клинике:",
             "uz": "🏥 Klinika haqida:",
@@ -2987,55 +3004,31 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ── Jamoa ──
     elif data == "menu_staff":
-        staff = d.get("staff", [])
-        intro = {
-            "ru": (
-                "👨‍⚕️ *Наша команда*\n\n"
-                "В частном медицинском центре «Эргаш ота» работают опытные врачи, медсёстры и специалисты.\n\n"
-                "Главная цель нашей команды — индивидуальный подход, качественное обслуживание и искренняя забота о каждом пациенте.\n\n"
-                "🏥 *В нашей клинике работают:*\n"
-                "✔ Опытные врачи\n"
-                "✔ Квалифицированные медсёстры\n"
-                "✔ Специалисты диагностики\n"
-                "✔ Сотрудники физиотерапии и реабилитации\n\n"
-                "💙 Здоровье, комфорт и доверие пациентов — наша главная ценность."
-            ),
-            "uz": (
-                "👨‍⚕️ *Bizning jamoamiz*\n\n"
-                "\"Ergash ota\" xususiy tibbiyot markazida tajribali shifokorlar, hamshiralar va mutaxassislar faoliyat olib boradi.\n\n"
-                "Bizning jamoamizning asosiy maqsadi — har bir bemorga individual yondashuv, sifatli xizmat va samimiy e'tibor ko'rsatishdir.\n\n"
-                "🏥 *Klinikamizda:*\n"
-                "✔ Tajribali shifokorlar\n"
-                "✔ Malakali hamshiralar\n"
-                "✔ Diagnostika mutaxassislari\n"
-                "✔ Fizioterapiya va reabilitatsiya xodimlari\n\n"
-                "faoliyat yuritadi.\n\n"
-                "💙 Biz bemorlarning sog'lig'i, qulayligi va ishonchini eng muhim qadriyat deb bilamiz."
-            ),
-            "kz": (
-                "👨‍⚕️ *Біздің команда*\n\n"
-                "«Эргаш ота» жеке медициналық орталығында тәжірибелі дәрігерлер, медбикелер және мамандар жұмыс істейді.\n\n"
-                "Командамыздың басты мақсаты — әр науқасқа жеке көзқарас, сапалы қызмет және шынайы қамқорлық.\n\n"
-                "🏥 *Клиникамызда жұмыс істейді:*\n"
-                "✔ Тәжірибелі дәрігерлер\n"
-                "✔ Білікті медбикелер\n"
-                "✔ Диагностика мамандары\n"
-                "✔ Физиотерапия және реабилитация қызметкерлері\n\n"
-                "💙 Науқастардың денсаулығы, жайлылығы және сенімі — біздің басты құндылығымыз."
-            ),
+        text = {
+            "ru": "👥 <b>Наша дружная команда</b>\n\nВ нашей клинике работают высококвалифицированные врачи, специалисты народной медицины, физиотерапевты и заботливые медсестры с многолетним опытом. Каждый наш сотрудник готов служить круглосуточно, чтобы восстановить ваше здоровье, обеспечить своевременное и качественное прохождение процедур, а также сделать так, чтобы вы чувствовали себя как дома!",
+            "uz": "👥 <b>Bizning Ahil Jamoamiz</b>\n\nKlinikamizda o'z kasbining mohir ustasi bo'lgan, ko'p yillik tajribaga ega shifokorlar, xalq tabobati mutaxassislari, fizioterapevtlar va g'amxo'r hamshiralar faoliyat olib borishadi. Har bir xodimimiz sizning salomatligingizni tiklash, muolajalarni o'z vaqtida va oliy darajada olishingiz hamda o'zingizni xuddi uyingizdagidek his qilishingiz uchun tunu-kun xizmatga tayyor!",
+            "kz": "👥 <b>Біздің ұйымшыл ұжымымыз</b>\n\nКлиникамызда өз ісінің шебері болып табылатын, көпжылдық тәжірибесі бар дәрігерлер, халық медицинасының мамандары, физиотерапевтер және қамқор медбикелер қызмет атқарады. Біздің әрбір қызметкеріміз сіздің денсаулығыңызды қалпына келтіру, ем-шараларды өз уақытында әрі жоғары деңгейде алуыңыз және өзіңізді үйдегідей сезінуіңіз үшін тәулік бойы қызмет етуге дайын!",
         }[lang]
-        await query.edit_message_text(intro, parse_mode="Markdown", reply_markup=back_keyboard(lang))
-        # Jamoaning rasmlari (admin orqali yuklangan)
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
+
+        await query.message.delete()
+
+        # Rasmlar albomini yuborish
         team_photos = d.get("team_photos", [])
+        media_msg_ids = []
         if team_photos:
-            await send_photos(context, chat_id, team_photos)
-        # Alohida a'zolar (eski tizim)
-        for member in staff:
-            text = f"👨‍⚕️ *{member['name']}*\n{member['role']}"
-            if member.get("photo_id"):
-                await context.bot.send_photo(chat_id=chat_id, photo=member["photo_id"], caption=text, parse_mode="Markdown")
-            else:
-                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="Markdown")
+            media = [InputMediaPhoto(p) for p in team_photos if p]
+            if media:
+                sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
+                media_msg_ids = [m.message_id for m in sent]
+
+        # Matn + Orqaga tugmasi
+        text_msg = await context.bot.send_message(chat_id=chat_id, text=text,
+                                                  parse_mode="HTML", reply_markup=kb)
+        # Keyinchalik o'chirish uchun ID larni saqlaymiz
+        context.user_data["team_media_ids"] = media_msg_ids
+        context.user_data["team_text_id"] = text_msg.message_id
 
     # ── Kasalliklar ──
     elif data == "menu_diseases":
