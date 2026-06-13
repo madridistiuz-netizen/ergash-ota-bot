@@ -4469,12 +4469,14 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text(f"❌ `{key}` topilmadi yoki allaqachon bo'sh.")
         return
+
+    if text.startswith("/admin_photo") and not text.startswith("/admin_photo_clear") and not text.startswith("/admin_photo_del"):
         parts = text.split()
         if len(parts) < 2:
-            await update.message.reply_text("Format: /admin_photo clinic|ward|samarkand|bukhara|doctor")
+            await update.message.reply_text("Format: /admin_photo <kalit>\nMisol: /admin_photo diag_mrt15")
             return
         context.user_data["waiting_photo"] = parts[1]
-        await update.message.reply_text(f"✅ Endi rasmni yuboring — {parts[1]} uchun saqlanadi!")
+        await update.message.reply_text(f"✅ Endi rasmni yuboring — `{parts[1]}` uchun saqlanadi!")
         return
 
     if text.startswith("/admin_staff_add"):
