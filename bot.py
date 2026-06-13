@@ -994,7 +994,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=guide_keyboard(lang))
 
-    elif data.startswith("guide_"):
+    elif data.startswith("guide_") and data not in (
+        "guide_step3", "guide_step3_s2", "guide_step3_s3",
+        "guide_step3_s4", "guide_step3_foreign", "guide_step3_local",
+    ):
         section = data.replace("guide_", "")
         guide_data_all = d.get("guide", {})
 
@@ -1378,6 +1381,30 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton(back_label, callback_data="menu_guide")],
             ])
             await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+        elif section == "infrastructure":
+            d2 = load_data()
+            INFRA_MENU_PHOTO = d2.get("infra_menu_photo", "")
+            text = {
+                "ru": "🏢 <b>Территория клиники и Корпуса</b>\n\nЧтобы не заблудиться и легко найти нужные процедурные кабинеты, выберите интересующий корпус:",
+                "uz": "🏢 <b>Klinikamiz hududi va Korpuslar</b>\n\nAdashib ketmasligingiz va kerakli muolaja xonalarini osongina topishingiz uchun kerakli korpusni tanlang:",
+                "kz": "🏢 <b>Клиника аумағы мен Корпустар</b>\n\nАдасып кетпей, керекті ем-шара бөлмелерін оңай табу үшін қажетті корпусты таңдаңыз:",
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            main_label = {"ru": "🏢 Главный корпус", "uz": "🏢 Asosiy korpus", "kz": "🏢 Бас корпус"}[lang]
+            m_label    = {"ru": "🏥 Корпус М", "uz": "🏥 M korpus", "kz": "🏥 М корпусы"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(main_label, callback_data="infra_main_building")],
+                [InlineKeyboardButton(m_label,    callback_data="infra_m_building")],
+                [InlineKeyboardButton(back_label, callback_data="back_to_guide_main")],
+            ])
+            await query.message.delete()
+            if INFRA_MENU_PHOTO:
+                await context.bot.send_photo(chat_id=chat_id, photo=INFRA_MENU_PHOTO,
+                                             caption=text, parse_mode="HTML", reply_markup=kb)
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=text,
+                                               parse_mode="HTML", reply_markup=kb)
 
         else:
             # Boshqa bo'limlar
