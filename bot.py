@@ -1713,7 +1713,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
-        await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+        try:
+            await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
     elif data == "info_taqiq":
         text = {
@@ -1747,7 +1751,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        try:
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "info_giyoh":
         text = {
@@ -1791,7 +1799,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="guide_shopping")]])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        try:
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="Markdown", reply_markup=kb)
 
     elif data == "menu_taomnoma":
         text = {
