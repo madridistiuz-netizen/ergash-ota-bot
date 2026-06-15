@@ -4608,7 +4608,17 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Endi rasmni yuboring — `{parts[1]}` uchun saqlanadi!")
         return
 
-    if text.startswith("/admin_team_clear"):
+    if text.startswith("/admin_check_team"):
+        d = load_data()
+        photos = d.get("team_photos", [])
+        await update.message.reply_text(
+            f"📊 team_photos soni: {len(photos)}\n"
+            f"DATA_FILE: {DATA_FILE}\n"
+            f"Rasmlar: {photos[:3]}{'...' if len(photos) > 3 else ''}"
+        )
+        return
+
+
         d = load_data()
         d["team_photos"] = []
         save_data(d)
@@ -6222,6 +6232,7 @@ def main():
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
     app.add_handler(CommandHandler("admin_photo_del", admin_handler))
+    app.add_handler(CommandHandler("admin_check_team", admin_handler))
     app.add_handler(CommandHandler("admin_team_clear", admin_handler))
     app.add_handler(CommandHandler("admin_reset_rules", admin_handler))
     app.add_handler(CommandHandler("admin_video", admin_handler))
