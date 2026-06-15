@@ -3002,16 +3002,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── Jamoa ──
     elif data == "menu_staff":
         text = {
-            "ru": "👥 <b>Наша дружная команда</b>\n\nВ нашей клинике работают высококвалифицированные врачи, специалисты народной медицины, физиотерапевты и заботливые медсестры с многолетним опытом. Каждый наш сотрудник готов служить круглосуточно, чтобы восстановить ваше здоровье, обеспечить своевременное и качественное прохождение процедур, а также сделать так, чтобы вы чувствовали себя как дома!",
-            "uz": "👥 <b>Bizning Ahil Jamoamiz</b>\n\nKlinikamizda o'z kasbining mohir ustasi bo'lgan, ko'p yillik tajribaga ega shifokorlar, xalq tabobati mutaxassislari, fizioterapevtlar va g'amxo'r hamshiralar faoliyat olib borishadi. Har bir xodimimiz sizning salomatligingizni tiklash, muolajalarni o'z vaqtida va oliy darajada olishingiz hamda o'zingizni xuddi uyingizdagidek his qilishingiz uchun tunu-kun xizmatga tayyor!",
-            "kz": "👥 <b>Біздің ұйымшыл ұжымымыз</b>\n\nКлиникамызда өз ісінің шебері болып табылатын, көпжылдық тәжірибесі бар дәрігерлер, халық медицинасының мамандары, физиотерапевтер және қамқор медбикелер қызмет атқарады. Біздің әрбір қызметкеріміз сіздің денсаулығыңызды қалпына келтіру, ем-шараларды өз уақытында әрі жоғары деңгейде алуыңыз және өзіңізді үйдегідей сезінуіңіз үшін тәулік бойы қызмет етуге дайын!",
+            "ru": "👥 Наша дружная команда\n\nВ нашей клинике работают высококвалифицированные врачи, специалисты народной медицины, физиотерапевты и заботливые медсестры с многолетним опытом. Каждый наш сотрудник готов служить круглосуточно, чтобы восстановить ваше здоровье, обеспечить своевременное и качественное прохождение процедур, а также сделать так, чтобы вы чувствовали себя как дома!",
+            "uz": "👥 Bizning Ahil Jamoamiz\n\nKlinikamizda o'z kasbining mohir ustasi bo'lgan, ko'p yillik tajribaga ega shifokorlar, xalq tabobati mutaxassislari, fizioterapevtlar va g'amxo'r hamshiralar faoliyat olib borishadi. Har bir xodimimiz sizning salomatligingizni tiklash, muolajalarni o'z vaqtida va oliy darajada olishingiz hamda o'zingizni xuddi uyingizdagidek his qilishingiz uchun tunu-kun xizmatga tayyor!",
+            "kz": "👥 Біздің ұйымшыл ұжымымыз\n\nКлиникамызда өз ісінің шебері болып табылатын, көпжылдық тәжірибесі бар дәрігерлер, халық медицинасының мамандары, физиотерапевтер және қамқор медбикелер қызмет атқарады. Біздің әрбір қызметкеріміз сіздің денсаулығыңызды қалпына келтіру, ем-шараларды өз уақытында әрі жоғары деңгейде алуыңыз және өзіңізді үйдегідей сезінуіңіз үшін тәулік бойы қызмет етуге дайын!",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
 
-        # Asosiy xabarni EDIT qilamiz (o'chirmaymiz — chat bo'shab qoladi)
-        await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
-        # Asosiy xabar ID sini saqlaymiz (back bosilganda edit qilinadi)
+        # Xabarni edit qilamiz — parse_mode ko'rsatmaymiz (oddiy matn)
+        await query.edit_message_text(text, reply_markup=kb)
         context.user_data["team_main_msg_id"] = query.message.message_id
 
         # Albom rasmlarini alohida yuboramiz
@@ -3020,8 +3019,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if team_photos:
             media = [InputMediaPhoto(p) for p in team_photos if p]
             if media:
-                sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
-                media_msg_ids = [m.message_id for m in sent]
+                try:
+                    sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
+                    media_msg_ids = [m.message_id for m in sent]
+                except Exception:
+                    pass
         context.user_data["team_media_ids"] = media_msg_ids
 
     # ── Kasalliklar ──
