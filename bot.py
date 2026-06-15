@@ -3008,31 +3008,25 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
 
-        # Eski xabarni yashirin edit qilamiz (tugmani olib tashlaymiz)
-        try:
-            await query.edit_message_reply_markup(reply_markup=None)
-        except Exception:
-            pass
+        context.user_data["team_main_msg_id"] = query.message.message_id
+        await query.answer()
 
-        media_msg_ids = []
         team_photos = [p for p in d.get("team_photos", []) if p]
+        photo_msg_ids = []
 
-        if team_photos:
-            # Avval albom
+        # Rasmlarni bitta-bitta yuboramiz (send_media_group o'rniga)
+        for ph in team_photos:
             try:
-                media = [InputMediaPhoto(p) for p in team_photos]
-                sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
-                media_msg_ids = [m.message_id for m in sent]
+                msg = await context.bot.send_photo(chat_id=chat_id, photo=ph)
+                photo_msg_ids.append(msg.message_id)
             except Exception as e:
-                logger.error(f"team send_media_group error: {e}")
+                logger.error(f"team photo send error: {e}")
 
-        # Keyin matn + orqaga tugmasi
+        # Matn + Orqaga tugmasi
         text_msg = await context.bot.send_message(chat_id=chat_id, text=text, reply_markup=kb)
 
-        context.user_data["team_media_ids"] = media_msg_ids
+        context.user_data["team_media_ids"] = photo_msg_ids
         context.user_data["team_text_id"] = text_msg.message_id
-        # Asosiy eski xabar IDsi (back bosilganda o'chiriladi)
-        context.user_data["team_main_msg_id"] = query.message.message_id
 
     # ── Kasalliklar ──
     elif data == "menu_diseases":
