@@ -2964,12 +2964,33 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": "👨‍⚕️ <b>Klinika Bosh shifokori — Berdiqul Ergashev (Ergash Ota)</b>\n\nKo'p yillik tajribaga ega shifokor, xalq tabobati akademigi hamda shifobaxsh 'Eng shirin lazzat — salomatlik' kitobi muallifi. Ergash Ota rahbarligida klinikamizda o'nlab turdagi tabiiy giyohlar va maxsus Malxam yordamida jigar, o't pufagi, oshqozon-ichak hamda boshqa ko'plab surunkali kasalliklarni jarrohliksiz, tabiiy yo'llar bilan davolash yo'lga qo'yilgan.",
             "kz": "👨‍⚕️ <b>Клиниканың Бас дәрігері — Бердіқұл Эргашев (Эргаш Ота)</b>\n\nКөпжылдық тәжірибесі бар дәрігер, халық медицинасының академигі және шипалы 'Eng shirin lazzat — salomatlik' кітабының авторы. Эргаш Отаның жетекшілігімен клиникамызда ондаған табиғи шөптер мен арнайы Malxam көмегімен бауыр, өт қабы, асқазан-ішек және басқа да көптеген созылмалы ауруларды отасыз, табиғи жолдармен емдеу жолға қойылған.",
         }[lang]
-        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
+        back_label    = {"ru": "⬅️ Назад",                       "uz": "⬅️ Orqaga",                    "kz": "⬅️ Артқа"}[lang]
+        juraqulov_label = {"ru": "👨‍⚕️ Врач Джуракулов Жахонгир", "uz": "👨‍⚕️ Vrach Jo'raqulov Jaxongir", "kz": "👨‍⚕️ Дәрігер Жорақұлов Жахонгир"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(juraqulov_label, callback_data="doctor_juraqulov")],
+            [InlineKeyboardButton(back_label,      callback_data="back_to_about_menu")],
+        ])
         CHIEF_DOCTOR_PHOTO_ID = d.get("doctor", {}).get("photo_id", "")
         await query.message.delete()
         if CHIEF_DOCTOR_PHOTO_ID:
             await context.bot.send_photo(chat_id=chat_id, photo=CHIEF_DOCTOR_PHOTO_ID,
+                                         caption=text, parse_mode="HTML", reply_markup=kb)
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data == "doctor_juraqulov":
+        text = {
+            "ru": "👨‍⚕️ <b>Врач высшей категории — Джуракулов Жахонгир Бердикулович</b>\n\nВедущий ассистент главного врача. Врач с 15-летним богатым опытом работы. Является главным помощником главного врача в приёме пациентов, диагностике и эффективной организации курсов лечения с использованием целебного Malxam и натуральных трав.",
+            "uz": "👨‍⚕️ <b>Oliy toifali shifokor — Jo'raqulov Jaxongir Berdiqul o'g'li</b>\n\nBosh shifokorning yetakchi yordamchisi. 15 yillik boy tajribaga ega shifokor. Klinikamizda bemorlarni qabul qilish, tashxis qo'yish hamda shifobaxsh Malxam va tabiiy giyohlar bilan davolash kurslarini samarali tashkil etishda bosh shifokorning bosh ko'makchisi hisoblanadi.",
+            "kz": "👨‍⚕️ <b>Жоғары санатты дәрігер — Жорақұлов Жахонгир Бердіқұл ұлы</b>\n\nБас дәрігердің жетекші көмекшісі. 15 жылдық бай тәжірибесі бар дәрігер. Клиникамызда бейтаптарды қабылдау, диагноз қою және шипалы Malxam мен табиғи шөптер арқылы емдеу курстарын тиімді ұйымдастыруда бас дәрігердің басты көмекшісі болып табылады.",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_doctor")]])
+        JURAQULOV_PHOTO_ID = d.get("juraqulov_photo_id", "")
+        await query.message.delete()
+        if JURAQULOV_PHOTO_ID:
+            await context.bot.send_photo(chat_id=chat_id, photo=JURAQULOV_PHOTO_ID,
                                          caption=text, parse_mode="HTML", reply_markup=kb)
         else:
             await context.bot.send_message(chat_id=chat_id, text=text,
@@ -4466,7 +4487,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 `/admin_photo guide_step3_local` — O'zbekiston fuqarolari grafigi
 `/admin_photo guide_step3_p3` — 3-bo'lim 3-qadam rasmi
 `/admin_photo guide_step3_p4` — 3-bo'lim 4-qadam rasmi
-`/admin_photo infra_menu` — Infratuzilma menyu rasmi
+`/admin_photo juraqulov` — Jo'raqulov Jaxongir rasmi
 `/admin_photo infra_main` — Asosiy korpus rasmi
 `/admin_photo infra_m_building` — M korpus rasmi
 `/admin_photo infra_klizma` — Klizma xonasi rasmi
@@ -4862,8 +4883,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if waiting == "clinic":
         d["clinic_photos"].append(file_id)
         await update.message.reply_text(f"✅ Klinika rasmi qo'shildi! Jami: {len(d['clinic_photos'])} ta")
-    elif waiting == "team":
-        d.setdefault("team_photos", []).append(file_id)
+    elif waiting == "juraqulov":
+        d["juraqulov_photo_id"] = file_id
+        await update.message.reply_text("✅ Jo'raqulov rasmi saqlandi!")
         await update.message.reply_text(f"✅ Jamoa rasmi qo'shildi! Jami: {len(d['team_photos'])} ta\n"
                                         f"Tozalash uchun: /admin_team_clear")
     elif waiting == "ward":
