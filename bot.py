@@ -4602,7 +4602,71 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Endi rasmni yuboring — `{parts[1]}` uchun saqlanadi!")
         return
 
-    if text.startswith("/admin_check_team"):
+    if text.startswith("/admin_video_clear"):
+        parts = text.split()
+        if len(parts) < 2:
+            await update.message.reply_text(
+                "Format: /admin_video_clear xona_m_yangi_4\n"
+                "Xonadagi barcha videolarni o'chiradi."
+            )
+            return
+        target = parts[1]
+        d = load_data()
+        if target.startswith("xona_"):
+            last = target.rfind("_")
+            korpus_id = target[5:last]
+            xona_idx = int(target[last+1:])
+            for k in d.get("korpuslar", []):
+                if k["id"] == korpus_id:
+                    if xona_idx < len(k["xonalar"]):
+                        k["xonalar"][xona_idx]["videos"] = []
+                        save_data(d)
+                        await update.message.reply_text(f"✅ {korpus_id} / {xona_idx}-xona videolari tozalandi!")
+                    else:
+                        await update.message.reply_text("❌ Xona topilmadi")
+                    return
+            await update.message.reply_text("❌ Korpus topilmadi")
+        return
+
+    if text.startswith("/admin_video_del"):
+        parts = text.split()
+        if len(parts) < 3:
+            await update.message.reply_text(
+                "Format: /admin_video_del xona_m_yangi_4 0\n"
+                "(0 = birinchi video)"
+            )
+            return
+        target = parts[1]
+        try:
+            vid_idx = int(parts[2])
+        except ValueError:
+            await update.message.reply_text("❌ Index raqam bo'lishi kerak")
+            return
+        d = load_data()
+        if target.startswith("xona_"):
+            last = target.rfind("_")
+            korpus_id = target[5:last]
+            xona_idx = int(target[last+1:])
+            for k in d.get("korpuslar", []):
+                if k["id"] == korpus_id:
+                    if xona_idx < len(k["xonalar"]):
+                        videos = k["xonalar"][xona_idx].get("videos", [])
+                        if vid_idx < len(videos):
+                            videos.pop(vid_idx)
+                            k["xonalar"][xona_idx]["videos"] = videos
+                            save_data(d)
+                            await update.message.reply_text(
+                                f"✅ {xona_idx}-xonadan {vid_idx}-video o'chirildi! Qolgan: {len(videos)} ta"
+                            )
+                        else:
+                            await update.message.reply_text(f"❌ Index {vid_idx} topilmadi. Jami: {len(videos)} ta video")
+                    else:
+                        await update.message.reply_text("❌ Xona topilmadi")
+                    return
+            await update.message.reply_text("❌ Korpus topilmadi")
+        return
+
+
         d = load_data()
         photos = d.get("team_photos", [])
         await update.message.reply_text(
@@ -6233,6 +6297,8 @@ def main():
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
     app.add_handler(CommandHandler("admin_photo_del", admin_handler))
+    app.add_handler(CommandHandler("admin_video_clear", admin_handler))
+    app.add_handler(CommandHandler("admin_video_del", admin_handler))
     app.add_handler(CommandHandler("admin_check_team", admin_handler))
     app.add_handler(CommandHandler("admin_team_clear", admin_handler))
     app.add_handler(CommandHandler("admin_reset_rules", admin_handler))
