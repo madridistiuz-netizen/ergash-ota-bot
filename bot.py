@@ -2960,9 +2960,40 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── Shifokor ──
     elif data == "menu_doctor":
         text = {
-            "ru": "🌟 <b>Основатель и Главный Врач Клиники — Эргашев Бердикул Джуракулович</b>\n\n👴🏼 Врач высшей категории, Почетный профессор, Действительный член Академии наук Турон и Академик. Автор знаменитых целебных книг 📘 <i>'Ergash ota Mo'jizalari'</i> и 📘 <i>'Eng shirin lazzat — salomatlikdir'</i>.\n\n🔬 <b>Уникальный рецепт подлинного \"Malxam\" из 32 видов целебных трав!</b>\nЭтот уникальный <b>Malxam</b> разработан Бердикулом Эргашевым в результате глубоких научных исследований и состоит ровно из 32 видов специальных трав. Его единственный подлинный рецепт готовится исключительно в нашей клинике!\n\n⚠️ <b>ВНИМАНИЕ, ОСТЕРЕГАЙТЕСЬ МОШЕННИКОВ!</b>\nВ последнее время в социальных сетях участились случаи обмана, когда мошенники утверждают, что якобы 'нашли или получили рецепт Malxam от Эргаш ота'. Будьте бдительны! Настоящий, целебный и лицензированный оригинальный <b>Malxam</b> выдается пациентам только в самой клинике 'Эргаш Ота'. Не доверяйте свое здоровье подделкам!",
-            "uz": "🌟 <b>Klinika Asoschisi va Bosh Shifokori — Ergashev Berdiqul Jo'raqulovich</b>\n\n👴🏼 Oliy toifali shifokor, Faxriy professor, Turon Fanlar Akademiyasining haqiqiy a'zosi va Akademik. Mashhur 📘 <i>'Ergash ota Mo'jizalari'</i> va 📘 <i>'Eng shirin lazzat — salomatlikdir'</i> kitoblari muallifi.\n\n🔬 <b>32 Xil Giyohdan Tayyorlanadigan Noyob va Haqiqiy \"Malxam\" Retsepti!</b>\nUshbu shifobaxsh <b>Malxam</b> Berdiqul Ergashev tomonidan chuqur ilmiy izlanishlar natijasida, aynan 32 xil maxsus giyohdan tarkib topgan bo'lib, uning yagona haqiqiy retsepti faqatgina bizning klinikada tayyorlanadi!\n\n⚠️ <b>DIQQAT, FIRIBGARLARDAN OGOH BO'LING!</b>\nHozirgi kunda ijtimoiy tarmoqlarda 'Ergash otaning Malxam retseptini topdik, biz ham tayyorlayapmiz' deb odamlarni aldab, soxta mahsulot sotayotgan firibgarlar ko'paygan. Ogoh bo'ling! Haqiqiy, shifobaxsh va litsenziyalangan original <b>Malxam</b> faqat va faqat 'Ergash Ota' klinikasining o'zida bemorlarga beriladi. O'z sog'lig'ingizni soxtakorlarga ishonib topshirmang!",
-            "kz": "🌟 <b>Клиниканың Негізін Қалаушы және Бас Дәрігері — Эргашев Бердіқұл Жорақұлұлы</b>\n\n👴🏼 Жоғары санатты дәрігер, Құрметті профессор, Тұран Ғылым Академиясының толық мүшесі және Академик. Белгілі шипалы 📘 <i>'Ergash ota Mo'jizalari'</i> және 📘 <i>'Eng shirin lazzat — salomatlikdir'</i> кітаптарының авторы.\n\n🔬 <b>32 Түрлі Шөптен Дайындалатын Бірегей және Нағыз \"Malxam\" Рецепті!</b>\nБұл шипалы <b>Malxam</b> Бердіқұл Эргашевтің терең ғылыми ізденістерінің нәтижесінде, дәл 32 түрлі арнайы шөптен құралған және оның жалғыз шынайы рецепті тек біздің клиникада дайындалады!\n\n⚠️ <b>НАЗАР АУДАРЫҢЫЗ, АЛАЯҚТАРДАН САҚ БОЛЫҢЫЗ!</b>\nҚазіргі уақытта әлеуметтік желілерде 'Эргаш отаның Malxam рецептін таптық, біз де дайындаймыз' деп адамдарды алдап, жалған өнім сатып жүрген алаяқтар көбейіп кетті. Сақ болыңыз! Нағыз, шипалы және лицензияланған түпнұсқа <b>Malxam</b> тек қана 'Эргаш Ота' клиникасының өзінде бейтаптарға беріледі. Денсаулығыңызды жалған емшілерге сеніп тапсырмаңыз!",
+            "ru": (
+                "🌟 <b>Основатель и Главный Врач Клиники — Эргашев Бердикул Джуракулович</b>\n\n"
+                "👴🏼 Врач высшей категории, Почетный профессор, Действительный член Академии наук Турон и Академик.\n"
+                "Автор знаменитых книг\n"
+                "📘 <i>'Ergash ota Mo'jizalari'</i>\n"
+                "📘 <i>'Eng shirin lazzat — salomatlikdir'</i>\n\n"
+                "🔬 <b>Уникальный рецепт подлинного \"Malxam\" из 32 видов целебных трав!</b>\n"
+                "Разработан Бердикулом Эргашевым в результате глубоких научных исследований, состоит ровно из 32 видов специальных трав. Его единственный подлинный рецепт готовится исключительно в нашей клинике!\n\n"
+                "⚠️ <b>ВНИМАНИЕ, ОСТЕРЕГАЙТЕСЬ МОШЕННИКОВ!</b>\n"
+                "В последнее время в социальных сетях мошенники утверждают, что якобы 'нашли или получили рецепт Malxam от Эргаш ота'. Будьте бдительны! Настоящий, целебный и лицензированный оригинальный <b>Malxam</b> выдается пациентам только в самой клинике 'Эргаш Ота'. Не доверяйте свое здоровье подделкам!"
+            ),
+            "uz": (
+                "🌟 <b>Klinika Asoschisi va Bosh Shifokori — Ergashev Berdiqul Jo'raqulovich</b>\n\n"
+                "👨‍⚕️ Oliy toifali shifokor, Faxriy professor, Turon Fanlar Akademiyasining haqiqiy a'zosi va Akademik.\n"
+                "Mashhur\n"
+                "📘 <i>'Ergash ota Mo'jizalari'</i>\n"
+                "📘 <i>'Eng shirin lazzat — salomatlikdir'</i>\n"
+                "kitoblari muallifi.\n\n"
+                "🔬 <b>32 Xil Giyohdan Tayyorlanadigan Noyob va Haqiqiy \"Malxam\" Retsepti!</b>\n"
+                "Berdiqul Ergashev tomonidan chuqur ilmiy izlanishlar natijasida, aynan 32 xil maxsus giyohdan tarkib topgan bo'lib, uning yagona haqiqiy retsepti faqatgina bizning klinikada tayyorlanadi!\n\n"
+                "⚠️ <b>DIQQAT, FIRIBGARLARDAN OGOH BO'LING!</b>\n"
+                "Hozirgi kunda ijtimoiy tarmoqlarda 'Ergash otaning Malxam retseptini topdik, biz ham tayyorlayapmiz' deb odamlarni aldab, soxta mahsulot sotayotgan firibgarlar ko'paygan. Ogoh bo'ling! Haqiqiy, shifobaxsh va litsenziyalangan original <b>Malxam</b> faqat va faqat 'Ergash Ota' klinikasining o'zida bemorlarga beriladi. O'z sog'lig'ingizni soxtakorlarga ishonib topshirmang!"
+            ),
+            "kz": (
+                "🌟 <b>Клиниканың Негізін Қалаушы және Бас Дәрігері — Эргашев Бердіқұл Жорақұлұлы</b>\n\n"
+                "👴🏼 Жоғары санатты дәрігер, Құрметті профессор, Тұран Ғылым Академиясының толық мүшесі және Академик.\n"
+                "Белгілі кітаптарының авторы\n"
+                "📘 <i>'Ergash ota Mo'jizalari'</i>\n"
+                "📘 <i>'Eng shirin lazzat — salomatlikdir'</i>\n\n"
+                "🔬 <b>32 Түрлі Шөптен Дайындалатын Бірегей және Нағыз \"Malxam\" Рецепті!</b>\n"
+                "Бердіқұл Эргашевтің терең ғылыми ізденістерінің нәтижесінде, дәл 32 түрлі арнайы шөптен құралған және оның жалғыз шынайы рецепті тек біздің клиникада дайындалады!\n\n"
+                "⚠️ <b>НАЗАР АУДАРЫҢЫЗ, АЛАЯҚТАРДАН САҚ БОЛЫҢЫЗ!</b>\n"
+                "Қазіргі уақытта әлеуметтік желілерде 'Эргаш отаның Malxam рецептін таптық, біз де дайындаймыз' деп адамдарды алдап, жалған өнім сатып жүрген алаяқтар көбейіп кетті. Сақ болыңыз! Нағыз, шипалы және лицензияланған түпнұсқа <b>Malxam</b> тек қана 'Эргаш Ота' клиникасының өзінде бейтаптарға беріледі. Денсаулығыңызды жалған емшілерге сеніп тапсырмаңыз!"
+            ),
         }[lang]
         back_label    = {"ru": "⬅️ Назад",                       "uz": "⬅️ Orqaga",                    "kz": "⬅️ Артқа"}[lang]
         juraqulov_label = {"ru": "👨‍⚕️ Врач Джуракулов Жахонгир", "uz": "👨‍⚕️ Vrach Jo'raqulov Jaxongir", "kz": "👨‍⚕️ Дәрігер Жорақұлов Жахонгир"}[lang]
