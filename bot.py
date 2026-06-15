@@ -4612,6 +4612,13 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    if text.startswith("/admin_team_clear"):
+        d = load_data()
+        d["team_photos"] = []
+        save_data(d)
+        await update.message.reply_text("✅ Jamoa rasmlari tozalandi. Qayta yuklash: /admin_photo team")
+        return
+
 
         d = load_data()
         d["team_photos"] = []
