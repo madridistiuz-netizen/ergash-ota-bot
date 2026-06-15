@@ -2976,28 +2976,27 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                            parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_to_about_menu":
-        # Albom rasmlarini o'chirish
-        media_ids = context.user_data.pop("team_media_ids", [])
-        context.user_data.pop("team_main_msg_id", None)
-        for mid in media_ids:
-            try:
-                await context.bot.delete_message(chat_id=chat_id, message_id=mid)
-            except Exception:
-                pass
-        # Asosiy xabarni edit qilib klinika menyusiga qaytaramiz
+        # Barcha jamoa xabarlarini o'chirish
+        ids_to_delete = (
+            context.user_data.pop("team_media_ids", []) +
+            [context.user_data.pop("team_text_id", None)] +
+            [context.user_data.pop("team_main_msg_id", None)]
+        )
+        for mid in ids_to_delete:
+            if mid:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+                except Exception:
+                    pass
+        # Klinika menyusini qaytarish
         title = {
             "ru": "🏥 *Клиника Эргаш-Ота*\n\nВыберите раздел:",
             "uz": "🏥 *Эргаш-Ота klinikasi*\n\nBo'limni tanlang:",
             "kz": "🏥 *Эргаш-Ота клиникасы*\n\nБөлімді таңдаңыз:",
         }[lang]
-        try:
-            await query.edit_message_text(title, parse_mode="Markdown",
-                                          reply_markup=clinic_submenu_keyboard(lang))
-        except Exception:
-            await query.message.delete()
-            await context.bot.send_message(chat_id=chat_id, text=title,
-                                           parse_mode="Markdown",
-                                           reply_markup=clinic_submenu_keyboard(lang))
+        await context.bot.send_message(chat_id=chat_id, text=title,
+                                       parse_mode="Markdown",
+                                       reply_markup=clinic_submenu_keyboard(lang))
 
     # ── Jamoa ──
     elif data == "menu_staff":
@@ -3009,22 +3008,31 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
 
-        # Xabarni edit qilamiz — parse_mode ko'rsatmaymiz (oddiy matn)
-        await query.edit_message_text(text, reply_markup=kb)
-        context.user_data["team_main_msg_id"] = query.message.message_id
+        # Eski xabarni yashirin edit qilamiz (tugmani olib tashlaymiz)
+        try:
+            await query.edit_message_reply_markup(reply_markup=None)
+        except Exception:
+            pass
 
-        # Albom rasmlarini alohida yuboramiz
-        team_photos = d.get("team_photos", [])
         media_msg_ids = []
+        team_photos = [p for p in d.get("team_photos", []) if p]
+
         if team_photos:
-            media = [InputMediaPhoto(p) for p in team_photos if p]
-            if media:
-                try:
-                    sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
-                    media_msg_ids = [m.message_id for m in sent]
-                except Exception:
-                    pass
+            # Avval albom
+            try:
+                media = [InputMediaPhoto(p) for p in team_photos]
+                sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
+                media_msg_ids = [m.message_id for m in sent]
+            except Exception as e:
+                logger.error(f"team send_media_group error: {e}")
+
+        # Keyin matn + orqaga tugmasi
+        text_msg = await context.bot.send_message(chat_id=chat_id, text=text, reply_markup=kb)
+
         context.user_data["team_media_ids"] = media_msg_ids
+        context.user_data["team_text_id"] = text_msg.message_id
+        # Asosiy eski xabar IDsi (back bosilganda o'chiriladi)
+        context.user_data["team_main_msg_id"] = query.message.message_id
 
     # ── Kasalliklar ──
     elif data == "menu_diseases":
@@ -4600,7 +4608,14 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Endi rasmni yuboring — `{parts[1]}` uchun saqlanadi!")
         return
 
-    if text.startswith("/admin_reset_rules"):
+    if text.startswith("/admin_team_clear"):
+        d = load_data()
+        d["team_photos"] = []
+        save_data(d)
+        await update.message.reply_text("✅ Jamoa rasmlari tozalandi. Qayta yuklash: /admin_photo team")
+        return
+
+
         d = load_data()
         if "guide" not in d:
             d["guide"] = {}
@@ -4774,7 +4789,8 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Klinika rasmi qo'shildi! Jami: {len(d['clinic_photos'])} ta")
     elif waiting == "team":
         d.setdefault("team_photos", []).append(file_id)
-        await update.message.reply_text(f"✅ Jamoa rasmi qo'shildi! Jami: {len(d['team_photos'])} ta")
+        await update.message.reply_text(f"✅ Jamoa rasmi qo'shildi! Jami: {len(d['team_photos'])} ta\n"
+                                        f"Tozalash uchun: /admin_team_clear")
     elif waiting == "ward":
         d["ward_photos"].append(file_id)
         await update.message.reply_text(f"✅ Palata rasmi qo'shildi! Jami: {len(d['ward_photos'])} ta")
@@ -6206,6 +6222,7 @@ def main():
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
     app.add_handler(CommandHandler("admin_photo_del", admin_handler))
+    app.add_handler(CommandHandler("admin_team_clear", admin_handler))
     app.add_handler(CommandHandler("admin_reset_rules", admin_handler))
     app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
