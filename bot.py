@@ -5543,6 +5543,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                     f"📅 Davolanish muddati: {booking.get('calc_days', '—')} kun\n"
                     f"✅ Umumiy summa: {booking.get('calc_total', '—')}\n\n"
                     f"💬 Telegram: {username}\n"
+                    f"🆔 uid:{user.id}\n"
                     f"🌐 Til: {lang.upper()}\n\n"
                     f"📌 Bemor narx kalkulyatori orqali xona/to'lov turini tanlab, shu asosida qabulga yozildi.\n\n"
                     f"🟢 QO'NG'IROQ QILING!"
@@ -5556,6 +5557,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                     f"📞 Telefon: {phone_num}\n"
                     f"🛏 Xona turi: {xona}\n"
                     f"💬 Telegram: {username}\n"
+                    f"🆔 uid:{user.id}\n"
                     f"🌐 Til: {lang.upper()}\n\n"
                     f"🟢 QO'NG'IROQ QILING!"
                 )
@@ -5584,6 +5586,7 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                 f"🔬 Xizmat: {service}\n"
                 f"📞 Telefon: {phone_num}\n"
                 f"💬 Telegram: {username}\n"
+                f"🆔 uid:{user.id}\n"
                 f"🌐 Til: {lang.upper()}\n\n"
                 f"🟢 QO'NG'IROQ QILING!"
             )
@@ -6359,6 +6362,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"📞 Telefon: {booking.get('phone', '—')}\n"
                 f"🛏 Xona turi: {booking.get('xona', '—')}\n"
                 f"💬 Telegram: {username}\n"
+                f"🆔 uid:{user.id}\n"
                 f"🌐 Til: {lang.upper()}\n\n"
                 f"🟢 QO'NG'IROQ QILING!"
             )
