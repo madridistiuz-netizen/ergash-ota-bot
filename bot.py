@@ -5305,8 +5305,19 @@ def confirm_keyboard(lang):
 async def send_lid(context, channel_id, text):
     try:
         await context.bot.send_message(chat_id=channel_id, text=text, parse_mode="Markdown")
+        logger.info(f"Lid yuborildi: {channel_id}")
     except Exception as e:
-        logger.error(f"Lid yuborish xatosi: {e}")
+        logger.error(f"Lid yuborish xatosi (channel={channel_id}): {e}")
+        # Admin ga xabar
+        try:
+            ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+            if ADMIN_ID:
+                await context.bot.send_message(
+                    chat_id=ADMIN_ID,
+                    text=f"⚠️ LID YUBORILMADI!\nKanal: {channel_id}\nXato: {e}\n\nMatn:\n{text[:500]}"
+                )
+        except Exception:
+            pass
 
 
 async def handle_booking_callbacks(query, context, data, lang, chat_id):
