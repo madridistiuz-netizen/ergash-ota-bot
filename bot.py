@@ -6291,6 +6291,26 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ),
             }[lang]
             await update.message.reply_text(warning, parse_mode="Markdown")
+
+            # Lid kanalga yuborish
+            booking = context.user_data.get("booking", {})
+            user = update.effective_user
+            username = f"@{user.username}" if user.username else "—"
+            lid = (
+                f"🏥 *STATSIONAR LID*\n\n"
+                f"👤 Ism: {booking.get('name', '—')}\n"
+                f"📅 Kelish sanasi: {booking.get('sana', '—')}\n"
+                f"👥 Kishi soni: {booking.get('kishi', '—')}\n"
+                f"📞 Telefon: {booking.get('phone', '—')}\n"
+                f"🛏 Xona turi: {booking.get('xona', '—')}\n"
+                f"💬 Telegram: {username}\n"
+                f"🌐 Til: {lang.upper()}\n\n"
+                f"🟢 QO'NG'IROQ QILING!"
+            )
+            await send_lid(context, STATSIONAR_CHANNEL, lid)
+            context.user_data["booking"] = {}
+            context.user_data["booking_step"] = None
+            context.user_data["booking_type"] = None
             return
 
     # ── DIAGNOSTIKA FLOW ──
