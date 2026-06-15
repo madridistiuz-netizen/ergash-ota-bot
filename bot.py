@@ -4864,7 +4864,9 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     msg = update.message
     if not msg or not msg.reply_to_message:
         return
-    if msg.chat.id != DOCTORS_GROUP_ID:
+    # Ruxsat berilgan guruhlar
+    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL}
+    if msg.chat.id not in allowed:
         return
 
     original = msg.reply_to_message
@@ -6458,6 +6460,8 @@ def main():
     app.add_handler(MessageHandler(filters.VOICE & ~filters.User(ADMIN_ID), medical_voice_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
