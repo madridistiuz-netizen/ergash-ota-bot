@@ -2976,31 +2976,28 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                            parse_mode="HTML", reply_markup=kb)
 
     elif data == "back_to_about_menu":
-        # Jamoa albom rasmlari va matnini o'chirish
+        # Albom rasmlarini o'chirish
         media_ids = context.user_data.pop("team_media_ids", [])
-        text_id   = context.user_data.pop("team_text_id", None)
+        context.user_data.pop("team_main_msg_id", None)
         for mid in media_ids:
             try:
                 await context.bot.delete_message(chat_id=chat_id, message_id=mid)
             except Exception:
                 pass
-        if text_id:
-            try:
-                await context.bot.delete_message(chat_id=chat_id, message_id=text_id)
-            except Exception:
-                pass
-        # Agar bu holatda eski menyu xabari hali o'chmagan bo'lsa
-        try:
-            await query.message.delete()
-        except Exception:
-            pass
+        # Asosiy xabarni edit qilib klinika menyusiga qaytaramiz
         title = {
-            "ru": "🏥 Информация о клинике:",
-            "uz": "🏥 Klinika haqida:",
-            "kz": "🏥 Клиника туралы:",
+            "ru": "🏥 *Клиника Эргаш-Ота*\n\nВыберите раздел:",
+            "uz": "🏥 *Эргаш-Ота klinikasi*\n\nBo'limni tanlang:",
+            "kz": "🏥 *Эргаш-Ота клиникасы*\n\nБөлімді таңдаңыз:",
         }[lang]
-        await context.bot.send_message(chat_id=chat_id, text=title,
-                                       reply_markup=clinic_submenu_keyboard(lang))
+        try:
+            await query.edit_message_text(title, parse_mode="Markdown",
+                                          reply_markup=clinic_submenu_keyboard(lang))
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=title,
+                                           parse_mode="Markdown",
+                                           reply_markup=clinic_submenu_keyboard(lang))
 
     # ── Jamoa ──
     elif data == "menu_staff":
@@ -3012,9 +3009,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_to_about_menu")]])
 
-        await query.message.delete()
+        # Asosiy xabarni EDIT qilamiz (o'chirmaymiz — chat bo'shab qoladi)
+        await query.edit_message_text(text, parse_mode="HTML", reply_markup=kb)
+        # Asosiy xabar ID sini saqlaymiz (back bosilganda edit qilinadi)
+        context.user_data["team_main_msg_id"] = query.message.message_id
 
-        # Rasmlar albomini yuborish
+        # Albom rasmlarini alohida yuboramiz
         team_photos = d.get("team_photos", [])
         media_msg_ids = []
         if team_photos:
@@ -3022,13 +3022,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if media:
                 sent = await context.bot.send_media_group(chat_id=chat_id, media=media)
                 media_msg_ids = [m.message_id for m in sent]
-
-        # Matn + Orqaga tugmasi
-        text_msg = await context.bot.send_message(chat_id=chat_id, text=text,
-                                                  parse_mode="HTML", reply_markup=kb)
-        # Keyinchalik o'chirish uchun ID larni saqlaymiz
         context.user_data["team_media_ids"] = media_msg_ids
-        context.user_data["team_text_id"] = text_msg.message_id
 
     # ── Kasalliklar ──
     elif data == "menu_diseases":
