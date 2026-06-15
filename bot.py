@@ -746,6 +746,7 @@ def guide_keyboard(lang):
             "4️⃣ Инфраструктура",
             "⚠️ Важные правила",
             "6️⃣ Что купить домой",
+            "✍️ Предложения и жалобы",
             "⬅️ Назад",
         ),
         "uz": (
@@ -755,6 +756,7 @@ def guide_keyboard(lang):
             "4️⃣ Infrastruktura",
             "⚠️ Muhim qoidalar",
             "6️⃣ Uyga tafsiyaoma",
+            "✍️ Taklif va shikoyatlar",
             "⬅️ Orqaga",
         ),
         "kz": (
@@ -764,6 +766,7 @@ def guide_keyboard(lang):
             "4️⃣ Инфрақұрылым",
             "⚠️ Маңызды ережелер",
             "6️⃣ Үйге ұсыным",
+            "✍️ Ұсыныстар мен шағымдар",
             "⬅️ Артқа",
         ),
     }[lang]
@@ -774,7 +777,8 @@ def guide_keyboard(lang):
         [InlineKeyboardButton(labels[3], callback_data="guide_infrastructure")],
         [InlineKeyboardButton(labels[4], callback_data="guide_muhim_qoidalar")],
         [InlineKeyboardButton(labels[5], callback_data="guide_shopping")],
-        [InlineKeyboardButton(labels[6], callback_data="back_main")],
+        [InlineKeyboardButton(labels[6], callback_data="guide_feedback")],
+        [InlineKeyboardButton(labels[7], callback_data="back_main")],
     ])
 
 
@@ -1405,6 +1409,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await context.bot.send_message(chat_id=chat_id, text=text,
                                                parse_mode="HTML", reply_markup=kb)
+
+        elif section == "feedback":
+            text = {
+                "ru": "✍️ <b>Раздел предложений и жалоб</b>\n\nПожалуйста, оставьте свои предложения или жалобы в текстовом виде для улучшения качества наших услуг. Ваше мнение очень важно для нас!",
+                "uz": "✍️ <b>Taklif va shikoyatlar bo'limi</b>\n\nKlinikamiz xizmat sifatini yaxshilash bo'yicha o'z takliflaringizni yoki shikoyatlaringizni matn ko'rinishida yozib qoldiring. Sizning fikringiz biz uchun juda muhim!",
+                "kz": "✍️ <b>Ұсыныстар мен шағымдар бөлімі</b>\n\nҚызмет көрсету сапасын жақсарту үшін өз ұсыныстарыңызды немесе шағымдарыңызды мәтін түрінде жазып қалдырыңыз. Сіздің пікіріңіз біз үшін өте маңызды!",
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            context.user_data["state"] = "FEEDBACK_WAITING"
+            try:
+                await query.message.delete()
+            except Exception:
+                pass
+            await context.bot.send_message(chat_id=chat_id, text=text,
+                                           parse_mode="HTML", reply_markup=kb)
 
         elif section == "muhim_qoidalar":
             text = {
@@ -4781,7 +4801,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
-DOCTORS_GROUP_ID = -5193012514  # Shifokorlar guruhi
+DOCTORS_GROUP_ID = -5529849558  # Shifokorlar guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor rasm/fayl yuborsa — FSM state ga qo'shadi"""
@@ -4847,7 +4867,6 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     if msg.chat.id != DOCTORS_GROUP_ID:
         return
 
-    # Asl xabarda uid ni topamiz
     original = msg.reply_to_message
     original_text = original.caption or original.text or ""
     import re
@@ -4856,10 +4875,10 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         return
 
     patient_id = int(match.group(1))
+    is_feedback = "Yangi taklif/shikoyat" in original_text or "таклиф" in original_text.lower()
 
     try:
         if msg.voice:
-            # Shifokor ovozli javob yubordi
             voice_cap = "👨‍⚕️ *Shifokordan ovozli javob:*"
             await context.bot.send_voice(
                 chat_id=patient_id,
@@ -4868,7 +4887,10 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
                 parse_mode="Markdown"
             )
         elif msg.text or msg.caption:
-            reply_text = f"👨‍⚕️ *Shifokordan javob:*\n\n{msg.text or msg.caption}"
+            if is_feedback:
+                reply_text = f"📩 *Taklifingizga javob:*\n\n{msg.text or msg.caption}"
+            else:
+                reply_text = f"👨‍⚕️ *Shifokordan javob:*\n\n{msg.text or msg.caption}"
             await context.bot.send_message(
                 chat_id=patient_id,
                 text=reply_text,
@@ -5931,6 +5953,37 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "kz": "📝 Жылдам жауап алу үшін сұрағыңызды *мәтін* түрінде жіберіңіз.",
         }[lang]
         await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+
+    # ── TAKLIF VA SHIKOYAT ──
+    if context.user_data.get("state") == "FEEDBACK_WAITING" and text and not text.startswith("/"):
+        user = update.effective_user
+        username = f"@{user.username}" if user.username else "—"
+        lang = get_lang(context)
+        feedback_msg = (
+            f"✍️ <b>Yangi taklif/shikoyat:</b>\n"
+            f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
+            f"💬 Telegram: {username}\n"
+            f"📝 Matn: {text}"
+        )
+        try:
+            await context.bot.send_message(
+                chat_id=DOCTORS_GROUP_ID,
+                text=feedback_msg,
+                parse_mode="HTML"
+            )
+            context.user_data["state"] = None
+            confirm = {
+                "ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
+                "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
+                "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет.",
+            }[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            await update.message.reply_text(confirm, reply_markup=kb)
+        except Exception as e:
+            logger.error(f"Feedback yuborish xatosi: {e}")
+            await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
         return
 
     # ── TIBBIY MUROJAAT — matn saqlash ──
