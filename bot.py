@@ -1416,6 +1416,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "uz": "✍️ <b>Taklif va shikoyatlar bo'limi</b>\n\nKlinikamiz xizmat sifatini yaxshilash bo'yicha o'z takliflaringizni yoki shikoyatlaringizni matn ko'rinishida yozib qoldiring. Sizning fikringiz biz uchun juda muhim!",
                 "kz": "✍️ <b>Ұсыныстар мен шағымдар бөлімі</b>\n\nҚызмет көрсету сапасын жақсарту үшін өз ұсыныстарыңызды немесе шағымдарыңызды мәтін түрінде жазып қалдырыңыз. Сіздің пікіріңіз біз үшін өте маңызды!",
             }[lang]
+            placeholder = {
+                "ru": "Пишите только предложения и жалобы...",
+                "uz": "Faqat taklif va shikoyat yozing...",
+                "kz": "Тек ұсыныстар мен шағымдарды жазыңыз...",
+            }[lang]
             back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
             kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
             context.user_data["state"] = "FEEDBACK_WAITING"
@@ -1423,8 +1428,16 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await query.message.delete()
             except Exception:
                 pass
-            await context.bot.send_message(chat_id=chat_id, text=text,
-                                           parse_mode="HTML", reply_markup=kb)
+            await context.bot.send_message(
+                chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb
+            )
+            # Placeholder uchun ForceReply yuboramiz
+            from telegram import ForceReply
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text="👇",
+                reply_markup=ForceReply(selective=True, input_field_placeholder=placeholder)
+            )
 
         elif section == "muhim_qoidalar":
             text = {
@@ -5978,6 +5991,25 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
         username = f"@{user.username}" if user.username else "—"
         lang = get_lang(context)
+
+        # Kalit so'zlar filtri
+        BLOCKED_KEYWORDS = [
+            "og'riq", "ogriq", "kasal", "shifokor", "doktor", "dori",
+            "mrt", "mskt", "tosh", "parhez", "davolash", "bol", "vrach",
+            "lechenie", "болит", "боль", "врач", "лечение", "таблетки",
+            "диагноз", "диагноз", "ауру", "дәрі",
+        ]
+        text_lower = text.lower()
+        if any(kw in text_lower for kw in BLOCKED_KEYWORDS):
+            context.user_data["state"] = None
+            warn = {
+                "ru": "⛔️ Этот раздел только для предложений и жалоб!\n\nВопросы о болезнях, лечении или приёме врача отправляйте в соответствующие разделы.",
+                "uz": "⛔️ Bu bo'lim faqat takliflar uchun!\n\nKasallik yoki shifokor qabuli bo'yicha savollarni tegishli bo'limlarga yuboring.",
+                "kz": "⛔️ Бұл бөлім тек ұсыныстар үшін!\n\nАуру немесе дәрігер қабылдауы туралы сұрақтарды тиісті бөлімдерге жіберіңіз.",
+            }[lang]
+            await update.message.reply_text(warn, reply_markup=main_menu_keyboard(lang))
+            return
+
         feedback_msg = (
             f"✍️ <b>Yangi taklif/shikoyat:</b>\n"
             f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
