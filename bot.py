@@ -4860,15 +4860,13 @@ async def medical_voice_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Shifokor guruhda bemorning xabariga REPLY qilganda — bemorga yetkazadi"""
-    msg = update.message
+    """Shifokor guruh yoki kanalda xabariga REPLY qilganda — bemorga yetkazadi"""
+    msg = update.message or update.channel_post
     if not msg or not msg.reply_to_message:
         return
-    # Ruxsat berilgan guruhlar
     allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL}
     logger.info(f"doctor_reply_handler: chat_id={msg.chat.id}, allowed={allowed}")
     if msg.chat.id not in allowed:
-        logger.info(f"doctor_reply_handler: chat {msg.chat.id} not in allowed, skip")
         return
 
     original = msg.reply_to_message
@@ -4878,8 +4876,11 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     import re
     match = re.search(r"uid:(\d+)", original_text)
     if not match:
-        logger.info(f"doctor_reply_handler: uid topilmadi, matn: {original_text[:200]}")
-        await msg.reply_text("⚠️ uid topilmadi — bemor aniqlanmadi.")
+        logger.info(f"doctor_reply_handler: uid topilmadi")
+        try:
+            await msg.reply_text("⚠️ uid topilmadi — bemor aniqlanmadi.")
+        except Exception:
+            pass
         return
 
     patient_id = int(match.group(1))
@@ -4904,10 +4905,16 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
                 text=reply_text,
                 parse_mode="Markdown"
             )
-        await msg.reply_text("✅ Javob bemorga yetkazildi.")
+        try:
+            await msg.reply_text("✅ Javob bemorga yetkazildi.")
+        except Exception:
+            pass
     except Exception as e:
         logger.error(f"doctor_reply_handler error: {e}")
-        await msg.reply_text(f"❌ Xato: {e}")
+        try:
+            await msg.reply_text(f"❌ Xato: {e}")
+        except Exception:
+            pass
 
 
 
@@ -6472,6 +6479,9 @@ def main():
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    # Kanal postlari uchun (channel_post)
+    app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.VOICE, unknown))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
