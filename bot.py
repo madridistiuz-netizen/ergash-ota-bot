@@ -4866,26 +4866,32 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         return
     # Ruxsat berilgan guruhlar
     allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL}
+    logger.info(f"doctor_reply_handler: chat_id={msg.chat.id}, allowed={allowed}")
     if msg.chat.id not in allowed:
+        logger.info(f"doctor_reply_handler: chat {msg.chat.id} not in allowed, skip")
         return
 
     original = msg.reply_to_message
     original_text = original.caption or original.text or ""
+    logger.info(f"doctor_reply_handler: original_text={original_text[:100]}")
+
     import re
     match = re.search(r"uid:(\d+)", original_text)
     if not match:
+        logger.info(f"doctor_reply_handler: uid topilmadi, matn: {original_text[:200]}")
+        await msg.reply_text("⚠️ uid topilmadi — bemor aniqlanmadi.")
         return
 
     patient_id = int(match.group(1))
-    is_feedback = "Yangi taklif/shikoyat" in original_text or "таклиф" in original_text.lower()
+    logger.info(f"doctor_reply_handler: patient_id={patient_id}")
+    is_feedback = "taklif/shikoyat" in original_text.lower()
 
     try:
         if msg.voice:
-            voice_cap = "👨‍⚕️ *Shifokordan ovozli javob:*"
             await context.bot.send_voice(
                 chat_id=patient_id,
                 voice=msg.voice.file_id,
-                caption=voice_cap,
+                caption="👨‍⚕️ *Shifokordan ovozli javob:*",
                 parse_mode="Markdown"
             )
         elif msg.text or msg.caption:
