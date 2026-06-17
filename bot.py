@@ -4952,6 +4952,33 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     user = update.effective_user
     lang = get_lang(context)
 
+    # ── TAKLIF VA SHIKOYATLAR bo'limi kutayotgan bo'lsa — rasm/video shu yerga yo'naltiriladi ──
+    if context.user_data.get("state") == "FEEDBACK_WAITING" and (update.message.photo or update.message.video):
+        username = f"@{user.username}" if user.username else "—"
+        context.user_data["state"] = None
+        caption = (
+            f"✍️ <b>Yangi taklif/shikoyat ({'rasm' if update.message.photo else 'video'}):</b>\n"
+            f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
+            f"💬 Telegram: {username}"
+        )
+        try:
+            if update.message.photo:
+                await context.bot.send_photo(chat_id=DOCTORS_GROUP_ID, photo=update.message.photo[-1].file_id,
+                                              caption=caption, parse_mode="HTML")
+            else:
+                await context.bot.send_video(chat_id=DOCTORS_GROUP_ID, video=update.message.video.file_id,
+                                              caption=caption, parse_mode="HTML")
+            confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
+                       "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
+                       "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет."}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            await update.message.reply_text(confirm, reply_markup=kb)
+        except Exception as e:
+            logger.error(f"Feedback media yuborish xatosi: {e}")
+            await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
+        return
+
     # ── SHIFOKORGA SAVOL bo'limi rasm kutayotgan bo'lsa — bu yerga yo'naltiramiz ──
     if context.user_data.get("state") == "DOCTOR_MEDIA_WAITING" and update.message.photo:
         photo_id = update.message.photo[-1].file_id
@@ -5002,6 +5029,30 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def medical_voice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor ovozli xabar yuborsa — FSM state ga saqlaydi"""
     lang = get_lang(context)
+
+    # ── TAKLIF VA SHIKOYATLAR bo'limi kutayotgan bo'lsa — ovozli xabarni shu yerga yo'naltiramiz ──
+    if context.user_data.get("state") == "FEEDBACK_WAITING":
+        user = update.effective_user
+        username = f"@{user.username}" if user.username else "—"
+        context.user_data["state"] = None
+        caption = (
+            f"✍️ <b>Yangi taklif/shikoyat (ovozli):</b>\n"
+            f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
+            f"💬 Telegram: {username}"
+        )
+        try:
+            await context.bot.send_voice(chat_id=DOCTORS_GROUP_ID, voice=update.message.voice.file_id,
+                                          caption=caption, parse_mode="HTML")
+            confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
+                       "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
+                       "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет."}[lang]
+            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+            await update.message.reply_text(confirm, reply_markup=kb)
+        except Exception as e:
+            logger.error(f"Feedback voice yuborish xatosi: {e}")
+            await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
+        return
 
     if "med_state" not in context.user_data:
         context.user_data["med_state"] = {"photos": [], "voice_id": None, "bemor_matni": ""}
@@ -6719,6 +6770,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
+    app.add_handler(MessageHandler(filters.VIDEO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ADMIN_ID), medical_doc_handler))
