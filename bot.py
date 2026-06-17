@@ -882,6 +882,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         d["users"] = users
         save_data(d)
 
+    # ── Deep Linking: ?start=PARAM bo'lsa, tilni tanlagandan keyin shu bo'limga yo'naltirish uchun saqlaymiz ──
+    if context.args:
+        context.user_data["deep_link_target"] = context.args[0]
+
     await update.message.reply_text(
         "👋 Добро пожаловать / Xush kelibsiz / Қош келдіңіз!\n\n🌐 Выберите язык / Tilni tanlang / Тілді таңдаңыз:",
         reply_markup=lang_keyboard()
@@ -914,6 +918,23 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             users[uid]["lang"] = lang
         d2["users"] = users
         save_data(d2)
+
+        # ── Deep Linking: agar /start parametri bilan kelgan bo'lsa, shu bo'limga yo'naltiramiz ──
+        target = context.user_data.pop("deep_link_target", None)
+        DEEP_LINK_MAP = {
+            "guide": ("menu_guide", None),
+            "feedback": ("guide_feedback", None),
+            "rooms": ("menu_rooms", None),
+            "doctor": ("doctor_question", None),
+            "diagnostics": ("menu_diagnostics", None),
+            "faq": ("menu_faq", None),
+        }
+        if target in DEEP_LINK_MAP:
+            redirect_data, _ = DEEP_LINK_MAP[target]
+            fake_query = query
+            fake_query.data = redirect_data
+            return await callback_handler(update, context)
+
         welcome = {
             "ru": "🏥 Клиника *Эргаш-Ота* — Каттакурган\n\nВыберите раздел:",
             "uz": "🏥 *Эргаш-Ота* klinikasi — Kattaqo'rg'on\n\nBo'limni tanlang:",
