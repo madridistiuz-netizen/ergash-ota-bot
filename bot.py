@@ -750,7 +750,7 @@ def guide_keyboard(lang):
             "4️⃣ Инфраструктура",
             "⚠️ Важные правила",
             "6️⃣ Что купить домой",
-            "✍️ Предложения и жалобы",
+            "🏢 Медицинские услуги — ваше мнение",
             "⬅️ Назад",
         ),
         "uz": (
@@ -760,7 +760,7 @@ def guide_keyboard(lang):
             "4️⃣ Infrastruktura",
             "⚠️ Muhim qoidalar",
             "6️⃣ Uyga tafsiyaoma",
-            "✍️ Taklif va shikoyatlar",
+            "🏢 Tibbiy xizmatlar haqida fikringiz",
             "⬅️ Orqaga",
         ),
         "kz": (
@@ -770,7 +770,7 @@ def guide_keyboard(lang):
             "4️⃣ Инфрақұрылым",
             "⚠️ Маңызды ережелер",
             "6️⃣ Үйге ұсыным",
-            "✍️ Ұсыныстар мен шағымдар",
+            "🏢 Медициналық қызметтер туралы пікіріңіз",
             "⬅️ Артқа",
         ),
     }[lang]
@@ -1014,6 +1014,31 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🧲 Диагностика түрін таңдаңыз:",
         }[lang]
         await query.edit_message_text(title, reply_markup=diagnostics_keyboard(lang))
+
+    elif data == "feedback_confirmed_start":
+        text = {
+            "ru": "✍️ <b>Раздел предложений и жалоб</b>\n\nПожалуйста, оставьте свои предложения или жалобы в текстовом виде для улучшения качества наших услуг. Ваше мнение очень важно для нас!",
+            "uz": "✍️ <b>Taklif va shikoyatlar bo'limi</b>\n\nKlinikamiz xizmat sifatini yaxshilash bo'yicha o'z takliflaringizni yoki shikoyatlaringizni matn ko'rinishida yozib qoldiring. Sizning fikringiz biz uchun juda muhim!",
+            "kz": "✍️ <b>Ұсыныстар мен шағымдар бөлімі</b>\n\nҚызмет көрсету сапасын жақсарту үшін өз ұсыныстарыңызды немесе шағымдарыңызды мәтін түрінде жазып қалдырыңыз. Сіздің пікіріңіз біз үшін өте маңызды!",
+        }[lang]
+        placeholder = {
+            "ru": "Пишите только предложения и жалобы...",
+            "uz": "Faqat taklif va shikoyat yozing...",
+            "kz": "Тек ұсыныстар мен шағымдарды жазыңыз...",
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
+        context.user_data["state"] = "FEEDBACK_WAITING"
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
+        from telegram import ForceReply
+        await context.bot.send_message(
+            chat_id=chat_id, text="👇",
+            reply_markup=ForceReply(selective=True, input_field_placeholder=placeholder)
+        )
 
     elif data in ("menu_booking", "book_statsionar", "book_diagnostika", "calc_book_statsionar") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
@@ -1442,33 +1467,22 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                                                parse_mode="HTML", reply_markup=kb)
 
         elif section == "feedback":
-            text = {
-                "ru": "✍️ <b>Раздел предложений и жалоб</b>\n\nПожалуйста, оставьте свои предложения или жалобы в текстовом виде для улучшения качества наших услуг. Ваше мнение очень важно для нас!",
-                "uz": "✍️ <b>Taklif va shikoyatlar bo'limi</b>\n\nKlinikamiz xizmat sifatini yaxshilash bo'yicha o'z takliflaringizni yoki shikoyatlaringizni matn ko'rinishida yozib qoldiring. Sizning fikringiz biz uchun juda muhim!",
-                "kz": "✍️ <b>Ұсыныстар мен шағымдар бөлімі</b>\n\nҚызмет көрсету сапасын жақсарту үшін өз ұсыныстарыңызды немесе шағымдарыңызды мәтін түрінде жазып қалдырыңыз. Сіздің пікіріңіз біз үшін өте маңызды!",
+            warn_text = {
+                "ru": "🏢 <b>Обращение к руководству клиники</b>\n\n⚠️ Внимание: этот раздел НЕ для анализов и не для вопросов о лечении!\n\nЗдесь принимаются только отзывы и предложения по качеству обслуживания администрации клиники.",
+                "uz": "🏢 <b>Klinika rahbariyatiga murojaat</b>\n\n⚠️ Diqqat: bu bo'lim analizlar uchun EMAS va davolanish bo'yicha savollar uchun emas!\n\nBu yerda faqat ma'muriyatga xizmat sifati bo'yicha fikr-mulohaza va takliflar qabul qilinadi.",
+                "kz": "🏢 <b>Клиника басшылығына өтініш</b>\n\n⚠️ Назар аударыңыз: бұл бөлім анализдер үшін ЕМЕС және емдеу туралы сұрақтар үшін емес!\n\nМұнда тек әкімшілікке қызмет сапасы бойынша пікір мен ұсыныстар қабылданады.",
             }[lang]
-            placeholder = {
-                "ru": "Пишите только предложения и жалобы...",
-                "uz": "Faqat taklif va shikoyat yozing...",
-                "kz": "Тек ұсыныстар мен шағымдарды жазыңыз...",
-            }[lang]
+            confirm_label = {"ru": "✅ Понятно, продолжить", "uz": "✅ Tushunarli, davom etish", "kz": "✅ Түсінікті, жалғастыру"}[lang]
             back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
-            context.user_data["state"] = "FEEDBACK_WAITING"
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(confirm_label, callback_data="feedback_confirmed_start")],
+                [InlineKeyboardButton(back_label, callback_data="menu_guide")],
+            ])
             try:
                 await query.message.delete()
             except Exception:
                 pass
-            await context.bot.send_message(
-                chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb
-            )
-            # Placeholder uchun ForceReply yuboramiz
-            from telegram import ForceReply
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text="👇",
-                reply_markup=ForceReply(selective=True, input_field_placeholder=placeholder)
-            )
+            await context.bot.send_message(chat_id=chat_id, text=warn_text, parse_mode="HTML", reply_markup=kb)
 
         elif section == "muhim_qoidalar":
             text = {
@@ -4960,31 +4974,15 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     user = update.effective_user
     lang = get_lang(context)
 
-    # ── TAKLIF VA SHIKOYATLAR bo'limi kutayotgan bo'lsa — rasm/video shu yerga yo'naltiriladi ──
+    # ── TAKLIF VA SHIKOYATLAR bo'limida RASM/VIDEO yuborilsa — qabul qilinmaydi, shifokor bo'limiga yo'naltiriladi ──
     if context.user_data.get("state") == "FEEDBACK_WAITING" and (update.message.photo or update.message.video):
-        username = f"@{user.username}" if user.username else "—"
         context.user_data["state"] = None
-        caption = (
-            f"✍️ <b>Yangi taklif/shikoyat ({'rasm' if update.message.photo else 'video'}):</b>\n"
-            f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
-            f"💬 Telegram: {username}"
-        )
-        try:
-            if update.message.photo:
-                await context.bot.send_photo(chat_id=DOCTORS_GROUP_ID, photo=update.message.photo[-1].file_id,
-                                              caption=caption, parse_mode="HTML")
-            else:
-                await context.bot.send_video(chat_id=DOCTORS_GROUP_ID, video=update.message.video.file_id,
-                                              caption=caption, parse_mode="HTML")
-            confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
-                       "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
-                       "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет."}[lang]
-            back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="menu_guide")]])
-            await update.message.reply_text(confirm, reply_markup=kb)
-        except Exception as e:
-            logger.error(f"Feedback media yuborish xatosi: {e}")
-            await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
+        reject = {
+            "ru": "❌ Не отправляйте сюда фото анализов! Пожалуйста, используйте раздел [👨‍⚕️ Вопрос врачу].",
+            "uz": "❌ Bu yerga analiz rasmlarini yubormang! Iltimos, [👨‍⚕️ Shifokorga savol yuborish] bo'limidan foydalaning.",
+            "kz": "❌ Бұл жерге анализ суреттерін жібермеңіз! Өтінеміз, [👨‍⚕️ Дәрігерге сұрақ] бөлімін пайдаланыңыз.",
+        }[lang]
+        await update.message.reply_text(reject, reply_markup=main_menu_keyboard(lang))
         return
 
     # ── SHIFOKORGA SAVOL bo'limi rasm kutayotgan bo'lsa — bu yerga yo'naltiramiz ──
