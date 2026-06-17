@@ -608,40 +608,43 @@ def lang_keyboard():
 
 MENU_LABELS = {
     "ru": {
-        "clinic":      "🏥 О клинике",
-        "rooms":       "🛏 Стоимость номеров",
-        "diagnostics": "🧲 Диагностика",
-        "wards":       "🏨 Палаты",
-        "guide":       "📖 Инструкция для пациентов",
-        "faq":         "❓ Частые вопросы",
-        "booking":     "📅 Записаться на приём",
-        "transfer":    "🚗 Добраться до клиники",
-        "weekend":     "🌅 Воскресенье",
-        "operator":    "📞 Оператор",
+        "clinic":          "🏥 О клинике",
+        "rooms":           "🛏 Стоимость номеров",
+        "diagnostics":     "🧲 Диагностика",
+        "wards":           "🏨 Палаты",
+        "guide":           "📖 Инструкция для пациентов",
+        "faq":             "❓ Частые вопросы",
+        "booking":         "📅 Записаться на приём",
+        "transfer":        "🚗 Добраться до клиники",
+        "weekend":         "🌅 Воскресенье",
+        "operator":        "📞 Оператор",
+        "doctor_question": "👨‍⚕️ Задать вопрос врачу",
     },
     "uz": {
-        "clinic":      "🏥 Klinika haqida",
-        "rooms":       "🛏 Xonalar narxi",
-        "diagnostics": "🧲 Diagnostika",
-        "wards":       "🏨 Palatalar",
-        "guide":       "📖 Bemor uchun qo'llanma",
-        "faq":         "❓ Ko'p so'raladigan savollar",
-        "booking":     "📅 Qabulga yozilish",
-        "transfer":    "🚗 Klinikaga yetib olish",
-        "weekend":     "🌅 Yakshanba",
-        "operator":    "📞 Operator",
+        "clinic":          "🏥 Klinika haqida",
+        "rooms":           "🛏 Xonalar narxi",
+        "diagnostics":     "🧲 Diagnostika",
+        "wards":           "🏨 Palatalar",
+        "guide":           "📖 Bemor uchun qo'llanma",
+        "faq":             "❓ Ko'p so'raladigan savollar",
+        "booking":         "📅 Qabulga yozilish",
+        "transfer":        "🚗 Klinikaga yetib olish",
+        "weekend":         "🌅 Yakshanba",
+        "operator":        "📞 Operator",
+        "doctor_question": "👨‍⚕️ Shifokorga savol yuborish",
     },
     "kz": {
-        "clinic":      "🏥 Клиника туралы",
-        "rooms":       "🛏 Бөлмелер бағасы",
-        "diagnostics": "🧲 Диагностика",
-        "wards":       "🏨 Палаталар",
-        "guide":       "📖 Науқас нұсқаулығы",
-        "faq":         "❓ Жиі сұрақтар",
-        "booking":     "📅 Қабылдауға жазылу",
-        "transfer":    "🚗 Клиникаға жету",
-        "weekend":     "🌅 Жексенбі",
-        "operator":    "📞 Оператор",
+        "clinic":          "🏥 Клиника туралы",
+        "rooms":           "🛏 Бөлмелер бағасы",
+        "diagnostics":     "🧲 Диагностика",
+        "wards":           "🏨 Палаталар",
+        "guide":           "📖 Науқас нұсқаулығы",
+        "faq":             "❓ Жиі сұрақтар",
+        "booking":         "📅 Қабылдауға жазылу",
+        "transfer":        "🚗 Клиникаға жету",
+        "weekend":         "🌅 Жексенбі",
+        "operator":        "📞 Оператор",
+        "doctor_question": "👨‍⚕️ Дәрігерге сұрақ жіберу",
     },
 }
 
@@ -649,14 +652,15 @@ MENU_LABELS = {
 def main_menu_keyboard(lang):
     labels = MENU_LABELS[lang]
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton(labels["clinic"],      callback_data="menu_clinic")],
-        [InlineKeyboardButton(labels["rooms"],       callback_data="menu_rooms")],
-        [InlineKeyboardButton(labels["wards"],       callback_data="menu_wards")],
-        [InlineKeyboardButton(labels["diagnostics"], callback_data="menu_diagnostics")],
-        [InlineKeyboardButton(labels["guide"],       callback_data="menu_guide")],
-        [InlineKeyboardButton(labels["faq"],         callback_data="menu_faq")],
-        [InlineKeyboardButton(labels["booking"],     callback_data="menu_booking")],
-        [InlineKeyboardButton(labels["weekend"],     callback_data="menu_weekend")],
+        [InlineKeyboardButton(labels["clinic"],          callback_data="menu_clinic")],
+        [InlineKeyboardButton(labels["rooms"],           callback_data="menu_rooms")],
+        [InlineKeyboardButton(labels["wards"],           callback_data="menu_wards")],
+        [InlineKeyboardButton(labels["diagnostics"],     callback_data="menu_diagnostics")],
+        [InlineKeyboardButton(labels["guide"],           callback_data="menu_guide")],
+        [InlineKeyboardButton(labels["faq"],             callback_data="menu_faq")],
+        [InlineKeyboardButton(labels["booking"],         callback_data="menu_booking")],
+        [InlineKeyboardButton(labels["weekend"],         callback_data="menu_weekend")],
+        [InlineKeyboardButton(labels["doctor_question"], callback_data="doctor_question")],
     ])
 
 
@@ -4071,7 +4075,115 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer("❌ Xona topilmadi")
         return
 
-    elif data == "menu_diagnostics":
+    elif data == "doctor_question":
+        intro = {
+            "ru": (
+                "👨‍⚕️ <b>Вопрос врачу — Правила подачи</b>\n\n"
+                "Чтобы врач смог дать точный ответ, пожалуйста:\n\n"
+                "1️⃣ Укажите <b>возраст и пол</b>\n"
+                "2️⃣ Опишите <b>жалобы и симптомы</b> подробно\n"
+                "3️⃣ Прикрепите <b>анализы, МРТ, УЗИ</b> (если есть)\n\n"
+                "⚠️ Одно сообщение не принимается напрямую — после отправки текста вы сможете добавить снимки или сразу отправить врачу.\n\n"
+                "✍️ Напишите ваш вопрос:"
+            ),
+            "uz": (
+                "👨‍⚕️ <b>Shifokorga savol — Yuborish qoidalari</b>\n\n"
+                "Shifokor aniq javob bera olishi uchun, iltimos:\n\n"
+                "1️⃣ <b>Yosh va jinsingizni</b> yozing\n"
+                "2️⃣ <b>Shikoyat va belgilarni</b> batafsil yozing\n"
+                "3️⃣ <b>Tahlillar, MRT, UZI</b> rasmlarini qo'shing (agar bo'lsa)\n\n"
+                "⚠️ Bitta xabar to'g'ridan-to'g'ri qabul qilinmaydi — matn yuborgandan so'ng rasm qo'shishingiz yoki shifokorga yuborishingiz mumkin.\n\n"
+                "✍️ Savolingizni yozing:"
+            ),
+            "kz": (
+                "👨‍⚕️ <b>Дәрігерге сұрақ — Жіберу ережелері</b>\n\n"
+                "Дәрігер нақты жауап бере алуы үшін:\n\n"
+                "1️⃣ <b>Жасыңызды және жынысыңызды</b> жазыңыз\n"
+                "2️⃣ <b>Шағымдар мен белгілерді</b> толық жазыңыз\n"
+                "3️⃣ <b>Талдаулар, МРТ, УЗИ</b> суреттерін қосыңыз (болса)\n\n"
+                "⚠️ Бір хабарлама тікелей қабылданбайды — мәтін жібергеннен кейін сурет қосуға немесе дәрігерге жіберуге болады.\n\n"
+                "✍️ Сұрағыңызды жазыңыз:"
+            ),
+        }[lang]
+        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+        context.user_data["state"] = "DOCTOR_QUESTION_WAITING"
+        context.user_data["temp_text"] = None
+        context.user_data["temp_photos"] = []
+        try:
+            await query.edit_message_text(intro, parse_mode="HTML", reply_markup=kb)
+        except Exception:
+            await query.message.delete()
+            await context.bot.send_message(chat_id=chat_id, text=intro,
+                                           parse_mode="HTML", reply_markup=kb)
+
+    elif data == "send_to_doctor_now":
+        temp_text  = context.user_data.get("temp_text", "")
+        temp_photos = context.user_data.get("temp_photos", [])
+        user = query.from_user
+        username = f"@{user.username}" if user.username else "—"
+
+        header = (
+            f"👨‍⚕️ <b>Yangi savol (Shifokorga savol bo'limi)</b>\n\n"
+            f"👤 Bemor: {user.full_name}  uid:{user.id}\n"
+            f"💬 Telegram: {username}\n"
+            f"🌐 Til: {lang.upper()}\n\n"
+            f"📝 Savol:\n{temp_text}"
+        )
+        try:
+            if temp_photos:
+                # Rasm + matn birgalikda
+                from telegram import InputMediaPhoto
+                media = [InputMediaPhoto(temp_photos[0], caption=header, parse_mode="HTML")]
+                for ph in temp_photos[1:]:
+                    media.append(InputMediaPhoto(ph))
+                await context.bot.send_media_group(chat_id=DOCTORS_GROUP_ID, media=media)
+            else:
+                await context.bot.send_message(chat_id=DOCTORS_GROUP_ID,
+                                               text=header, parse_mode="HTML")
+
+            context.user_data["state"] = None
+            context.user_data["temp_text"] = None
+            context.user_data["temp_photos"] = []
+            confirm = {
+                "ru": "✅ Ваш вопрос отправлен врачу! Ожидайте ответа.",
+                "uz": "✅ Savolingiz shifokorga yetkazildi! Javobni kuting.",
+                "kz": "✅ Сұрағыңыз дәрігерге жіберілді! Жауапты күтіңіз.",
+            }[lang]
+            await query.edit_message_text(confirm, reply_markup=main_menu_keyboard(lang))
+        except Exception as e:
+            logger.error(f"send_to_doctor_now error: {e}")
+            await query.answer("❌ Xatolik yuz berdi", show_alert=True)
+
+    elif data == "add_medical_photo":
+        prompt = {
+            "ru": "📸 Отправьте фото анализов или снимков (можно несколько). Когда закончите — нажмите «Готово».",
+            "uz": "📸 Tahlil yoki MRT/UZI rasmlarini yuboring (bir nechtasini ham). Tugagach «Tayyor» tugmasini bosing.",
+            "kz": "📸 Талдау немесе МРТ/УЗИ суреттерін жіберіңіз (бірнешеуін де). Аяқтағанда «Дайын» түймесін басыңыз.",
+        }[lang]
+        done_label   = {"ru": "✅ Готово — отправить врачу", "uz": "✅ Tayyor — shifokorga yuborish", "kz": "✅ Дайын — дәрігерге жіберу"}[lang]
+        cancel_label = {"ru": "❌ Отмена", "uz": "❌ Bekor qilish", "kz": "❌ Болдырмау"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(done_label,   callback_data="send_to_doctor_now")],
+            [InlineKeyboardButton(cancel_label, callback_data="cancel_doctor_question")],
+        ])
+        context.user_data["state"] = "DOCTOR_MEDIA_WAITING"
+        await query.edit_message_text(prompt, reply_markup=kb)
+
+    elif data == "cancel_doctor_question":
+        context.user_data["state"] = None
+        context.user_data["temp_text"] = None
+        context.user_data["temp_photos"] = []
+        cancel_text = {
+            "ru": "❌ Отменено.",
+            "uz": "❌ Bekor qilindi.",
+            "kz": "❌ Болдырылмады.",
+        }[lang]
+        try:
+            await query.edit_message_text(cancel_text, reply_markup=main_menu_keyboard(lang))
+        except Exception:
+            await context.bot.send_message(chat_id=chat_id, text=cancel_text,
+                                           reply_markup=main_menu_keyboard(lang))
         title = {
             "ru": "🧲 Выберите вид диагностики:",
             "uz": "🧲 Diagnostika turini tanlang:",
@@ -5984,6 +6096,57 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "kz": "📝 Жылдам жауап алу үшін сұрағыңызды *мәтін* түрінде жіберіңіз.",
         }[lang]
         await update.message.reply_text(msg, parse_mode="Markdown")
+        return
+
+    # ── SHIFOKORGA SAVOL — matn bosqichi ──
+    if context.user_data.get("state") == "DOCTOR_QUESTION_WAITING" and text and not text.startswith("/"):
+        lang = get_lang(context)
+        context.user_data["temp_text"] = text
+        context.user_data["state"] = "DOCTOR_QUESTION_INTRO"
+
+        add_label    = {"ru": "📸 Добавить анализ/фото",    "uz": "📸 Analiz/Rasm qo'shish",    "kz": "📸 Талдау/Сурет қосу"}[lang]
+        send_label   = {"ru": "🚀 ОТПРАВИТЬ ВРАЧУ",         "uz": "🚀 SHIFOKORGA YUBORISH",     "kz": "🚀 ДӘРІГЕРГЕ ЖІБЕРУ"}[lang]
+        cancel_label = {"ru": "❌ Отмена",                  "uz": "❌ Bekor qilish",             "kz": "❌ Болдырмау"}[lang]
+        confirm_text = {
+            "ru": (
+                "📋 <b>Ваш вопрос получен:</b>\n\n"
+                f"<i>{text[:500]}</i>\n\n"
+                "Что делаем дальше?"
+            ),
+            "uz": (
+                "📋 <b>Savolingiz qabul qilindi:</b>\n\n"
+                f"<i>{text[:500]}</i>\n\n"
+                "Keyin nima qilamiz?"
+            ),
+            "kz": (
+                "📋 <b>Сұрағыңыз қабылданды:</b>\n\n"
+                f"<i>{text[:500]}</i>\n\n"
+                "Əрі қарай не істейміз?"
+            ),
+        }[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(add_label,    callback_data="add_medical_photo")],
+            [InlineKeyboardButton(send_label,   callback_data="send_to_doctor_now")],
+            [InlineKeyboardButton(cancel_label, callback_data="cancel_doctor_question")],
+        ])
+        await update.message.reply_text(confirm_text, parse_mode="HTML", reply_markup=kb)
+        return
+
+    # ── SHIFOKORGA SAVOL — rasm bosqichi ──
+    if context.user_data.get("state") == "DOCTOR_MEDIA_WAITING":
+        lang = get_lang(context)
+        if update.message.photo:
+            photo_id = update.message.photo[-1].file_id
+            context.user_data.setdefault("temp_photos", []).append(photo_id)
+            count = len(context.user_data["temp_photos"])
+            done_label   = {"ru": f"✅ Готово ({count} фото) — отправить", "uz": f"✅ Tayyor ({count} rasm) — yuborish", "kz": f"✅ Дайын ({count} сурет) — жіберу"}[lang]
+            cancel_label = {"ru": "❌ Отмена", "uz": "❌ Bekor qilish", "kz": "❌ Болдырмау"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(done_label,   callback_data="send_to_doctor_now")],
+                [InlineKeyboardButton(cancel_label, callback_data="cancel_doctor_question")],
+            ])
+            added = {"ru": f"✅ Фото {count} добавлено.", "uz": f"✅ {count}-rasm qo'shildi.", "kz": f"✅ {count} сурет қосылды."}[lang]
+            await update.message.reply_text(added, reply_markup=kb)
         return
 
     # ── TAKLIF VA SHIKOYAT ──
