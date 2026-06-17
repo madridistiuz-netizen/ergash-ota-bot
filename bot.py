@@ -922,17 +922,21 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # ── Deep Linking: agar /start parametri bilan kelgan bo'lsa, shu bo'limga yo'naltiramiz ──
         target = context.user_data.pop("deep_link_target", None)
         DEEP_LINK_MAP = {
-            "guide": ("menu_guide", None),
-            "feedback": ("guide_feedback", None),
-            "rooms": ("menu_rooms", None),
-            "doctor": ("doctor_question", None),
-            "diagnostics": ("menu_diagnostics", None),
-            "faq": ("menu_faq", None),
+            "guide": "menu_guide",
+            "feedback": "guide_feedback",
+            "rooms": "menu_rooms",
+            "doctor": "doctor_question",
+            "diagnostics": "menu_diagnostics",
+            "faq": "menu_faq",
         }
         if target in DEEP_LINK_MAP:
-            redirect_data, _ = DEEP_LINK_MAP[target]
-            fake_query = query
-            fake_query.data = redirect_data
+            class _FakeQuery:
+                def __init__(self, real_query, new_data):
+                    self._real = real_query
+                    self.data = new_data
+                def __getattr__(self, name):
+                    return getattr(self._real, name)
+            update.callback_query = _FakeQuery(query, DEEP_LINK_MAP[target])
             return await callback_handler(update, context)
 
         welcome = {
@@ -6453,6 +6457,25 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if btype == "statsionar" and step:
 
         if step == "name":
+            # ── KASALLIK FILTRI: XPN faqat 1-2 bosqich, og'ir holatlar qabul qilinmaydi ──
+            STOP_DISEASES = [
+                'gemodializ', 'гемодиализ', 'rak', 'рак', 'onkologiya', 'онкология',
+                '3-bosqich', '3 bosqich', '3 стадия', '4-bosqich', '4 bosqich', '4 стадия',
+                '5-bosqich', '5 bosqich', '5 стадия', 'терминальная',
+            ]
+            text_lower = text.lower()
+            if any(stop in text_lower for stop in STOP_DISEASES):
+                reject = {
+                    "uz": "⚠️ Kechirasiz, klinikamiz XPN (buyrak yetishmovchiligi) kasalligining faqat 1- va 2-boshlang'ich bosqichlarini davolaydi. Og'irroq bosqichlar, gemodializ yoki onkologik holatlar qabul qilinmaydi.",
+                    "ru": "⚠️ К сожалению, наша клиника лечит только начальные 1-ю и 2-ю стадии ХПН. Пациенты с более тяжелыми стадиями, на гемодиализе или с онкологией не принимаются.",
+                    "kz": "⚠️ Кешіріңіз, біздің клиника ХБЖ (бүйрек жеткіліксіздігі) ауруының тек 1-ші және 2-ші бастапқы кезеңдерін емдейді. Ауырлау кезеңдер, гемодиализ немесе онкологиялық жағдайлар қабылданбайды.",
+                }[lang]
+                context.user_data["booking"] = {}
+                context.user_data["booking_step"] = None
+                context.user_data["booking_type"] = None
+                await update.message.reply_text(reject, reply_markup=back_keyboard(lang))
+                return
+
             context.user_data.setdefault("booking", {})["name"] = text
             context.user_data["booking_step"] = "sana"
             ask = {
