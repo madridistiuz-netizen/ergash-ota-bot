@@ -1013,7 +1013,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "uz": "🧲 Diagnostika turini tanlang:",
             "kz": "🧲 Диагностика түрін таңдаңыз:",
         }[lang]
-        await query.edit_message_text(title, reply_markup=diagnostics_keyboard(lang))
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        await context.bot.send_message(chat_id=chat_id, text=title, reply_markup=diagnostics_keyboard(lang))
 
     elif data == "feedback_confirmed_start":
         text = {
