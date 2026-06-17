@@ -892,10 +892,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, override_data: str = None):
     query = update.callback_query
-    await query.answer()
-    data = query.data
+    if not override_data:
+        await query.answer()
+    data = override_data if override_data else query.data
     logger.info(f"CALLBACK: data='{data}'")
     d = load_data()
     lang = get_lang(context)
@@ -930,14 +931,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "faq": "menu_faq",
         }
         if target in DEEP_LINK_MAP:
-            class _FakeQuery:
-                def __init__(self, real_query, new_data):
-                    self._real = real_query
-                    self.data = new_data
-                def __getattr__(self, name):
-                    return getattr(self._real, name)
-            update.callback_query = _FakeQuery(query, DEEP_LINK_MAP[target])
-            return await callback_handler(update, context)
+            return await callback_handler(update, context, override_data=DEEP_LINK_MAP[target])
 
         welcome = {
             "ru": "🏥 Клиника *Эргаш-Ота* — Каттакурган\n\nВыберите раздел:",
