@@ -727,7 +727,7 @@ def diagnostics_keyboard(lang):
         [InlineKeyboardButton(labels[5], callback_data="diag_lab")],
         [InlineKeyboardButton(labels[6], callback_data="diag_mammografiya"),
          InlineKeyboardButton(labels[7], callback_data="diag_fibroskan")],
-        [InlineKeyboardButton(labels[8], callback_data="menu_diagnostics")],
+        [InlineKeyboardButton(labels[8], callback_data="back_main")],
     ])
 
 
