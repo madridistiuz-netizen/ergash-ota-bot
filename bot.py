@@ -1007,6 +1007,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         else:
             await handle_booking_callbacks(query, context, data, lang, chat_id)
 
+    elif data == "menu_diagnostics":
+        title = {
+            "ru": "🧲 Выберите вид диагностики:",
+            "uz": "🧲 Diagnostika turini tanlang:",
+            "kz": "🧲 Диагностика түрін таңдаңыз:",
+        }[lang]
+        await query.edit_message_text(title, reply_markup=diagnostics_keyboard(lang))
+
     elif data in ("menu_booking", "book_statsionar", "book_diagnostika", "calc_book_statsionar") or \
          data.startswith("diag_book_") or data.startswith("excursion_book_"):
         await handle_booking_callbacks(query, context, data, lang, chat_id)
