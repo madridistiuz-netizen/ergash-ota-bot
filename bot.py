@@ -4926,12 +4926,27 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
-DOCTORS_GROUP_ID = -5193012514  # Ergash-Ota shifokorlar nazorati guruhi
+DOCTORS_GROUP_ID = -5529849558  # Shifokorlar guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor rasm/fayl yuborsa — FSM state ga qo'shadi"""
     user = update.effective_user
     lang = get_lang(context)
+
+    # ── SHIFOKORGA SAVOL bo'limi rasm kutayotgan bo'lsa — bu yerga yo'naltiramiz ──
+    if context.user_data.get("state") == "DOCTOR_MEDIA_WAITING" and update.message.photo:
+        photo_id = update.message.photo[-1].file_id
+        context.user_data.setdefault("temp_photos", []).append(photo_id)
+        count = len(context.user_data["temp_photos"])
+        done_label   = {"ru": f"✅ Готово ({count} фото) — отправить", "uz": f"✅ Tayyor ({count} rasm) — yuborish", "kz": f"✅ Дайын ({count} сурет) — жіберу"}[lang]
+        cancel_label = {"ru": "❌ Отмена", "uz": "❌ Bekor qilish", "kz": "❌ Болдырмау"}[lang]
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(done_label,   callback_data="send_to_doctor_now")],
+            [InlineKeyboardButton(cancel_label, callback_data="cancel_doctor_question")],
+        ])
+        added = {"ru": f"✅ Фото {count} добавлено.", "uz": f"✅ {count}-rasm qo'shildi.", "kz": f"✅ {count} сурет қосылды."}[lang]
+        await update.message.reply_text(added, reply_markup=kb)
+        return
 
     # Med state yo'q bo'lsa — init qilamiz
     if "med_state" not in context.user_data:
