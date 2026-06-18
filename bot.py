@@ -4971,7 +4971,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"❌ Topilmadi: {section} → {key}")
 
 
-DOCTORS_GROUP_ID = -5529849558  # Shifokorlar guruhi
+DOCTORS_GROUP_ID = -5193012514  # Ergash-Ota shifokorlar nazorati guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor rasm/fayl yuborsa — FSM state ga qo'shadi"""
