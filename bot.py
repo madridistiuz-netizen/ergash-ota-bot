@@ -1865,43 +1865,25 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
     elif data == "info_qoidalar":
         text = {
             "uz": (
-                "📋 <b>Klinika ichki tartib-qoidalari</b>\n\n"
-                "Hurmatli bemorlar! Siz klinikaga qabul qilinayotganda quyidagi tartib-qoidalarga rozilik bildirgan holda tilxat yozgansiz:\n\n"
-                "• Siz klinika hududidan <b>100 metr uzoqlashmaslik</b> majburiyatini olgansiz.\n"
-                "• Klinikadan uzoqlashish klinika tartib-qoidalariga <b>zid</b> hisoblanadi.\n\n"
-                "⚠️ <b>Eslatib o'tamiz:</b>\n"
-                "Agar siz klinika hududidan tashqariga chiqishingiz zarur bo'lganda:\n\n"
-                "1️⃣ Birinchi navbatda <b>klinika rahbariyati roziligi</b> bilan chiqishingizga ruxsat beriladi.\n"
-                "2️⃣ Xonangiz kalitini o'zingiz bilan olib chiqishingiz <b>qat'iyan man etiladi</b>.\n\n"
-                "Bunday holatda siz:\n"
-                "— Xona kalitini <b>binoning mas'ul xodimi xonasiga topshirishingiz</b> shart.\n\n"
-                "<i>Ushbu tartib barcha bemorlar uchun majburiy hisoblanadi.</i>"
+                "⚠️ <b>Muhim qoidalar</b>\n\n"
+                "• Dastlabki 3 kun davomida umuman non iste'mol qilmang!\n"
+                "• Jismoniy og'ir ishlar qilish va og'ir yuk ko'tarish mutlaqo mumkin emas.\n"
+                "• 10 kun davomida hazarsipand (isiriq) qaynatib, uning bug'iga vanna qilishingiz tavsiya etiladi.\n"
+                "• 30 kundan so'ng shifokor ko'rigidan o'ting va imkoniyatga qarab 6–9 oydan so'ng takroriy maslahatga keling."
             ),
             "ru": (
-                "📋 <b>Внутренние правила клиники</b>\n\n"
-                "Уважаемые пациенты! При поступлении в клинику вы подписали согласие со следующими правилами:\n\n"
-                "• Вы взяли на себя обязательство <b>не удаляться от территории клиники более чем на 100 метров</b>.\n"
-                "• Удаление от клиники считается <b>нарушением</b> внутреннего распорядка.\n\n"
-                "⚠️ <b>Напоминаем:</b>\n"
-                "Если вам необходимо выйти за пределы территории клиники:\n\n"
-                "1️⃣ Выход разрешён только с <b>согласия руководства клиники</b>.\n"
-                "2️⃣ Брать ключ от палаты с собой <b>строго запрещено</b>.\n\n"
-                "В таком случае вы обязаны:\n"
-                "— <b>Сдать ключ от палаты ответственному сотруднику здания</b>.\n\n"
-                "<i>Данный порядок является обязательным для всех пациентов.</i>"
+                "⚠️ <b>Важные правила</b>\n\n"
+                "• В течение первых 3 дней полностью откажитесь от хлеба!\n"
+                "• Тяжёлый физический труд и поднятие тяжестей категорически запрещены.\n"
+                "• В течение 10 дней рекомендуется делать паровые ванны с отваром гармалы (исирик).\n"
+                "• Через 30 дней пройдите осмотр врача, а через 6–9 месяцев (по возможности) приходите на повторную консультацию."
             ),
             "kz": (
-                "📋 <b>Клиниканың ішкі тәртіп ережелері</b>\n\n"
-                "Құрметті науқастар! Клиникаға қабылданған кезде сіз мына ережелерге келісіп, тілхат жаздыңыз:\n\n"
-                "• Сіз клиника аумағынан <b>100 метрден артық ұзамау</b> міндеттемесін алдыңыз.\n"
-                "• Клиникадан ұзау клиника тәртіп ережелеріне <b>қайшы</b> келеді.\n\n"
-                "⚠️ <b>Ескертеміз:</b>\n"
-                "Егер клиника аумағынан шығуыңыз қажет болса:\n\n"
-                "1️⃣ Ең алдымен <b>клиника басшылығының рұқсатымен</b> ғана шығуға болады.\n"
-                "2️⃣ Палата кілтін өзіңізбен алып шығу <b>қатаң тыйым салынады</b>.\n\n"
-                "Мұндай жағдайда сіз:\n"
-                "— Палата кілтін <b>ғимараттың жауапты қызметкері бөлмесіне тапсыруыңыз</b> шарт.\n\n"
-                "<i>Бұл тәртіп барлық науқастар үшін міндетті болып табылады.</i>"
+                "⚠️ <b>Маңызды ережелер</b>\n\n"
+                "• Алғашқы 3 күн бойы наннан мүлдем бас тартыңыз!\n"
+                "• Ауыр физикалық жұмыс істеу және ауыр жүк көтеру мүлдем тыйым салынады.\n"
+                "• 10 күн бойы исирик (адыраспан) қайнатып, оның буына ванна қабылдау ұсынылады.\n"
+                "• 30 күннен кейін дәрігер тексерісінен өтіңіз және мүмкіндігіне қарай 6–9 айдан кейін қайталама кеңеске келіңіз."
             ),
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
@@ -3594,8 +3576,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 callback_data=f"xona_{korpus_id}_{i}")])
         back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         buttons.append([InlineKeyboardButton(back, callback_data="menu_wards")])
-        await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=InlineKeyboardMarkup(buttons))
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        await context.bot.send_message(chat_id=chat_id, text=title, parse_mode="Markdown",
+                                        reply_markup=InlineKeyboardMarkup(buttons))
         # Korpus rasmlari
         if korpus.get("photos"):
             await send_photos(context, chat_id, korpus["photos"])
@@ -3710,10 +3696,21 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             [InlineKeyboardButton(book_label, callback_data="menu_booking")],
             [InlineKeyboardButton(back_label, callback_data=f"korpus_{korpus_id}")],
         ])
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
-        # Xona rasmlari
-        if xona.get("photos"):
-            await send_photos(context, chat_id, xona["photos"])
+
+        # ── Yangi mantiq: rasm + matn (caption) + tugma — bitta yaxlit xabar ──
+        room_photos = xona.get("photos", [])
+        await query.message.delete()
+        if room_photos:
+            await context.bot.send_photo(
+                chat_id=chat_id, photo=room_photos[0],
+                caption=text, parse_mode="Markdown", reply_markup=kb
+            )
+            # Qo'shimcha rasmlar bo'lsa, ularni tugmasiz alohida yuboramiz (caption asosiy rasmda)
+            if len(room_photos) > 1:
+                await send_photos(context, chat_id, room_photos[1:])
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="Markdown", reply_markup=kb)
+        # ...
 
     # ── Xonalar ──
     elif data == "menu_rooms":
