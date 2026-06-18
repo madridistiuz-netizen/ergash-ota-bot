@@ -3634,18 +3634,28 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
                     back_label, callback_data=f"korpus_{korpus['id']}")]])
 
-            await query.edit_message_text(description, parse_mode="Markdown", reply_markup=back_kb)
+            try:
+                await query.message.delete()
+            except Exception:
+                pass
 
-            # Yangi rasmlarni yuborib, message_id larini saqlab qolish
-            if xona.get("photos"):
-                sent_ids = []
-                for photo_id in xona["photos"][:10]:
+            room_photos = xona.get("photos", [])
+            if room_photos:
+                msg = await context.bot.send_photo(
+                    chat_id=chat_id, photo=room_photos[0],
+                    caption=description, parse_mode="Markdown", reply_markup=back_kb
+                )
+                sent_ids = [msg.message_id]
+                for photo_id in room_photos[1:10]:
                     try:
-                        msg = await context.bot.send_photo(chat_id=chat_id, photo=photo_id)
-                        sent_ids.append(msg.message_id)
+                        m = await context.bot.send_photo(chat_id=chat_id, photo=photo_id)
+                        sent_ids.append(m.message_id)
                     except Exception:
                         pass
                 context.user_data["xona_photo_ids"] = sent_ids
+            else:
+                await context.bot.send_message(chat_id=chat_id, text=description,
+                                                parse_mode="Markdown", reply_markup=back_kb)
             return
 
         text = {
