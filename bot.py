@@ -4974,21 +4974,36 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 DOCTORS_GROUP_ID = -5193012514  # Ergash-Ota shifokorlar nazorati guruhi
+FEEDBACK_GROUP_ID = -5529849558  # Taklif va shikoyatlar (klinika rahbariyati) guruhi
 
 async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Bemor rasm/fayl yuborsa — FSM state ga qo'shadi"""
     user = update.effective_user
     lang = get_lang(context)
 
-    # ── TAKLIF VA SHIKOYATLAR bo'limida RASM/VIDEO yuborilsa — qabul qilinmaydi, shifokor bo'limiga yo'naltiriladi ──
+    # ── TAKLIF VA SHIKOYATLAR bo'limida RASM/VIDEO yuborilsa — fikr-mulohaza guruhiga yuboriladi ──
     if context.user_data.get("state") == "FEEDBACK_WAITING" and (update.message.photo or update.message.video):
+        username = f"@{user.username}" if user.username else "—"
         context.user_data["state"] = None
-        reject = {
-            "ru": "❌ Не отправляйте сюда фото анализов! Пожалуйста, используйте раздел [👨‍⚕️ Вопрос врачу].",
-            "uz": "❌ Bu yerga analiz rasmlarini yubormang! Iltimos, [👨‍⚕️ Shifokorga savol yuborish] bo'limidan foydalaning.",
-            "kz": "❌ Бұл жерге анализ суреттерін жібермеңіз! Өтінеміз, [👨‍⚕️ Дәрігерге сұрақ] бөлімін пайдаланыңыз.",
-        }[lang]
-        await update.message.reply_text(reject, reply_markup=main_menu_keyboard(lang))
+        caption = (
+            f"✍️ <b>Yangi taklif/shikoyat ({'rasm' if update.message.photo else 'video'}):</b>\n"
+            f"👤 Bemor ID: {user.id}  uid:{user.id}\n"
+            f"💬 Telegram: {username}"
+        )
+        try:
+            if update.message.photo:
+                await context.bot.send_photo(chat_id=FEEDBACK_GROUP_ID, photo=update.message.photo[-1].file_id,
+                                              caption=caption, parse_mode="HTML")
+            else:
+                await context.bot.send_video(chat_id=FEEDBACK_GROUP_ID, video=update.message.video.file_id,
+                                              caption=caption, parse_mode="HTML")
+            confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
+                       "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
+                       "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет."}[lang]
+            await update.message.reply_text(confirm, reply_markup=main_menu_keyboard(lang))
+        except Exception as e:
+            logger.error(f"Feedback media yuborish xatosi: {e}")
+            await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
         return
 
     # ── SHIFOKORGA SAVOL bo'limi rasm kutayotgan bo'lsa — bu yerga yo'naltiramiz ──
@@ -5053,7 +5068,7 @@ async def medical_voice_handler(update: Update, context: ContextTypes.DEFAULT_TY
             f"💬 Telegram: {username}"
         )
         try:
-            await context.bot.send_voice(chat_id=DOCTORS_GROUP_ID, voice=update.message.voice.file_id,
+            await context.bot.send_voice(chat_id=FEEDBACK_GROUP_ID, voice=update.message.voice.file_id,
                                           caption=caption, parse_mode="HTML")
             confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
                        "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
@@ -6278,7 +6293,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         try:
             await context.bot.send_message(
-                chat_id=DOCTORS_GROUP_ID,
+                chat_id=FEEDBACK_GROUP_ID,
                 text=feedback_msg,
                 parse_mode="HTML"
             )
