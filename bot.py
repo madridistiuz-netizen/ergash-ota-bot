@@ -1021,9 +1021,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
     elif data == "feedback_confirmed_start":
         text = {
-            "ru": "✍️ <b>Раздел предложений и жалоб</b>\n\nПожалуйста, оставьте свои предложения или жалобы в текстовом виде для улучшения качества наших услуг. Ваше мнение очень важно для нас!",
-            "uz": "✍️ <b>Taklif va shikoyatlar bo'limi</b>\n\nKlinikamiz xizmat sifatini yaxshilash bo'yicha o'z takliflaringizni yoki shikoyatlaringizni matn ko'rinishida yozib qoldiring. Sizning fikringiz biz uchun juda muhim!",
-            "kz": "✍️ <b>Ұсыныстар мен шағымдар бөлімі</b>\n\nҚызмет көрсету сапасын жақсарту үшін өз ұсыныстарыңызды немесе шағымдарыңызды мәтін түрінде жазып қалдырыңыз. Сіздің пікіріңіз біз үшін өте маңызды!",
+            "ru": "🏢 <b>Обращение к руководству клиники</b>\n\nДля нас искренне важно мнение каждого пациента и ваше впечатление о нашей клинике!\n\nВаши отзывы, предложения или замечания помогают нам улучшать качество работы и сервиса. Каждое ваше обращение внимательно изучается лично Главным врачом.\n\n✨ Внесите свой вклад в развитие клиники! Пожалуйста, поделитесь своими мыслями, предложениями или замечаниями ниже.",
+            "uz": "🏢 <b>Klinika rahbariyatiga murojaat</b>\n\nBiz uchun har bir bemorimizning fikri va taassurotlari juda qadrli!\n\nSizning takliflaringiz yoki duch kelgan kamchiliklaringiz haqidagi mulohazalaringiz klinikamiz faoliyatini yanada yaxshilashga yordam beradi. Har bir murojaat shaxsan Bosh shifokor nazoratida to'liq o'rganib chiqiladi.\n\n✨ Klinikamiz rivojiga o'z hissangizni qo'shing! O'z taklif, mulohaza yoki e'tirozlaringizni pastda yozib qoldiring.",
+            "kz": "🏢 <b>Клиника басшылығына өтініш</b>\n\nБіз үшін әрбір емделушіміздің пікірі мен алған әсері өте құнды!\n\nСіздің ұсыныстарыңыз бен байқалған кемшіліктер туралы пікірлеріңіз клиникамыздың жұмысын жақсартуға көмектеседі. Әрбір өтініш Бас дәрігердің жеке бақылауымен мұқият зерттеледі.\n\n✨ Клиникамыздың дамуына өз үлесіңізді қосыңыз! Төменде өз ұсыныстарыңызды, пікірлеріңізді немесе ескертулеріңізді қалдырыңыз.",
         }[lang]
         placeholder = {
             "ru": "Пишите только предложения и жалобы...",
