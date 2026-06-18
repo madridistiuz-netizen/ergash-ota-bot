@@ -777,7 +777,7 @@ def guide_keyboard(lang):
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="guide_arrival")],
         [InlineKeyboardButton(labels[1], callback_data="guide_malham")],
-        [InlineKeyboardButton(labels[2], callback_data="guide_step3")],
+        [InlineKeyboardButton(labels[2], callback_data="g_step_1")],
         [InlineKeyboardButton(labels[3], callback_data="guide_infrastructure")],
         [InlineKeyboardButton(labels[4], callback_data="guide_muhim_qoidalar")],
         [InlineKeyboardButton(labels[5], callback_data="guide_shopping")],
@@ -1299,7 +1299,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 [InlineKeyboardButton(foreign_label, callback_data="guide_step3_foreign")],
                 [InlineKeyboardButton(local_label,   callback_data="guide_step3_local")],
                 [InlineKeyboardButton(next_label,    callback_data="guide_step3_s3")],
-                [InlineKeyboardButton(back_label,    callback_data="guide_step3")],
+                [InlineKeyboardButton(back_label,    callback_data="g_step_1")],
             ])
             await query.message.delete()
             if photo:
