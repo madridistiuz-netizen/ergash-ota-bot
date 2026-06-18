@@ -943,6 +943,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
     # ── Orqaga ──
     elif data == "back_main":
+        context.user_data["state"] = None
         title = {
             "ru": "🏥 Клиника *Эргаш-Ота*\n\nВыберите раздел:",
             "uz": "🏥 *Эргаш-Ота* klinikasi\n\nBo'limni tanlang:",
@@ -1050,6 +1051,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
     # ── Bemor qo'llanmasi ──
     elif data == "menu_guide":
+        context.user_data["state"] = None
         title = {
             "ru": "📖 *Руководство пациента*\n\nВыберите раздел:",
             "uz": "📖 *Bemor uchun qo'llanma*\n\nBo'limni tanlang:",
