@@ -6262,11 +6262,19 @@ KLINIKA HAQIDA:
 
 QABUL TARTIBI (MUHIM — bu haqida noto'g'ri ma'lumot berma):
 - Klinikaga oldindan yozilish, navbat olish SHART EMAS.
-- Klinika dushanbadan shanbagacha ishlaydi, ish vaqti soat 08:00 dan 18:00 gacha.
-- Yakshanba — dam olish kuni.
-- Bemor o'ziga qulay vaqtda, ish kunlari ichida xohlagan paytda kelishi mumkin.
-- Kelgan bemor shu kuniyoq qabul qilinadi va birinchi kun muolajasi boshlanadi.
-- HECH QACHON "qabulga yozilish kerak", "navbat band qilish kerak", "oldindan band qiling" kabi gaplarni ishlatma — bu noto'g'ri ma'lumot.
+- Klinika dushanbadan shanbagacha ish kuni, ish vaqti soat 08:00 dan 18:00 gacha (shu vaqtda RASMIY QABUL/REGISTRATSIYA ishlaydi).
+- Yakshanba — dam olish kuni, LEKIN agar bemor yakshanba kelsa ham, qabul bo'limi uni qabul qilib joylashtiradi va birinchi kun davolanishini boshlaydi.
+- Agar bemor ISH VAQTIDAN KEYIN (kechqurun, hatto 21:00-22:00 da) kelsa ham — klinika bemorni rad etmaydi! Navbatchilar bemorni kutib oladi, mehmonxona xonasiga (gostinitsa sifatida) joylashtiradi, bemor ertalabgacha shu yerda yotib qoladi. Ertalab u rasmiy registratsiyadan o'tib, birinchi kun muolajasini oladi.
+- Demak: klinikaga istalgan vaqtda (kun, tun, ish kuni, dam olish kuni) kelish mumkin — bemor doim qabul qilinadi, faqat rasmiy registratsiya/hujjat ish vaqtida (08:00-18:00) rasmiylashtiriladi.
+- HECH QACHON "bugun kech bo'lgani uchun qabul qilinmaysiz", "klinika yopiq, ertaga keling" kabi rad etuvchi gaplarni ishlatma.
+
+BIRINCHI KUN MUOLAJASI (bemor so'rasa, shu tartibni tushuntir):
+- Birinchi kun — bu organizmni Malxamga tayyorlash kuni hisoblanadi, shu sababli BIRINCHI KUNDA Malxamning o'zi berilmaydi.
+- Birinchi kun tartibi: bemorga surgi giyohi beriladi, klizma qilinadi, giyohli choylar va olma sharbati ichiriladi — bu organizmni tozalash va tayyorlash uchun.
+- Malxam ikkinchi kundan boshlab beriladi.
+
+QABUL QILINMAYDIGAN HOLATLAR HAQIDA:
+- Agar bemor og'ir holat (onkologiya, gemodializ, XPN 3-4-5 bosqich va h.k.) haqida yozsa, buni ochiq ayt va operatorga/shifokorga murojaat qilishni tavsiya qil — lekin doctor_question yo'naltirishini FAQAT bemor aniq o'z tashxisini/tibbiy hujjatini ko'rsatib shifokor fikrini so'rasa qo'll, har qanday oddiy savol uchun emas.
 
 QOIDALAR:
 - Foydalanuvchi qaysi tilda yozsa (o'zbek, rus, qozoq), shu tilda javob ber — juda muloyim, professional shifoxona xodimi ohangida.
@@ -6286,10 +6294,11 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_faq — tez-tez so'raladigan savollar
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
-- doctor_question — bemor o'z tashxisi/analizi haqida shifokorga savol bermoqchi
+- doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
 - calc_start — narx hisoblash, necha kun necha pul bo'ladi
-- menu_operator — bemor odam/operator bilan gaplashmoqchi
-Agar hech qaysi bo'lim mos kelmasa, ROUTE qatorini umuman yozma."""
+- menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
+Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
+ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
 
 SECTION_BUTTON_LABELS = {
     "menu_clinic":       {"ru": "🏥 О клинике",              "uz": "🏥 Klinika haqida",          "kz": "🏥 Клиника туралы"},
@@ -6337,8 +6346,16 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
     return any(m in ai_reply.lower() for m in fail_markers)
 
 
-def _call_anthropic_sync(user_text: str) -> str:
-    """Anthropic Claude API ga sinxron so'rov (executor ichida ishlaydi)"""
+def _build_dynamic_system_prompt() -> str:
+    """AI_SYSTEM_PROMPT ga joriy sana, vaqt va hafta kunini qo'shib qaytaradi."""
+    now = datetime.datetime.now()
+    weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
+    return AI_SYSTEM_PROMPT + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
+
+
+def _call_anthropic_sync(user_text: str, history: list = None) -> str:
+    """Anthropic Claude API ga sinxron so'rov, suhbat tarixi bilan (executor ichida ishlaydi)"""
+    messages = (history or []) + [{"role": "user", "content": user_text}]
     resp = httpx.post(
         "https://api.anthropic.com/v1/messages",
         headers={
@@ -6349,8 +6366,8 @@ def _call_anthropic_sync(user_text: str) -> str:
         json={
             "model": AI_MODEL,
             "max_tokens": 400,
-            "system": AI_SYSTEM_PROMPT,
-            "messages": [{"role": "user", "content": user_text}],
+            "system": _build_dynamic_system_prompt(),
+            "messages": messages,
         },
         timeout=20,
     )
@@ -6359,18 +6376,17 @@ def _call_anthropic_sync(user_text: str) -> str:
     return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text").strip()
 
 
-def _call_openai_sync(user_text: str) -> str:
-    """OpenAI GPT-4o API ga sinxron so'rov (executor ichida ishlaydi)"""
+def _call_openai_sync(user_text: str, history: list = None) -> str:
+    """OpenAI GPT-4o API ga sinxron so'rov, suhbat tarixi bilan (executor ichida ishlaydi)"""
+    messages = [{"role": "system", "content": _build_dynamic_system_prompt()}] + (history or []) + \
+               [{"role": "user", "content": user_text}]
     resp = httpx.post(
         "https://api.openai.com/v1/chat/completions",
         headers={"Authorization": f"Bearer {AI_API_KEY}", "Content-Type": "application/json"},
         json={
             "model": AI_MODEL,
             "max_tokens": 400,
-            "messages": [
-                {"role": "system", "content": AI_SYSTEM_PROMPT},
-                {"role": "user", "content": user_text},
-            ],
+            "messages": messages,
         },
         timeout=20,
     )
@@ -6506,10 +6522,12 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
+    history = context.user_data.get("ai_history", [])
+
     loop = asyncio.get_running_loop()
     try:
         caller = _call_anthropic_sync if AI_PROVIDER == "anthropic" else _call_openai_sync
-        ai_reply = await loop.run_in_executor(None, caller, text)
+        ai_reply = await loop.run_in_executor(None, caller, text, history)
     except Exception as e:
         logger.error(f"AI Administrator xatosi: {e}")
         ai_reply = {
@@ -6519,6 +6537,10 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
         }[lang]
 
     ai_reply, route = _extract_route(ai_reply)
+
+    # Suhbat tarixini yangilaymiz (oxirgi 3 juft — 6 xabar — saqlanadi)
+    history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": ai_reply}]
+    context.user_data["ai_history"] = history[-6:]
 
     operator_label = {"ru": "📞 Связаться с оператором", "uz": "📞 Operatorga bog'lanish", "kz": "📞 Операторға хабарласу"}[lang]
     buttons = []
