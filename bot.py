@@ -6328,12 +6328,13 @@ QOIDALAR:
 - Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
 - Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
 - Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil.
+- MUHIM: agar savol xona narxi, xona surati, palatalar, diagnostika, narx hisoblash kabi ANIQ BIR BO'LIMGA tegishli bo'lsa, operatorga yo'naltirishni TAVSIYA QILMA — buning o'rniga pastdagi ROUTE qoidasi bo'yicha to'g'ridan-to'g'ri shu bo'limga yo'naltir, chunki o'sha bo'limda aniq rasmlar va narxlar allaqachon mavjud.
 
 BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona/palata narxlari haqida savol
+- menu_rooms — xona/palata narxlari YOKI xonalar surati/rasmi haqida savol (bu yerda aniq rasmlar va narxlar bor — operatorga yubormasdan to'g'ridan-to'g'ri shu kodni ishlat)
 - menu_wards — qaysi korpus/palatalar bor, joylashish haqida
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
@@ -6388,7 +6389,8 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
     """Smart routing: kalit so'zlar yoki AI o'zi yordam bera olmasligini bildirsa — True"""
     if any(kw in text_lower for kw in ROUTE_TO_OPERATOR_KEYWORDS):
         return True
-    fail_markers = ["operatorga", "operator bilan", "оператору", "операторға", "bilmayman", "не знаю", "білмеймін"]
+    fail_markers = ["aniq javob berolmayman", "не могу точно ответить", "нақты жауап бере алмаймын",
+                    "bilmayman", "не знаю", "білмеймін"]
     return any(m in ai_reply.lower() for m in fail_markers)
 
 
