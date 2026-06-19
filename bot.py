@@ -2,6 +2,7 @@ import logging
 import os
 import json
 import asyncio
+import datetime
 import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -24,6 +25,7 @@ STATSIONAR_CHANNEL = int(os.getenv("STATSIONAR_CHANNEL", "-1003991204638"))
 DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
+AI_LOG_FILE = os.getenv("AI_LOG_FILE", "/app/data/ai_logs.json")
 
 DEFAULT_DATA = {
     "contacts": {
@@ -4631,6 +4633,39 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
 # ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
 
+async def ai_logs_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/ai_logs [N] — faqat admin uchun, AI'ning oxirgi N (default 10) savol-javobini ko'rsatadi."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    n = 10
+    if context.args:
+        try:
+            n = max(1, min(int(context.args[0]), 50))
+        except ValueError:
+            pass
+    if not os.path.exists(AI_LOG_FILE):
+        await update.message.reply_text("📭 AI loglari hali bo'sh.")
+        return
+    with open(AI_LOG_FILE, "r", encoding="utf-8") as f:
+        logs = json.load(f)
+    if not logs:
+        await update.message.reply_text("📭 AI loglari hali bo'sh.")
+        return
+    chunk = logs[-n:]
+    for entry in chunk:
+        flag = "🔴" if entry.get("needs_operator") else "🟢"
+        route_txt = f" → {entry['route']}" if entry.get("route") else ""
+        msg = (
+            f"{flag} <b>{entry['time']}</b> | {entry['lang']} | @{entry['username']} (id:{entry['user_id']})\n"
+            f"❓ {entry['question']}\n"
+            f"💬 {entry['answer']}{route_txt}"
+        )
+        try:
+            await update.message.reply_text(msg, parse_mode="HTML")
+        except Exception:
+            await update.message.reply_text(msg)
+
+
 async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
@@ -6433,6 +6468,30 @@ DOCTOR_FOLLOWUP_NOTE = {
 }
 
 
+def _log_ai_interaction(user, text: str, ai_reply: str, route, needs_operator: bool, lang: str):
+    """Har bir AI savol-javobini /app/data/ai_logs.json ga yozadi (oxirgi 500 ta saqlanadi)."""
+    try:
+        logs = []
+        if os.path.exists(AI_LOG_FILE):
+            with open(AI_LOG_FILE, "r", encoding="utf-8") as f:
+                logs = json.load(f)
+        logs.append({
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "user_id": user.id,
+            "username": user.username or "-",
+            "lang": lang,
+            "question": text,
+            "answer": ai_reply,
+            "route": route,
+            "needs_operator": needs_operator,
+        })
+        logs = logs[-500:]
+        with open(AI_LOG_FILE, "w", encoding="utf-8") as f:
+            json.dump(logs, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"AI log yozishda xato: {e}")
+
+
 async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, lang: str):
     """FSM state bo'lmagan erkin matnlarga AI orqali javob beradi, kerak bo'lsa operatorga yo'naltiradi."""
     if not AI_API_KEY:
@@ -6466,10 +6525,12 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
     if route:
         section_label = SECTION_BUTTON_LABELS[route][lang]
         buttons.append([InlineKeyboardButton(section_label, callback_data=route)])
-    if _ai_needs_operator(text.lower(), ai_reply):
+    needs_op = _ai_needs_operator(text.lower(), ai_reply)
+    if needs_op:
         buttons.append([InlineKeyboardButton(operator_label, callback_data="connect_operator")])
     kb = InlineKeyboardMarkup(buttons) if buttons else None
 
+    _log_ai_interaction(update.effective_user, text, ai_reply, route, needs_op, lang)
     await update.message.reply_text(ai_reply, reply_markup=kb)
 
 
@@ -7078,6 +7139,7 @@ def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_handler))
+    app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
