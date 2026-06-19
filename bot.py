@@ -26,6 +26,7 @@ DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
 AI_LOG_FILE = os.getenv("AI_LOG_FILE", "/app/data/ai_logs.json")
+TASHKENT_TZ = datetime.timezone(datetime.timedelta(hours=5))
 
 DEFAULT_DATA = {
     "contacts": {
@@ -6334,7 +6335,7 @@ BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona/palata narxlari YOKI xonalar surati/rasmi haqida savol (bu yerda aniq rasmlar va narxlar bor — operatorga yubormasdan to'g'ridan-to'g'ri shu kodni ishlat)
+- menu_rooms — xona SURATI/RASMI so'ralganda, YOKI xona turlari va ularning narxlari haqida umumiy savol (bu yerda haqiqiy xona rasmlari mavjud)
 - menu_wards — qaysi korpus/palatalar bor, joylashish haqida
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
@@ -6342,7 +6343,7 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
-- calc_start — narx hisoblash, necha kun necha pul bo'ladi
+- calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_rooms ishlat.
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
 ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
@@ -6396,7 +6397,7 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
 
 def _build_dynamic_system_prompt() -> str:
     """AI_SYSTEM_PROMPT ga joriy sana, vaqt va hafta kunini qo'shib qaytaradi."""
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(TASHKENT_TZ)
     weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
     return AI_SYSTEM_PROMPT + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
 
@@ -6540,7 +6541,7 @@ def _log_ai_interaction(user, text: str, ai_reply: str, route, needs_operator: b
             with open(AI_LOG_FILE, "r", encoding="utf-8") as f:
                 logs = json.load(f)
         logs.append({
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "time": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
             "user_id": user.id,
             "username": user.username or "-",
             "lang": lang,
