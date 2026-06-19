@@ -1,6 +1,8 @@
 import logging
 import os
 import json
+import asyncio
+import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
@@ -13,6 +15,11 @@ logger = logging.getLogger(__name__)
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
+
+# ── AI Administrator sozlamalari ──
+AI_PROVIDER = os.getenv("AI_PROVIDER", "anthropic")  # "anthropic" yoki "openai"
+AI_API_KEY = os.getenv("AI_API_KEY", "")
+AI_MODEL = os.getenv("AI_MODEL", "claude-sonnet-4-6" if AI_PROVIDER == "anthropic" else "gpt-4o")
 STATSIONAR_CHANNEL = int(os.getenv("STATSIONAR_CHANNEL", "-1003991204638"))
 DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
@@ -4205,6 +4212,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 "kz": "✅ Сұрағыңыз дәрігерге жіберілді! Жауапты күтіңіз.",
             }[lang]
             await query.edit_message_text(confirm, reply_markup=main_menu_keyboard(lang))
+
+            # ── AI orqali umumiy yo'naltiruvchi javob (shifokor javobini almashtirmaydi) ──
+            if temp_text:
+                verdict, reason = await ai_check_diagnosis(temp_text)
+                if verdict in ("MOS_KELADI", "MOS_KELMAYDI") and reason:
+                    icon = "✅" if verdict == "MOS_KELADI" else "⚠️"
+                    ai_msg = f"{icon} {reason}" + DOCTOR_FOLLOWUP_NOTE[lang]
+                    await context.bot.send_message(chat_id=chat_id, text=ai_msg)
         except Exception as e:
             logger.error(f"send_to_doctor_now error: {e}")
             await query.answer("❌ Xatolik yuz berdi", show_alert=True)
@@ -4604,7 +4619,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Operator ──
-    elif data == "menu_operator":
+    elif data in ("menu_operator", "connect_operator"):
         c = d["contacts"]
         text = {
             "ru": f"📞 *Свяжитесь с нами:*\n\n☎️ {c['phone1']}\n☎️ {c['phone2']}\n\n📸 Instagram: {c['instagram']}\n🌐 {c['website']}\n\nМы ответим в рабочее время!",
@@ -6201,6 +6216,202 @@ async def handle_faq_callbacks(query, context, data, lang):
                 f"❓ *{q}*\n\n{a}", parse_mode="Markdown", reply_markup=back)
 
 
+# ── AI ADMINISTRATOR ──────────────────────────────────────────────────────────
+
+AI_SYSTEM_PROMPT = """Sen "Ergash Ota" klinikasining sun'iy intellekt administratorisan.
+
+KLINIKA HAQIDA:
+- Klinika nomi: "Ergash Ota" (Asoschisi: Akademik Berdiqul Ergashev).
+- Asosiy yo'nalish: Jigar, o't pufagi, oshqozon-ichak va boshqa surunkali kasalliklarni jarrohliksiz, 32 xil maxsus shifobaxsh giyohlar va "Malxam" giyohi yordamida tabiiy davolash.
+- Internetda soxta retsept sotayotgan firibgarlar bor — haqiqiy Malxam FAQAT shu klinikada beriladi, buni har doim ta'kidla.
+
+QOIDALAR:
+- Foydalanuvchi qaysi tilda yozsa (o'zbek, rus, qozoq), shu tilda javob ber — juda muloyim, professional shifoxona xodimi ohangida.
+- "Malxam" so'zini barcha tillarda o'zgarishsiz, lotin/krill holida yoz (tarjima qilma).
+- Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
+- Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
+- Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil."""
+
+ROUTE_TO_OPERATOR_KEYWORDS = [
+    "operator", "оператор", "одам бил", "одам билан", "живым", "человеком",
+    "shikoyat", "жалоба", "шағым", "qimmat", "дорого", "қымбат",
+    "boshliq", "rahbar", "руководител", "басшы", "директор",
+]
+
+
+def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
+    """Smart routing: kalit so'zlar yoki AI o'zi yordam bera olmasligini bildirsa — True"""
+    if any(kw in text_lower for kw in ROUTE_TO_OPERATOR_KEYWORDS):
+        return True
+    fail_markers = ["operatorga", "operator bilan", "оператору", "операторға", "bilmayman", "не знаю", "білмеймін"]
+    return any(m in ai_reply.lower() for m in fail_markers)
+
+
+def _call_anthropic_sync(user_text: str) -> str:
+    """Anthropic Claude API ga sinxron so'rov (executor ichida ishlaydi)"""
+    resp = httpx.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": AI_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        json={
+            "model": AI_MODEL,
+            "max_tokens": 400,
+            "system": AI_SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": user_text}],
+        },
+        timeout=20,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text").strip()
+
+
+def _call_openai_sync(user_text: str) -> str:
+    """OpenAI GPT-4o API ga sinxron so'rov (executor ichida ishlaydi)"""
+    resp = httpx.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {AI_API_KEY}", "Content-Type": "application/json"},
+        json={
+            "model": AI_MODEL,
+            "max_tokens": 400,
+            "messages": [
+                {"role": "system", "content": AI_SYSTEM_PROMPT},
+                {"role": "user", "content": user_text},
+            ],
+        },
+        timeout=20,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return data["choices"][0]["message"]["content"].strip()
+
+
+def _call_anthropic_sync_with_prompt(system_prompt: str, user_text: str) -> str:
+    """Anthropic ga maxsus system prompt bilan sinxron so'rov"""
+    resp = httpx.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": AI_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        json={
+            "model": AI_MODEL,
+            "max_tokens": 300,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": user_text}],
+        },
+        timeout=20,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text").strip()
+
+
+def _call_openai_sync_with_prompt(system_prompt: str, user_text: str) -> str:
+    """OpenAI ga maxsus system prompt bilan sinxron so'rov"""
+    resp = httpx.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {AI_API_KEY}", "Content-Type": "application/json"},
+        json={
+            "model": AI_MODEL,
+            "max_tokens": 300,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_text},
+            ],
+        },
+        timeout=20,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    return data["choices"][0]["message"]["content"].strip()
+
+
+DIAGNOSIS_CHECK_SYSTEM_PROMPT = """Sen "Ergash Ota" klinikasining tibbiy ariza saralovchisisan (triage yordamchisi).
+
+VAZIFANG: Bemor yozgan tashxis/shikoyat matnini o'qib, klinikamiz bu holatni qabul qilishi mumkinligini umumiy aniqlash.
+
+KLINIKA YO'NALISHI: Jigar, o't pufagi, oshqozon-ichak va boshqa surunkali kasalliklarni jarrohliksiz, tabiiy giyohlar va "Malxam" yordamida davolash. XPN (buyrak yetishmovchiligi) faqat 1- va 2-bosqichlarini qabul qiladi.
+
+QABUL QILINMAYDIGAN HOLATLAR: onkologiya (rak), gemodializ, XPN 3-4-5 bosqich, o'tkir jarrohlik talab qiladigan holatlar, yuqumli og'ir kasalliklar.
+
+JAVOB FORMATI — FAQAT shu uchta variantdan birini, boshqa hech narsa qo'shmasdan qaytar:
+MOS_KELADI: <qisqa, 1 gapli sabab>
+MOS_KELMAYDI: <qisqa, 1 gapli sabab>
+NOMA'LUM: <qisqa, 1 gapli sabab — agar matn juda umumiy/aniq bo'lmasa>
+
+Hech qachon aniq tashxis qo'yma, dori tavsiya qilma — faqat klinikaga MOS/NOMOS ekanini bahola."""
+
+
+def _parse_diagnosis_verdict(ai_raw: str) -> tuple:
+    """AI javobidan (MOS_KELADI/MOS_KELMAYDI/NOMA'LUM) va sababni ajratib oladi"""
+    ai_raw = ai_raw.strip()
+    for verdict in ("MOS_KELMAYDI", "MOS_KELADI", "NOMA'LUM"):
+        if ai_raw.upper().startswith(verdict.upper()):
+            reason = ai_raw.split(":", 1)[1].strip() if ":" in ai_raw else ""
+            return verdict, reason
+    return "NOMA'LUM", ai_raw
+
+
+async def ai_check_diagnosis(text: str) -> tuple:
+    """Bemor matnini AI orqali tekshirib, (verdict, reason) qaytaradi. AI sozlanmagan bo'lsa (None, None)."""
+    if not AI_API_KEY:
+        return None, None
+    loop = asyncio.get_running_loop()
+    try:
+        caller = _call_anthropic_sync_with_prompt if AI_PROVIDER == "anthropic" else _call_openai_sync_with_prompt
+        raw = await loop.run_in_executor(None, caller, DIAGNOSIS_CHECK_SYSTEM_PROMPT, text)
+        return _parse_diagnosis_verdict(raw)
+    except Exception as e:
+        logger.error(f"AI diagnosis-check xatosi: {e}")
+        return None, None
+
+
+DOCTOR_FOLLOWUP_NOTE = {
+    "ru": "\n\n📋 При визите врачи проведут комплексное обследование и дадут окончательное заключение.",
+    "uz": "\n\n📋 Klinikaga kelganingizda shifokorlar bemorni kompleks tekshirib, yakuniy xulosa beradi.",
+    "kz": "\n\n📋 Клиникаға келгенде дәрігерлер науқасты кешенді тексеріп, түпкілікті қорытынды береді.",
+}
+
+
+async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, lang: str):
+    """FSM state bo'lmagan erkin matnlarga AI orqali javob beradi, kerak bo'lsa operatorga yo'naltiradi."""
+    if not AI_API_KEY:
+        # API kalit sozlanmagan bo'lsa — eski statik fallbackka qaytamiz
+        msg = {
+            "ru": "Выберите раздел в меню 👇",
+            "uz": "Menyudan bo'lim tanlang 👇",
+            "kz": "Мәзірден бөлім таңдаңыз 👇",
+        }[lang]
+        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
+        return
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+
+    loop = asyncio.get_running_loop()
+    try:
+        caller = _call_anthropic_sync if AI_PROVIDER == "anthropic" else _call_openai_sync
+        ai_reply = await loop.run_in_executor(None, caller, text)
+    except Exception as e:
+        logger.error(f"AI Administrator xatosi: {e}")
+        ai_reply = {
+            "ru": "Извините, не смог обработать запрос.",
+            "uz": "Kechirasiz, so'rovni qayta ishlay olmadim.",
+            "kz": "Кешіріңіз, сұрауды өңдей алмадым.",
+        }[lang]
+
+    operator_label = {"ru": "📞 Связаться с оператором", "uz": "📞 Operatorga bog'lanish", "kz": "📞 Операторға хабарласу"}[lang]
+    kb = None
+    if _ai_needs_operator(text.lower(), ai_reply):
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(operator_label, callback_data="connect_operator")]])
+
+    await update.message.reply_text(ai_reply, reply_markup=kb)
+
+
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_lang(context)
     step = context.user_data.get("booking_step")
@@ -6555,6 +6766,28 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text(reject, reply_markup=back_keyboard(lang))
                 return
 
+            # ── AI orqali qo'shimcha tekshiruv (so'z-filtrdan o'tgan, lekin murakkabroq holatlar uchun) ──
+            verdict, reason = await ai_check_diagnosis(text)
+            if verdict == "MOS_KELMAYDI":
+                ai_reject = {
+                    "uz": f"⚠️ Kechirasiz, klinikamiz bu holatni qabul qila olmaydi.\n\n💬 {reason}",
+                    "ru": f"⚠️ К сожалению, наша клиника не может принять этот случай.\n\n💬 {reason}",
+                    "kz": f"⚠️ Кешіріңіз, біздің клиника бұл жағдайды қабылдай алмайды.\n\n💬 {reason}",
+                }[lang]
+                context.user_data["booking"] = {}
+                context.user_data["booking_step"] = None
+                context.user_data["booking_type"] = None
+                await update.message.reply_text(ai_reject, reply_markup=back_keyboard(lang))
+                return
+            elif verdict == "MOS_KELADI":
+                pre_info = {
+                    "uz": f"✅ {reason}" + DOCTOR_FOLLOWUP_NOTE["uz"],
+                    "ru": f"✅ {reason}" + DOCTOR_FOLLOWUP_NOTE["ru"],
+                    "kz": f"✅ {reason}" + DOCTOR_FOLLOWUP_NOTE["kz"],
+                }[lang]
+                await update.message.reply_text(pre_info)
+            # verdict == "NOMA'LUM" yoki AI sozlanmagan (None) bo'lsa — jim davom etamiz, ariza odatdagidek ketadi
+
             context.user_data.setdefault("booking", {})["name"] = text
             context.user_data["booking_step"] = "sana"
             ask = {
@@ -6774,13 +7007,8 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
         return
 
-    # Boshqa matnlar
-    msg = {
-        "ru": "Выберите раздел в меню 👇",
-        "uz": "Menyudan bo'lim tanlang 👇",
-        "kz": "Мәзірден бөлім таңдаңыз 👇",
-    }[lang]
-    await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
+    # Boshqa matnlar — AI Administrator orqali javob beramiz
+    await ai_administrator_handler(update, context, text, lang)
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
