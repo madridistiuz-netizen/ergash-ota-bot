@@ -6225,12 +6225,67 @@ KLINIKA HAQIDA:
 - Asosiy yo'nalish: Jigar, o't pufagi, oshqozon-ichak va boshqa surunkali kasalliklarni jarrohliksiz, 32 xil maxsus shifobaxsh giyohlar va "Malxam" giyohi yordamida tabiiy davolash.
 - Internetda soxta retsept sotayotgan firibgarlar bor — haqiqiy Malxam FAQAT shu klinikada beriladi, buni har doim ta'kidla.
 
+QABUL TARTIBI (MUHIM — bu haqida noto'g'ri ma'lumot berma):
+- Klinikaga oldindan yozilish, navbat olish SHART EMAS.
+- Klinika dushanbadan shanbagacha ishlaydi, ish vaqti soat 08:00 dan 18:00 gacha.
+- Yakshanba — dam olish kuni.
+- Bemor o'ziga qulay vaqtda, ish kunlari ichida xohlagan paytda kelishi mumkin.
+- Kelgan bemor shu kuniyoq qabul qilinadi va birinchi kun muolajasi boshlanadi.
+- HECH QACHON "qabulga yozilish kerak", "navbat band qilish kerak", "oldindan band qiling" kabi gaplarni ishlatma — bu noto'g'ri ma'lumot.
+
 QOIDALAR:
 - Foydalanuvchi qaysi tilda yozsa (o'zbek, rus, qozoq), shu tilda javob ber — juda muloyim, professional shifoxona xodimi ohangida.
 - "Malxam" so'zini barcha tillarda o'zgarishsiz, lotin/krill holida yoz (tarjima qilma).
 - Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
 - Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
-- Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil."""
+- Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil.
+
+BO'LIMGA YO'NALTIRISH (juda muhim):
+Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
+"ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
+- menu_clinic — klinika haqida umumiy ma'lumot
+- menu_rooms — xona/palata narxlari haqida savol
+- menu_wards — qaysi korpus/palatalar bor, joylashish haqida
+- menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
+- menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
+- menu_faq — tez-tez so'raladigan savollar
+- menu_booking — qabulga kelish/yozilish jarayoni haqida
+- menu_weekend — yakshanba kuni ish tartibi haqida
+- doctor_question — bemor o'z tashxisi/analizi haqida shifokorga savol bermoqchi
+- calc_start — narx hisoblash, necha kun necha pul bo'ladi
+- menu_operator — bemor odam/operator bilan gaplashmoqchi
+Agar hech qaysi bo'lim mos kelmasa, ROUTE qatorini umuman yozma."""
+
+SECTION_BUTTON_LABELS = {
+    "menu_clinic":       {"ru": "🏥 О клинике",              "uz": "🏥 Klinika haqida",          "kz": "🏥 Клиника туралы"},
+    "menu_rooms":        {"ru": "🛏 Стоимость номеров",       "uz": "🛏 Xonalar narxi",            "kz": "🛏 Бөлмелер құны"},
+    "menu_wards":        {"ru": "🏨 Палаты",                  "uz": "🏨 Palatalar",                "kz": "🏨 Палаталар"},
+    "menu_diagnostics":  {"ru": "🧲 Диагностика",             "uz": "🧲 Diagnostika",              "kz": "🧲 Диагностика"},
+    "menu_guide":        {"ru": "📖 Руководство пациента",    "uz": "📖 Bemor uchun qo'llanma",    "kz": "📖 Науқас нұсқаулығы"},
+    "menu_faq":          {"ru": "❓ Частые вопросы",           "uz": "❓ Ko'p so'raladigan savollar", "kz": "❓ Жиі сұралатын сұрақтар"},
+    "menu_booking":      {"ru": "📅 Записаться на приём",     "uz": "📅 Qabulga yozilish",         "kz": "📅 Қабылдауға жазылу"},
+    "menu_weekend":      {"ru": "🌅 Воскресенье",             "uz": "🌅 Yakshanba",                "kz": "🌅 Жексенбі"},
+    "doctor_question":   {"ru": "👨‍⚕️ Вопрос врачу",            "uz": "👨‍⚕️ Shifokorga savol",         "kz": "👨‍⚕️ Дәрігерге сұрақ"},
+    "calc_start":        {"ru": "🧮 Рассчитать стоимость",    "uz": "🧮 Narxni hisoblash",         "kz": "🧮 Құнын есептеу"},
+    "menu_operator":     {"ru": "📞 Связаться с оператором",  "uz": "📞 Operatorga bog'lanish",    "kz": "📞 Операторға хабарласу"},
+}
+
+
+def _extract_route(ai_raw: str) -> tuple:
+    """AI javobidan 'ROUTE:<kod>' qatorini ajratib oladi, qolgan matnni tozalab qaytaradi."""
+    lines = ai_raw.strip().split("\n")
+    route = None
+    clean_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.upper().startswith("ROUTE:"):
+            candidate = stripped.split(":", 1)[1].strip()
+            if candidate in SECTION_BUTTON_LABELS:
+                route = candidate
+        else:
+            clean_lines.append(line)
+    return "\n".join(clean_lines).strip(), route
+
 
 ROUTE_TO_OPERATOR_KEYWORDS = [
     "operator", "оператор", "одам бил", "одам билан", "живым", "человеком",
@@ -6404,10 +6459,16 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
             "kz": "Кешіріңіз, сұрауды өңдей алмадым.",
         }[lang]
 
+    ai_reply, route = _extract_route(ai_reply)
+
     operator_label = {"ru": "📞 Связаться с оператором", "uz": "📞 Operatorga bog'lanish", "kz": "📞 Операторға хабарласу"}[lang]
-    kb = None
+    buttons = []
+    if route:
+        section_label = SECTION_BUTTON_LABELS[route][lang]
+        buttons.append([InlineKeyboardButton(section_label, callback_data=route)])
     if _ai_needs_operator(text.lower(), ai_reply):
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton(operator_label, callback_data="connect_operator")]])
+        buttons.append([InlineKeyboardButton(operator_label, callback_data="connect_operator")])
+    kb = InlineKeyboardMarkup(buttons) if buttons else None
 
     await update.message.reply_text(ai_reply, reply_markup=kb)
 
