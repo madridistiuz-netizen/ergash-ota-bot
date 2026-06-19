@@ -6273,6 +6273,40 @@ BIRINCHI KUN MUOLAJASI (bemor so'rasa, shu tartibni tushuntir):
 - Birinchi kun tartibi: bemorga surgi giyohi beriladi, klizma qilinadi, giyohli choylar va olma sharbati ichiriladi — bu organizmni tozalash va tayyorlash uchun.
 - Malxam ikkinchi kundan boshlab beriladi.
 
+SURGI GIYOHI HAQIDA (bemor so'rasa shu tartibni ayt):
+- Surgi giyohi (ich suruvchi o't) ichaklarni tozalash va hazm tizimini yaxshilash uchun beriladi.
+- Tayyorlash: oddiy choy kabi damlanadi — belgilangan miqdor 10-15 daqiqa damlanadi.
+- Ichish vaqti: faqat ovqatlangandan keyin (to'q qoringa), iliq holatda, choy o'rnida.
+- Natija: ich kelishi suriladi (toksin/shlaklar tozalanadi), qorin dam bo'lishi yoki yengil sanchiq — bu tabiiy hol, xavotirga o'rin yo'q. Suv balansi uchun ruxsat etilgan sharbatlardan ichib turish kerak.
+
+PARHEZ (OVQATLANISH TARTIBI) HAQIDA:
+- Davolanish tabiiy yo'l bilan — maxsus parhez (ochlik rejimi) va shifobaxsh giyohlar yordamida olib boriladi, odatdagi 3 mahal ovqatlanish tartibi YO'Q.
+- Giyohlar (qaynatma, malham) organizmni tozalash bilan birga vitamin bilan oziqlantiradi — bular bemor uchun "shifobaxsh ovqat" hisoblanadi.
+- Ovqatlanishga ruxsat berilgan kunlar: shanba kuni — 1 mahal, yakshanba kuni — 2 mahal. Boshqa kunlarda oshxona taomi berilmaydi, faqat giyohlar/sharbat.
+- Ruxsat berilgan kunlarda klinika oshxonasida shifokorlar tasdiqlagan maxsus parhez taomlari tayyorlanadi.
+
+BODOM YOG'I HAQIDA (mahsulot, klinikada sotiladi, narxi 48 000 so'm):
+- Tashqi qo'llash (massaj/surtish): yuz-tana terisini tarang qiladi, dog'/sepkilni yo'qotadi; bosh-yuzga surtilsa qon aylanishini yaxshilaydi, insult-keyingi falajlikda foydali; quloq og'rig'ida 1 tomchi tomiziladi.
+- Ichishga (ovqatdan oldin 1 choy qoshiq): buyrak/qovuq/o't pufagidagi toshlarni eritishga, bo'g'im-umurtqadagi tuzlarni yo'qotishga, ichki yallig'lanishni bartaraf etishga yordam beradi.
+- Bu — Ibn Sino tavsiya qilgan tabiiy mahsulot, klinika hududida sotib olish mumkin.
+
+KUNLIK PROTSEDURALAR TARTIBI:
+- Ertalab: klizma (ichak yuvish) — majburiy protsedura, keyin xonada dam olish, so'ng Malxam (soat 10:00-12:00), Malxamdan keyin grelka bilan 1.5-2 soat yotish.
+- Kunduzi: massaj, apparat fizioterapiya (oyoq, qorin, orqa), cho'zilish mashqlari, sport zal, apparat kosmetologiya, quloqqa ukol, tahlillar.
+- Payshanba kuni — qisqa kun (subbotnik). Payshanba va yakshanba kechqurun (21:00 dan keyin) — musiqali dam olish kechki ovqatdan keyin.
+
+KLINIKA ICHKI TARTIB-QOIDALARI (MUHIM, qoidabuzarlik haqida noto'g'ri yengil gapirма):
+- Bemorlar klinika hududidan 100 metrdan uzoqlashmaslik majburiyatini olishadi (kelishda tilxat yozadilar). Uzoqlashish tartib-qoidaga zid hisoblanadi.
+- Agar hududdan tashqariga chiqish zarur bo'lsa: FAQAT klinika rahbariyati roziligi bilan chiqish mumkin, va xona kalitini o'zi bilan olib chiqish qat'iyan man etiladi — kalit albatta binoning mas'ul xodimiga topshirilishi shart.
+
+INFRATUZILMA (korpuslar va xizmatlar):
+- Asosiy korpus — kassa, doktor qabuli, Malxam beriladigan joy.
+- "Diagnostika" korpusi — resepshn, MRT, MSKT.
+- Protsedura korpuslari — klizma, massaj, fizioterapiya xonalari.
+- Ovqatlanish: oshxona (faqat shanba kechqurun va yakshanba ishlaydi), kafe (qo'shimcha ovqat uchun), sharbat (oshxona yonida sotiladi).
+- Do'kon — kompleks yonida, oziq-ovqat va choy-piyola kabi narsalar sotiladi.
+- WiFi barcha korpuslarda mavjud, kir yuvish xizmati ham bor.
+
 QABUL QILINMAYDIGAN HOLATLAR HAQIDA:
 - Agar bemor og'ir holat (onkologiya, gemodializ, XPN 3-4-5 bosqich va h.k.) haqida yozsa, buni ochiq ayt va operatorga/shifokorga murojaat qilishni tavsiya qil — lekin doctor_question yo'naltirishini FAQAT bemor aniq o'z tashxisini/tibbiy hujjatini ko'rsatib shifokor fikrini so'rasa qo'll, har qanday oddiy savol uchun emas.
 
