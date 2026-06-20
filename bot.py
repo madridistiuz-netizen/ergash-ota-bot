@@ -936,6 +936,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "guide": "menu_guide",
             "feedback": "guide_feedback",
             "rooms": "menu_rooms",
+            "wards": "menu_wards",
             "doctor": "doctor_question",
             "diagnostics": "menu_diagnostics",
             "faq": "menu_faq",
