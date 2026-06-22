@@ -6100,7 +6100,7 @@ async def handle_faq_callbacks(query, context, data, lang):
                 "🍽 <b>Питание и лечебный режим диеты в нашем центре</b>\n\n"
                 "Лечение в нашей клинике проводится исключительно естественным путём — с помощью <b>лечебного голодания, специальной диеты и целебных трав</b>. Поэтому привычного трёхразового питания у нас нет.\n\n"
                 "🟢 <b>Травы — наше основное питание:</b>\n"
-                "Целебные травы (Малхам), которые выдаются пациентам, не только очищают организм, но и насыщают его витаминами и микроэлементами. Эти травы служат лечебным питанием.\n\n"
+                "Целебные травы (отвары и бальзамы), которые выдаются пациентам, не только очищают организм, но и насыщают его витаминами и микроэлементами. Эти травы служат лечебным питанием.\n\n"
                 "📆 <b>Дни, когда разрешено питание:</b>\n"
                 "• <b>Суббота:</b> Разрешается 1-разовое питание в день.\n"
                 "• <b>Воскресенье:</b> Разрешается 2-разовое питание в день.\n\n"
@@ -6112,7 +6112,7 @@ async def handle_faq_callbacks(query, context, data, lang):
                 "🍽 <b>Markazimizda ovqatlanish va shifobaxsh parhez tartibi</b>\n\n"
                 "Klinikamizda davolash mutlaqo tabiiy yo'l bilan — <b>ochlik, maxsus parhez va shifobaxsh giyohlar</b> yordamida olib boriladi. Shu sababli odatiy uch mahal ovqatlanish tartibi mavjud emas.\n\n"
                 "🟢 <b>Giyohlar — bizning asosiy taomimiz:</b>\n"
-                "Davolanish davomida beriladigan maxsus shifobaxsh giyohlar (Malham) organizmni tozalash bilan birga, kerakli vitaminlar bilan oziqlantiradi. Ya'ni, ushbu giyohlar bemor uchun shifobaxsh ovqat hisoblanadi.\n\n"
+                "Davolanish davomida beriladigan maxsus shifobaxsh giyohlar (qaynatma va malhamlar) organizmni tozalash bilan birga, kerakli vitaminlar bilan oziqlantiradi. Ya'ni, ushbu giyohlar bemor uchun shifobaxsh ovqat hisoblanadi.\n\n"
                 "📆 <b>Ovqatlanishga ruxsat berilgan kunlar:</b>\n"
                 "• <b>Shanba kuni:</b> Kuniga 1 mahal ovqatlanishga ruxsat beriladi.\n"
                 "• <b>Yakshanba kuni:</b> Kuniga 2 mahal ovqatlanishga ruxsat beriladi.\n\n"
@@ -6124,7 +6124,7 @@ async def handle_faq_callbacks(query, context, data, lang):
                 "🍽 <b>Орталығымыздағы тамақтану және шипалы диета тәртібі</b>\n\n"
                 "Клиникамызда емдеу толықтай табиғи жолмен — <b>емдік аштық, арнайы диета және шипалы шөптер</b> көмегімен жүргізіледі. Сондықтан мұнда үйреншікті үш мезгіл тамақтану тәртібі жоқ.\n\n"
                 "🟢 <b>Шөптер — біздің негізгі тағамымыз:</b>\n"
-                "Емдеу барысында берілетін шипалы шөптер (Малхам) ағзаны тазартумен қатар, қажетті витаминдермен де қоректендіреді. Яғни, бұл шөптер науқас үшін шипалы тағам болып есептеледі.\n\n"
+                "Емдеу барысында берілетін шипалы шөптер (қайнатпалар мен жақпамайлар) ағзаны тазартумен қатар, қажетті витаминдермен де қоректендіреді. Яғни, бұл шөптер науқас үшін шипалы тағам болып есептеледі.\n\n"
                 "📆 <b>Тамақтануға рұқсат берілген күндер:</b>\n"
                 "• <b>Сенбі күні:</b> Күніне 1 рет тамақтануға рұқсат.\n"
                 "• <b>Жексенбі күні:</b> Күніне 2 рет тамақтануға рұқсат.\n\n"
@@ -6324,13 +6324,16 @@ INFRATUZILMA (korpuslar va xizmatlar):
 QABUL QILINMAYDIGAN HOLATLAR HAQIDA:
 - Agar bemor og'ir holat (onkologiya, gemodializ, XPN 3-4-5 bosqich va h.k.) haqida yozsa, buni ochiq ayt va operatorga/shifokorga murojaat qilishni tavsiya qil — lekin doctor_question yo'naltirishini FAQAT bemor aniq o'z tashxisini/tibbiy hujjatini ko'rsatib shifokor fikrini so'rasa qo'll, har qanday oddiy savol uchun emas.
 
+ALOQA MA'LUMOTLARI VA MANZIL (bu ma'lumotlar pastda JORIY KONTAKT bo'limida har doim aniq beriladi — agar bemor telefon raqami, manzil, ish vaqti, Instagram yoki vebsayt so'rasa, "bilmayman" DEB HECH QACHON AYTMA, shu ma'lumotni TO'G'RIDAN-TO'G'RI ber. Operatorga yo'naltirish bu holatda kerak emas, faqat ma'lumotni o'zing taqdim et).
+
 QOIDALAR:
-- Foydalanuvchi qaysi tilda yozsa (o'zbek, rus, qozoq), shu tilda javob ber — juda muloyim, professional shifoxona xodimi ohangida.
+- Foydalanuvchi qaysi tilda yozsa (o'zbek lotin, rus yoki qozoq krill), albatta AYNAN shu tilda javob ber. Qozoqcha krill yozuvini o'zbekcha bilan ADASHTIRMA — agar matnda "қанша", "болады", "тенге", "қалай" kabi qozoqcha so'zlar yoki krill yozuv aralashgan bo'lsa, bu qozoqcha, javobni ham qozoq tilida yoz.
 - "Malxam" so'zini barcha tillarda o'zgarishsiz, lotin/krill holida yoz (tarjima qilma).
 - Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
 - Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
 - Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil.
 - MUHIM: agar savol xona narxi, xona surati, palatalar, diagnostika, narx hisoblash kabi ANIQ BIR BO'LIMGA tegishli bo'lsa, operatorga yo'naltirishni TAVSIYA QILMA — buning o'rniga pastdagi ROUTE qoidasi bo'yicha to'g'ridan-to'g'ri shu bo'limga yo'naltir, chunki o'sha bo'limda aniq rasmlar va narxlar allaqachon mavjud.
+- VALYUTA KURSI HAQIDA QAT'IY TAQIQ: hech qachon so'm/dollar/tenge/rubl orasida o'zing kurs hisoblama va konvertatsiya qilma — sening bilimingda joriy kurs yo'q, har qanday raqam o'zingdan TO'QILGAN bo'ladi va bemorni chalg'itadi. Bunday savol kelsa, aniq ayt: "Kechirasiz, joriy valyuta kursi haqida aniq ma'lumotga ega emasman, bank yoki ayirboshlash shoxobchasidan joriy kursni tekshirib ko'ring." — hech qanday raqam, hech qanday "taxminan" degan hisob-kitob qilma.
 
 BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
@@ -6397,10 +6400,28 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
 
 
 def _build_dynamic_system_prompt() -> str:
-    """AI_SYSTEM_PROMPT ga joriy sana, vaqt va hafta kunini qo'shib qaytaradi."""
+    """AI_SYSTEM_PROMPT ga joriy sana/vaqt va joriy kontakt ma'lumotlarini (data.json dan) qo'shib qaytaradi."""
     now = datetime.datetime.now(TASHKENT_TZ)
     weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
-    return AI_SYSTEM_PROMPT + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
+    try:
+        c = load_data().get("contacts", {})
+    except Exception:
+        c = {}
+    contacts_block = (
+        "\n\nJORIY KONTAKT MA'LUMOTLARI (bemor telefon/manzil/ish vaqti/Instagram/vebsayt so'rasa, shu yerdan TO'G'RIDAN-TO'G'RI ber):\n"
+        f"- Telefon: {c.get('phone1', '')}, {c.get('phone2', '')} (qabul vaqti: 08:00–18:00)\n"
+        f"- Manzil (uz): {c.get('address_uz', '')}\n"
+        f"- Manzil (ru): {c.get('address_ru', '')}\n"
+        f"- Manzil (kz): {c.get('address_kz', '')}\n"
+        f"- Instagram: {c.get('instagram', '')}\n"
+        f"- Vebsayt: {c.get('website', '')}\n"
+        f"- Ish vaqti (uz): {c.get('work_hours_uz', '')}"
+    )
+    return (
+        AI_SYSTEM_PROMPT
+        + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
+        + contacts_block
+    )
 
 
 def _call_anthropic_sync(user_text: str, history: list = None) -> str:
