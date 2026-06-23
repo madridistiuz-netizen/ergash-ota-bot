@@ -1064,7 +1064,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
     elif data == "menu_guide":
         context.user_data["state"] = None
         title = {
-            "ru": "📖 *Руководство пациента*\n\nВыберите раздел:",
+            "ru": "📖 *Инструкция для пациента*\n\nВыберите раздел:",
             "uz": "📖 *Bemor uchun qo'llanma*\n\nBo'limni tanlang:",
             "kz": "📖 *Науқас нұсқаулығы*\n\nБөлімді таңдаңыз:",
         }[lang]
