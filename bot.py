@@ -5687,6 +5687,24 @@ def normalize_sana_to_iso(sana_text: str):
                     return natija.isoformat()
                 except ValueError:
                     return None
+
+    # Faqat kun raqami (oy/yil ko'rsatilmagan) — masalan "25", "25.", "25-kun"
+    # Joriy oyda shu kun bugundan keyin bo'lsa — joriy oy, aks holda keyingi oy deb hisoblanadi
+    m = re.match(r"^(\d{1,2})\s*[.\-]?\s*(?:kun|кун)?$", text)
+    if m:
+        d = int(m.group(1))
+        if 1 <= d <= 31:
+            for oy_offset in (0, 1, 2):
+                yil, oy = bugun.year, bugun.month + oy_offset
+                if oy > 12:
+                    yil += 1
+                    oy -= 12
+                try:
+                    natija = datetime.date(yil, oy, d)
+                    if natija >= bugun:
+                        return natija.isoformat()
+                except ValueError:
+                    continue
     return None
 
 
@@ -5715,6 +5733,26 @@ def get_lidlar_by_sana(kelish_sanasi_iso: str) -> list:
         if lid.get("kelish_sanasi") == kelish_sanasi_iso
         and lid.get("holat") == "tasdiqlangan"
     ]
+
+
+async def lidlar_fix_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lidlar_fix — faqat admin: barcha saqlangan lidlarning sana_matn'ini qayta tahlil qilib,
+    kelish_sanasi (ISO) qiymatini yangilaydi (parser yaxshilangandan keyin eski None'larni tuzatish uchun)."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    lidlar = d.get("statsionar_lidlar", [])
+    if not lidlar:
+        await update.message.reply_text("📭 statsionar_lidlar ro'yxati bo'sh.")
+        return
+    tuzatildi = 0
+    for lid in lidlar:
+        yangi_iso = normalize_sana_to_iso(lid.get("sana_matn", ""))
+        if yangi_iso and yangi_iso != lid.get("kelish_sanasi"):
+            lid["kelish_sanasi"] = yangi_iso
+            tuzatildi += 1
+    save_data(d)
+    await update.message.reply_text(f"✅ Tekshirildi: {len(lidlar)} ta yozuv. Tuzatildi: {tuzatildi} ta.")
 
 
 async def lid_add_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -7434,6 +7472,7 @@ def main():
     app.add_handler(CommandHandler("ertaga", ertaga_handler))
     app.add_handler(CommandHandler("lidlar_debug", lidlar_debug_handler))
     app.add_handler(CommandHandler("lid_add", lid_add_handler))
+    app.add_handler(CommandHandler("lidlar_fix", lidlar_fix_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
