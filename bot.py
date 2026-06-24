@@ -7352,6 +7352,13 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🟢 QO'NG'IROQ QILING!"
             )
             await send_lid(context, STATSIONAR_CHANNEL, lid)
+            save_statsionar_lid(
+                name=booking.get("name", "—"),
+                phone=booking.get("phone", "—"),
+                sana_text=booking.get("sana", ""),
+                kasallik="",
+                xona=booking.get("xona", "—"),
+            )
             context.user_data["booking"] = {}
             context.user_data["booking_step"] = None
             context.user_data["booking_type"] = None
