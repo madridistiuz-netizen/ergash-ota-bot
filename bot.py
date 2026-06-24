@@ -6553,8 +6553,8 @@ BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona SURATI/RASMI so'ralganda, YOKI xona turlari va ularning narxlari haqida umumiy savol (bu yerda haqiqiy xona rasmlari mavjud)
-- menu_wards — qaysi korpus/palatalar bor, joylashish haqida
+- menu_rooms — xona turlari va ularning narxlari haqida umumiy savol (BU YERDA RASM YO'Q, faqat narx ro'yxati)
+- menu_wards — xona/palata SURATI/RASMI so'ralganda, YOKI qaysi korpus/palatalar bor, joylashish haqida (bu yerda har bir xonaning haqiqiy rasmlari mavjud)
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
 - menu_faq — tez-tez so'raladigan savollar
@@ -6562,7 +6562,7 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_weekend — yakshanba kuni ish tartibi haqida
 - menu_location — bemor klinikaning LOKATSIYASINI/manzilini xaritada, qayerda joylashganini, qanday borishni so'rasa (bu holatda javob matni yozma, faqat shu kodni ber, xaritadagi haqiqiy nuqta avtomatik yuboriladi)
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
-- calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_rooms ishlat.
+- calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_wards ishlat.
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
 MAXSUS QOIDA — menu_location: agar javobing menu_location bo'lsa, HECH QANDAY matn yozma, faqat "ROUTE:menu_location" qatorining o'zini yoz — chunki bemorga shu o'rniga haqiqiy xaritadagi nuqta (geolokatsiya) yuboriladi, undan oldin matn kerak emas.
