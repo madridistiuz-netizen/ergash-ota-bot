@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import re
 import asyncio
 import datetime
 import httpx
@@ -5637,6 +5638,110 @@ def confirm_keyboard(lang):
 
 # ─── BOOKING HANDLER ──────────────────────────────────────────────────────────
 
+OY_NOMLARI = {
+    "yanvar": 1, "fevral": 2, "mart": 3, "aprel": 4, "may": 5, "iyun": 6,
+    "iyul": 7, "avgust": 8, "sentyabr": 9, "oktyabr": 10, "noyabr": 11, "dekabr": 12,
+    "январ": 1, "феврал": 2, "март": 3, "апрел": 4, "май": 5, "июн": 6,
+    "июл": 7, "август": 8, "сентябр": 9, "октябр": 10, "ноябр": 11, "декабр": 12,
+}
+
+
+def normalize_sana_to_iso(sana_text: str):
+    """Bemor yozgan erkin sanani YYYY-MM-DD formatiga o'tkazadi. Aniqlab bo'lmasa None."""
+    if not sana_text:
+        return None
+    text = sana_text.strip().lower()
+    bugun = datetime.datetime.now(TASHKENT_TZ).date()
+
+    m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})$", text)
+    if m:
+        y, mo, d = map(int, m.groups())
+        try:
+            return datetime.date(y, mo, d).isoformat()
+        except ValueError:
+            return None
+
+    m = re.match(r"^(\d{1,2})[./](\d{1,2})(?:[./](\d{4}))?$", text)
+    if m:
+        d, mo, y = m.groups()
+        d, mo = int(d), int(mo)
+        y_given = bool(y)
+        y = int(y) if y else bugun.year
+        try:
+            natija = datetime.date(y, mo, d)
+            if not y_given and natija < bugun:
+                natija = datetime.date(y + 1, mo, d)
+            return natija.isoformat()
+        except ValueError:
+            return None
+
+    m = re.match(r"^(\d{1,2})\s+([a-zа-яʻ']+)", text)
+    if m:
+        d = int(m.group(1))
+        for nom, raqam in OY_NOMLARI.items():
+            if m.group(2).startswith(nom):
+                try:
+                    natija = datetime.date(bugun.year, raqam, d)
+                    if natija < bugun:
+                        natija = datetime.date(bugun.year + 1, raqam, d)
+                    return natija.isoformat()
+                except ValueError:
+                    return None
+    return None
+
+
+def save_statsionar_lid(name: str, phone: str, sana_text: str, kasallik: str = "", xona: str = ""):
+    """Tasdiqlangan statsionar lidni data.json ichiga, kelish_sanasi alohida ustun bilan saqlaydi."""
+    d = load_data()
+    lid = {
+        "ism": name,
+        "telefon": phone,
+        "kasallik": kasallik or "—",
+        "xona": xona or "—",
+        "sana_matn": sana_text,
+        "kelish_sanasi": normalize_sana_to_iso(sana_text),
+        "holat": "tasdiqlangan",
+        "yaratilgan": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    d.setdefault("statsionar_lidlar", []).append(lid)
+    save_data(d)
+
+
+def get_lidlar_by_sana(kelish_sanasi_iso: str) -> list:
+    """Berilgan sanaga (YYYY-MM-DD) teng, holati 'tasdiqlangan' bo'lgan barcha lidlarni qaytaradi."""
+    d = load_data()
+    return [
+        lid for lid in d.get("statsionar_lidlar", [])
+        if lid.get("kelish_sanasi") == kelish_sanasi_iso
+        and lid.get("holat") == "tasdiqlangan"
+    ]
+
+
+async def ertaga_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/ertaga — faqat admin: ertaga keladigan tasdiqlangan bemorlar ro'yxati."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    ertangi_sana = datetime.datetime.now(TASHKENT_TZ).date() + datetime.timedelta(days=1)
+    bemorlar = get_lidlar_by_sana(ertangi_sana.isoformat())
+
+    if not bemorlar:
+        await update.message.reply_text(
+            f"📅 {ertangi_sana.strftime('%d.%m.%Y')}\n\n🟡 Ertaga keladigan bemorlar yo'q."
+        )
+        return
+
+    lines = [f"📅 *{ertangi_sana.strftime('%d.%m.%Y')} — Ertaga keladigan bemorlar ({len(bemorlar)} ta):*\n"]
+    for i, b in enumerate(bemorlar, 1):
+        lines.append(
+            f"{i}. 👤 {b.get('ism', '—')}\n"
+            f"   📞 {b.get('telefon', '—')}\n"
+            f"   🩺 {b.get('kasallik', '—')}\n"
+            f"   🛏 {b.get('xona', '—')}\n"
+        )
+    await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
 async def send_lid(context, channel_id, text):
     try:
         await context.bot.send_message(chat_id=channel_id, text=text)
@@ -5873,6 +5978,13 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                     f"🟢 QO'NG'IROQ QILING!"
                 )
             await send_lid(context, STATSIONAR_CHANNEL, lid)
+            save_statsionar_lid(
+                name=name,
+                phone=phone_num,
+                sana_text=sana,
+                kasallik="",
+                xona=booking.get("calc_room", "—") if from_calc else xona,
+            )
 
         else:  # diagnostika
             name = booking.get("name", "—")
@@ -7250,6 +7362,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
+    app.add_handler(CommandHandler("ertaga", ertaga_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
