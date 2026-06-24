@@ -5717,6 +5717,48 @@ def get_lidlar_by_sana(kelish_sanasi_iso: str) -> list:
     ]
 
 
+async def lid_add_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lid_add Ism|Telefon|YYYY-MM-DD|Kasallik|Xona — faqat admin: eski/qo'lda lidni tizimga qo'shadi.
+    Kasallik va Xona ixtiyoriy — bo'lmasa '—' qo'yiladi."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    raw = update.message.text.replace("/lid_add", "", 1).strip()
+    if not raw:
+        await update.message.reply_text(
+            "Format: /lid_add Ism Familiya|+998901234567|2026-06-25|Kasallik nomi|Xona turi\n\n"
+            "Kasallik va Xona ixtiyoriy, qoldirib ketsa bo'ladi:\n"
+            "/lid_add Ism Familiya|+998901234567|2026-06-25"
+        )
+        return
+    parts = [p.strip() for p in raw.split("|")]
+    if len(parts) < 3:
+        await update.message.reply_text("❌ Kamida Ism|Telefon|Sana (YYYY-MM-DD) kerak.")
+        return
+    name, phone, sana_iso = parts[0], parts[1], parts[2]
+    kasallik = parts[3] if len(parts) > 3 else ""
+    xona = parts[4] if len(parts) > 4 else ""
+    try:
+        datetime.date.fromisoformat(sana_iso)
+    except ValueError:
+        await update.message.reply_text(f"❌ Sana formati noto'g'ri: '{sana_iso}'. To'g'ri format: YYYY-MM-DD (masalan 2026-06-25)")
+        return
+
+    d = load_data()
+    lid = {
+        "ism": name,
+        "telefon": phone,
+        "kasallik": kasallik or "—",
+        "xona": xona or "—",
+        "sana_matn": sana_iso,
+        "kelish_sanasi": sana_iso,
+        "holat": "tasdiqlangan",
+        "yaratilgan": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    d.setdefault("statsionar_lidlar", []).append(lid)
+    save_data(d)
+    await update.message.reply_text(f"✅ Qo'shildi: {name} | {sana_iso}")
+
+
 async def lidlar_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/lidlar_debug — faqat admin: statsionar_lidlar ro'yxatidagi BARCHA yozuvlarni xom holda ko'rsatadi (sana formatini tekshirish uchun)."""
     if update.effective_user.id != ADMIN_ID:
@@ -7384,6 +7426,7 @@ def main():
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
     app.add_handler(CommandHandler("ertaga", ertaga_handler))
     app.add_handler(CommandHandler("lidlar_debug", lidlar_debug_handler))
+    app.add_handler(CommandHandler("lid_add", lid_add_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
