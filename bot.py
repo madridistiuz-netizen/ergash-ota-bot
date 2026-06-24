@@ -5717,6 +5717,26 @@ def get_lidlar_by_sana(kelish_sanasi_iso: str) -> list:
     ]
 
 
+async def lidlar_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lidlar_debug — faqat admin: statsionar_lidlar ro'yxatidagi BARCHA yozuvlarni xom holda ko'rsatadi (sana formatini tekshirish uchun)."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    lidlar = d.get("statsionar_lidlar", [])
+    if not lidlar:
+        await update.message.reply_text("📭 statsionar_lidlar ro'yxati hozircha bo'sh (hech narsa saqlanmagan).")
+        return
+    lines = [f"📋 Jami: {len(lidlar)} ta yozuv\n"]
+    for i, lid in enumerate(lidlar[-20:], 1):  # oxirgi 20 tasi
+        lines.append(
+            f"{i}. {lid.get('ism', '—')} | "
+            f"sana_matn: '{lid.get('sana_matn', '—')}' | "
+            f"kelish_sanasi (ISO): {lid.get('kelish_sanasi', '—')} | "
+            f"holat: {lid.get('holat', '—')}"
+        )
+    await update.message.reply_text("\n".join(lines))
+
+
 async def ertaga_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/ertaga — faqat admin: ertaga keladigan tasdiqlangan bemorlar ro'yxati."""
     if update.effective_user.id != ADMIN_ID:
@@ -7363,6 +7383,7 @@ def main():
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
     app.add_handler(CommandHandler("ertaga", ertaga_handler))
+    app.add_handler(CommandHandler("lidlar_debug", lidlar_debug_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
