@@ -27,6 +27,8 @@ TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
 AI_LOG_FILE = os.getenv("AI_LOG_FILE", "/app/data/ai_logs.json")
 TASHKENT_TZ = datetime.timezone(datetime.timedelta(hours=5))
+CLINIC_LATITUDE = 39.892639
+CLINIC_LONGITUDE = 66.307028
 
 DEFAULT_DATA = {
     "contacts": {
@@ -1064,7 +1066,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
     elif data == "menu_guide":
         context.user_data["state"] = None
         title = {
-            "ru": "📖 *Инструкция для пациента*\n\nВыберите раздел:",
+            "ru": "📖 *Руководство пациента*\n\nВыберите раздел:",
             "uz": "📖 *Bemor uchun qo'llanma*\n\nBo'limni tanlang:",
             "kz": "📖 *Науқас нұсқаулығы*\n\nБөлімді таңдаңыз:",
         }[lang]
@@ -6324,7 +6326,7 @@ INFRATUZILMA (korpuslar va xizmatlar):
 QABUL QILINMAYDIGAN HOLATLAR HAQIDA:
 - Agar bemor og'ir holat (onkologiya, gemodializ, XPN 3-4-5 bosqich va h.k.) haqida yozsa, buni ochiq ayt va operatorga/shifokorga murojaat qilishni tavsiya qil — lekin doctor_question yo'naltirishini FAQAT bemor aniq o'z tashxisini/tibbiy hujjatini ko'rsatib shifokor fikrini so'rasa qo'll, har qanday oddiy savol uchun emas.
 
-ALOQA MA'LUMOTLARI VA MANZIL (bu ma'lumotlar pastda JORIY KONTAKT bo'limida har doim aniq beriladi — agar bemor telefon raqami, manzil, ish vaqti, Instagram yoki vebsayt so'rasa, "bilmayman" DEB HECH QACHON AYTMA, shu ma'lumotni TO'G'RIDAN-TO'G'RI ber. Operatorga yo'naltirish bu holatda kerak emas, faqat ma'lumotni o'zing taqdim et).
+ALOQA MA'LUMOTLARI (bu ma'lumotlar pastda JORIY KONTAKT bo'limida har doim aniq beriladi — agar bemor telefon raqami, ish vaqti, Instagram yoki vebsayt so'rasa, "bilmayman" DEB HECH QACHON AYTMA, shu ma'lumotni TO'G'RIDAN-TO'G'RI ber, operatorga yo'naltirish kerak emas). LOKATSIYA/manzil/xarita/qanday borish so'ralganda esa matn yozish O'RNIGA pastdagi ROUTE qoidasi bo'yicha menu_location kodini ishlat — bu holatda haqiqiy xaritadagi nuqta avtomatik yuboriladi.
 
 QOIDALAR:
 - Foydalanuvchi qaysi tilda yozsa (o'zbek lotin, rus yoki qozoq krill), albatta AYNAN shu tilda javob ber. Qozoqcha krill yozuvini o'zbekcha bilan ADASHTIRMA — agar matnda "қанша", "болады", "тенге", "қалай" kabi qozoqcha so'zlar yoki krill yozuv aralashgan bo'lsa, bu qozoqcha, javobni ham qozoq tilida yoz.
@@ -6346,10 +6348,12 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_faq — tez-tez so'raladigan savollar
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
+- menu_location — bemor klinikaning LOKATSIYASINI/manzilini xaritada, qayerda joylashganini, qanday borishni so'rasa (bu holatda javob matni yozma, faqat shu kodni ber, xaritadagi haqiqiy nuqta avtomatik yuboriladi)
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
 - calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_rooms ishlat.
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
+MAXSUS QOIDA — menu_location: agar javobing menu_location bo'lsa, HECH QANDAY matn yozma, faqat "ROUTE:menu_location" qatorining o'zini yoz — chunki bemorga shu o'rniga haqiqiy xaritadagi nuqta (geolokatsiya) yuboriladi, undan oldin matn kerak emas.
 ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
 
 SECTION_BUTTON_LABELS = {
@@ -6361,6 +6365,7 @@ SECTION_BUTTON_LABELS = {
     "menu_faq":          {"ru": "❓ Частые вопросы",           "uz": "❓ Ko'p so'raladigan savollar", "kz": "❓ Жиі сұралатын сұрақтар"},
     "menu_booking":      {"ru": "📅 Записаться на приём",     "uz": "📅 Qabulga yozilish",         "kz": "📅 Қабылдауға жазылу"},
     "menu_weekend":      {"ru": "🌅 Воскресенье",             "uz": "🌅 Yakshanba",                "kz": "🌅 Жексенбі"},
+    "menu_location":     {"ru": "📍 Локация клиники",         "uz": "📍 Klinika lokatsiyasi",      "kz": "📍 Клиника локациясы"},
     "doctor_question":   {"ru": "👨‍⚕️ Вопрос врачу",            "uz": "👨‍⚕️ Shifokorga savol",         "kz": "👨‍⚕️ Дәрігерге сұрақ"},
     "calc_start":        {"ru": "🧮 Рассчитать стоимость",    "uz": "🧮 Narxni hisoblash",         "kz": "🧮 Құнын есептеу"},
     "menu_operator":     {"ru": "📞 Связаться с оператором",  "uz": "📞 Operatorga bog'lanish",    "kz": "📞 Операторға хабарласу"},
@@ -6608,6 +6613,18 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
         }[lang]
 
     ai_reply, route = _extract_route(ai_reply)
+
+    # LOKATSIYA so'ralganda — matn yubormasdan, FAQAT haqiqiy xaritadagi geo-pin yuboriladi
+    if route == "menu_location":
+        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": "[lokatsiya yuborildi]"}]
+        context.user_data["ai_history"] = history[-6:]
+        _log_ai_interaction(update.effective_user, text, "[lokatsiya yuborildi]", route, False, lang)
+        await context.bot.send_location(
+            chat_id=update.effective_chat.id,
+            latitude=CLINIC_LATITUDE,
+            longitude=CLINIC_LONGITUDE,
+        )
+        return
 
     # Suhbat tarixini yangilaymiz (oxirgi 3 juft — 6 xabar — saqlanadi)
     history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": ai_reply}]
