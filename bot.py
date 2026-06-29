@@ -5163,7 +5163,7 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     msg = update.message or update.channel_post
     if not msg or not msg.reply_to_message:
         return
-    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL}
+    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, FEEDBACK_GROUP_ID}
     logger.info(f"doctor_reply_handler: chat_id={msg.chat.id}, allowed={allowed}")
     if msg.chat.id not in allowed:
         return
@@ -7511,11 +7511,12 @@ def main():
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(FEEDBACK_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     # Kanal postlari uchun (channel_post)
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
-    app.add_handler(MessageHandler(filters.VOICE, unknown))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
+    app.add_handler(MessageHandler(filters.VOICE & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
