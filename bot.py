@@ -664,11 +664,6 @@ MENU_LABELS = {
 
 def main_menu_keyboard(lang, user_id: int = 0):
     labels = MENU_LABELS[lang]
-    results_label = {
-        "ru": "📥 Получить результаты",
-        "uz": "📥 Natijalarni yuklab olish",
-        "kz": "📥 Нәтижелерді жүктеу",
-    }[lang]
     buttons = [
         [InlineKeyboardButton(labels["clinic"],          callback_data="menu_clinic")],
         [InlineKeyboardButton(labels["rooms"],           callback_data="menu_rooms")],
@@ -679,7 +674,6 @@ def main_menu_keyboard(lang, user_id: int = 0):
         [InlineKeyboardButton(labels["booking"],         callback_data="menu_booking")],
         [InlineKeyboardButton(labels["weekend"],         callback_data="menu_weekend")],
         [InlineKeyboardButton(labels["doctor_question"], callback_data="doctor_question")],
-        [InlineKeyboardButton(results_label,             callback_data="get_results")],
     ]
     if user_id and (user_id == ADMIN_ID or user_id in ALLOWED_STAFF):
         upload_label = {"ru": "📤 Загрузить PDF результат", "uz": "📤 PDF Natija Yuklash", "kz": "📤 PDF Нәтиже Жүктеу"}.get(lang, "📤 PDF Natija Yuklash")
@@ -4832,11 +4826,16 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop("staff_upload_step", None)
         context.user_data.pop("staff_upload_data", None)
 
-        await update.message.reply_text(
-            f"✅ *Muvaffaqiyatli saqlandi!*\n\n"
-            f"👤 Telefon: `{phone}`\n"
+        confirm_text = (
+            f"✅ *PDF muvaffaqiyatli yuklandi va saqlandi!*\n\n"
+            f"📞 Telefon: `{phone}`\n"
             f"🎂 Tug'ilgan kun: `{dob}`\n"
-            f"📄 Fayl: {file_name}",
+            f"📄 Fayl nomi: `{file_name}`\n"
+            f"🕐 Vaqt: `{uploaded_at}`\n\n"
+            f"Bemor endi botdan o'z natijasini olishi mumkin."
+        )
+        await update.message.reply_text(
+            confirm_text,
             parse_mode="Markdown",
             reply_markup=main_menu_keyboard(lang, user_id)
         )
