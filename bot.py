@@ -4700,11 +4700,20 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
 
         d = load_data()
         natijalari = d.get("bemor_natijalari", [])
-        # Telefon va tug'ilgan sanaga mos natijalarni topamiz
+
+        def norm_phone(p):
+            return "".join(c for c in p if c.isdigit())
+
+        def norm_dob(d_):
+            return "".join(c for c in d_ if c.isdigit())
+
+        phone_norm = norm_phone(phone)
+        dob_norm   = norm_dob(dob)
+
         found = [
             r for r in natijalari
-            if r.get("phone", "").replace(" ", "") == phone.replace(" ", "")
-            and r.get("dob", "").replace(" ", "") == dob.replace(" ", "")
+            if norm_phone(r.get("phone", "")) == phone_norm
+            and norm_dob(r.get("dob", "")) == dob_norm
         ]
 
         if not found:
@@ -4828,6 +4837,25 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📄 Fayl: {file_name}",
             parse_mode="Markdown",
             reply_markup=main_menu_keyboard(lang, user_id)
+        )
+
+
+async def results_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/results_debug — admin uchun saqlangan natijalarni ko'rish"""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    entries = d.get("bemor_natijalari", [])
+    if not entries:
+        await update.message.reply_text("📭 Hech qanday natija saqlanmagan.")
+        return
+    for i, r in enumerate(entries[-10:], 1):
+        await update.message.reply_text(
+            f"#{i}\n📞 Tel: `{r.get('phone')}`\n"
+            f"🎂 Tug: `{r.get('dob')}`\n"
+            f"📄 Fayl: {r.get('file_name')}\n"
+            f"🕐 Vaqt: {r.get('uploaded_at')}",
+            parse_mode="Markdown"
         )
 
 
@@ -7411,6 +7439,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
+    app.add_handler(CommandHandler("results_debug", results_debug_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
