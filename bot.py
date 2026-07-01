@@ -663,6 +663,11 @@ MENU_LABELS = {
 
 def main_menu_keyboard(lang, user_id: int = 0):
     labels = MENU_LABELS[lang]
+    results_label = {
+        "ru": "📥 Получить результаты",
+        "uz": "📥 Natijalarni yuklab olish",
+        "kz": "📥 Нәтижелерді жүктеу",
+    }[lang]
     buttons = [
         [InlineKeyboardButton(labels["clinic"],          callback_data="menu_clinic")],
         [InlineKeyboardButton(labels["rooms"],           callback_data="menu_rooms")],
@@ -673,6 +678,7 @@ def main_menu_keyboard(lang, user_id: int = 0):
         [InlineKeyboardButton(labels["booking"],         callback_data="menu_booking")],
         [InlineKeyboardButton(labels["weekend"],         callback_data="menu_weekend")],
         [InlineKeyboardButton(labels["doctor_question"], callback_data="doctor_question")],
+        [InlineKeyboardButton(results_label,             callback_data="get_results")],
     ]
     if user_id and (user_id == ADMIN_ID or user_id in ALLOWED_STAFF):
         upload_label = {"ru": "📤 Загрузить PDF результат", "uz": "📤 PDF Natija Yuklash", "kz": "📤 PDF Нәтиже Жүктеу"}.get(lang, "📤 PDF Natija Yuklash")
@@ -939,12 +945,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         # ── Deep Linking: agar /start parametri bilan kelgan bo'lsa, shu bo'limga yo'naltiramiz ──
         target = context.user_data.pop("deep_link_target", None)
         DEEP_LINK_MAP = {
-            "guide": "menu_guide",
-            "feedback": "guide_feedback",
-            "rooms": "menu_rooms",
-            "doctor": "doctor_question",
+            "guide":       "menu_guide",
+            "feedback":    "guide_feedback",
+            "rooms":       "menu_rooms",
+            "wards":       "menu_wards",
+            "doctor":      "doctor_question",
             "diagnostics": "menu_diagnostics",
-            "faq": "menu_faq",
+            "faq":         "menu_faq",
+            "results":     "get_results",
         }
         if target in DEEP_LINK_MAP:
             return await callback_handler(update, context, override_data=DEEP_LINK_MAP[target])
@@ -4628,6 +4636,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Operator ──
+    elif data == "get_results":
+        await get_results_start(update, context)
+
     elif data == "staff_pdf_upload":
         await staff_pdf_start(update, context)
 
@@ -4642,6 +4653,92 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
 
 # ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
+
+# ── BEMOR NATIJALARI OLISH FSM ───────────────────────────────────────────────
+
+async def get_results_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """QR deep-link yoki callback orqali natija olish bo'limini ochadi"""
+    lang = get_lang(context)
+    context.user_data["results_step"] = "phone"
+    text = {
+        "uz": "📥 *Natijangizni olish*\n\nTelefon raqamingizni kiriting:\n_(+998901234567 formatida)_",
+        "ru": "📥 *Получить результат*\n\nВведите ваш номер телефона:\n_(в формате +998901234567)_",
+        "kz": "📥 *Нәтижені алу*\n\nТелефон нөміріңізді енгізіңіз:\n_(+998901234567 форматында)_",
+    }[lang]
+    back_label = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang]
+    kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+    if hasattr(update, "callback_query") and update.callback_query:
+        await update.callback_query.answer()
+        await update.callback_query.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
+    else:
+        await update.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
+
+
+async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Bemor natija olish FSM — telefon → tug'ilgan sana → PDF yuborish"""
+    step = context.user_data.get("results_step")
+    if not step:
+        return
+    lang = get_lang(context)
+    text = update.message.text.strip() if update.message.text else ""
+
+    if step == "phone":
+        context.user_data["results_phone"] = text
+        context.user_data["results_step"] = "dob"
+        msg = {
+            "uz": "📅 Tug'ilgan kuningizni kiriting:\n_(DD.MM.YYYY formatida, masalan: 15.03.1985)_",
+            "ru": "📅 Введите дату вашего рождения:\n_(в формате DD.MM.YYYY, например: 15.03.1985)_",
+            "kz": "📅 Туған күніңізді енгізіңіз:\n_(DD.MM.YYYY форматында, мысалы: 15.03.1985)_",
+        }[lang]
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif step == "dob":
+        phone = context.user_data.get("results_phone", "")
+        dob = text
+        context.user_data.pop("results_step", None)
+        context.user_data.pop("results_phone", None)
+
+        d = load_data()
+        natijalari = d.get("bemor_natijalari", [])
+        # Telefon va tug'ilgan sanaga mos natijalarni topamiz
+        found = [
+            r for r in natijalari
+            if r.get("phone", "").replace(" ", "") == phone.replace(" ", "")
+            and r.get("dob", "").replace(" ", "") == dob.replace(" ", "")
+        ]
+
+        if not found:
+            msg = {
+                "uz": "❌ Afsuski, sizning ma'lumotlaringizga mos natija topilmadi.\n\nTelefon raqam va tug'ilgan sanani tekshirib, qaytadan urinib ko'ring yoki klinika bilan bog'laning.",
+                "ru": "❌ К сожалению, результаты по вашим данным не найдены.\n\nПроверьте номер телефона и дату рождения, попробуйте ещё раз или обратитесь в клинику.",
+                "kz": "❌ Кешіріңіз, деректеріңізге сәйкес нәтиже табылмады.\n\nТелефон нөмірі мен туған күнді тексеріп, қайта көріңіз немесе клиникаға хабарласыңыз.",
+            }[lang]
+            back_label = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+            await update.message.reply_text(msg, reply_markup=kb)
+            return
+
+        # Topilgan natijalarni yuboramiz
+        intro = {
+            "uz": f"✅ *{len(found)} ta natija topildi:*",
+            "ru": f"✅ *Найдено результатов: {len(found)}:*",
+            "kz": f"✅ *{len(found)} нәтиже табылды:*",
+        }[lang]
+        await update.message.reply_text(intro, parse_mode="Markdown")
+        for r in found:
+            try:
+                await context.bot.send_document(
+                    chat_id=update.effective_chat.id,
+                    document=r["file_id"],
+                    filename=r.get("file_name", "natija.pdf"),
+                    caption=f"📄 {r.get('file_name', 'natija.pdf')}\n🗓 {r.get('uploaded_at', '')}"
+                )
+            except Exception as e:
+                logger.error(f"Natija yuborishda xato: {e}")
+        back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+        await update.message.reply_text("✅", reply_markup=kb)
+
 
 # ── STAFF PDF UPLOAD FSM ─────────────────────────────────────────────────────
 
@@ -6704,9 +6801,14 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
 
-    # ── Staff PDF yuklash FSM faol bo'lsa — shu yerda ushlaylik ──
+    # ── Staff PDF yuklash FSM faol bo'lsa ──
     if context.user_data.get("staff_upload_step") and _is_staff(update.effective_user.id):
         await staff_pdf_handler(update, context)
+        return
+
+    # ── Bemor natija olish FSM faol bo'lsa ──
+    if context.user_data.get("results_step"):
+        await patient_results_handler(update, context)
         return
 
     # Ovozli xabar filtri
