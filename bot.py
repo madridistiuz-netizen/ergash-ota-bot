@@ -7324,7 +7324,7 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.VIDEO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
-    app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID + ALLOWED_STAFF), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
     app.add_handler(MessageHandler(filters.VOICE & ~filters.User(ADMIN_ID), medical_voice_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
