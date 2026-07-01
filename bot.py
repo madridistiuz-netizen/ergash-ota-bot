@@ -4777,6 +4777,7 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _is_staff(user_id):
         return
     step = context.user_data.get("staff_upload_step")
+    logger.info(f"STAFF_PDF: user={user_id} step={step} has_text={bool(update.message.text)} has_doc={bool(update.message.document)}")
     if not step:
         return
 
