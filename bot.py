@@ -4841,6 +4841,12 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def staff_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Document (PDF) yuborilganda faqat staff/admin uchun — staff_pdf_handler'ga yo'naltiradi"""
+    logger.info(f"STAFF_DOC: user={update.effective_user.id} step={context.user_data.get('staff_upload_step')}")
+    await staff_pdf_handler(update, context)
+
+
 async def results_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/results_debug — admin uchun saqlangan natijalarni ko'rish"""
     if update.effective_user.id != ADMIN_ID:
@@ -7456,8 +7462,8 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
-    # Staff PDF yuklash (ALLOWED_STAFF + ADMIN uchun, faqat staff_upload_step faol bo'lganda ishlaydi)
-    app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ALLOWED_STAFF + [ADMIN_ID]), staff_pdf_handler))
+    # Staff PDF yuklash
+    app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ALLOWED_STAFF + [ADMIN_ID]), staff_doc_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.VIDEO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
