@@ -6704,6 +6704,11 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
 
+    # ── Staff PDF yuklash FSM faol bo'lsa — shu yerda ushlaylik ──
+    if context.user_data.get("staff_upload_step") and _is_staff(update.effective_user.id):
+        await staff_pdf_handler(update, context)
+        return
+
     # Ovozli xabar filtri
     if update.message.voice or update.message.audio:
         msg = {
