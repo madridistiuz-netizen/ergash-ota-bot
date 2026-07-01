@@ -29,6 +29,7 @@ DIAGNOSTIKA_CHANNEL = int(os.getenv("DIAGNOSTIKA_CHANNEL", "-1003933653831"))
 TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
 AI_LOG_FILE = os.getenv("AI_LOG_FILE", "/app/data/ai_logs.json")
+TASHKENT_TZ = datetime.timezone(datetime.timedelta(hours=5))
 
 DEFAULT_DATA = {
     "contacts": {
