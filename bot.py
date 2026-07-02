@@ -960,7 +960,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы — Каттақурғон\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(welcome, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang))
+                                      reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
 
     # ── Orqaga ──
     elif data == "back_main":
@@ -971,7 +971,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang))
+                                      reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
 
     # ── FAQ ──
     elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question", "q_work_hours", "back_delete_work_hours"):
@@ -4225,7 +4225,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 "uz": "✅ Savolingiz shifokorga yetkazildi! Javobni kuting.",
                 "kz": "✅ Сұрағыңыз дәрігерге жіберілді! Жауапты күтіңіз.",
             }[lang]
-            await query.edit_message_text(confirm, reply_markup=main_menu_keyboard(lang))
+            await query.edit_message_text(confirm, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
 
             # ── AI orqali umumiy yo'naltiruvchi javob (shifokor javobini almashtirmaydi) ──
             if temp_text:
@@ -4263,10 +4263,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "❌ Болдырылмады.",
         }[lang]
         try:
-            await query.edit_message_text(cancel_text, reply_markup=main_menu_keyboard(lang))
+            await query.edit_message_text(cancel_text, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
         except Exception:
             await context.bot.send_message(chat_id=chat_id, text=cancel_text,
-                                           reply_markup=main_menu_keyboard(lang))
+                                           reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
         title = {
             "ru": "🧲 Выберите вид диагностики:",
             "uz": "🧲 Diagnostika turini tanlang:",
@@ -5283,7 +5283,7 @@ async def medical_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             confirm = {"ru": "✅ Ваше сообщение принято! Спасибо за обратную связь.",
                        "uz": "✅ Xabaringiz qabul qilindi! Fikr-mulohazangiz uchun rahmat.",
                        "kz": "✅ Хабарыңыз қабылданды! Пікіріңіз үшін рахмет."}[lang]
-            await update.message.reply_text(confirm, reply_markup=main_menu_keyboard(lang))
+            await update.message.reply_text(confirm, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
         except Exception as e:
             logger.error(f"Feedback media yuborish xatosi: {e}")
             await update.message.reply_text("❌ Xabar yuborishda xatolik yuz berdi.")
@@ -7037,7 +7037,7 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
             "uz": "Menyudan bo'lim tanlang 👇",
             "kz": "Мәзірден бөлім таңдаңыз 👇",
         }[lang]
-        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
+        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
         return
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
@@ -7181,7 +7181,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "uz": "⛔️ Bu bo'lim faqat takliflar uchun!\n\nKasallik yoki shifokor qabuli bo'yicha savollarni tegishli bo'limlarga yuboring.",
                 "kz": "⛔️ Бұл бөлім тек ұсыныстар үшін!\n\nАуру немесе дәрігер қабылдауы туралы сұрақтарды тиісті бөлімдерге жіберіңіз.",
             }[lang]
-            await update.message.reply_text(warn, reply_markup=main_menu_keyboard(lang))
+            await update.message.reply_text(warn, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
             return
 
         feedback_msg = (
@@ -7692,7 +7692,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "uz": "👋 Xush kelibsiz! Kerakli bo'limni tanlang:",
             "kz": "👋 Сәлем! Қажетті бөлімді таңдаңыз:",
         }[lang]
-        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang))
+        await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
         return
 
     # Boshqa matnlar — AI Administrator orqali javob beramiz
