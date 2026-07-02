@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
+# ── Diagnostika xodimlari: PDF natija yuklashga ruxsat berilgan Telegram ID lar ──
+# Railway Variables'ga: ALLOWED_STAFF=123456789,987654321 formatida kiriting
+ALLOWED_STAFF = [int(x) for x in os.getenv("ALLOWED_STAFF", "").split(",") if x.strip().isdigit()]
 
 # ── AI Administrator sozlamalari ──
 AI_PROVIDER = os.getenv("AI_PROVIDER", "anthropic")  # "anthropic" yoki "openai"
@@ -659,9 +662,9 @@ MENU_LABELS = {
 }
 
 
-def main_menu_keyboard(lang):
+def main_menu_keyboard(lang, user_id: int = 0):
     labels = MENU_LABELS[lang]
-    return InlineKeyboardMarkup([
+    buttons = [
         [InlineKeyboardButton(labels["clinic"],          callback_data="menu_clinic")],
         [InlineKeyboardButton(labels["rooms"],           callback_data="menu_rooms")],
         [InlineKeyboardButton(labels["wards"],           callback_data="menu_wards")],
@@ -671,7 +674,11 @@ def main_menu_keyboard(lang):
         [InlineKeyboardButton(labels["booking"],         callback_data="menu_booking")],
         [InlineKeyboardButton(labels["weekend"],         callback_data="menu_weekend")],
         [InlineKeyboardButton(labels["doctor_question"], callback_data="doctor_question")],
-    ])
+    ]
+    if user_id and (user_id == ADMIN_ID or user_id in ALLOWED_STAFF):
+        upload_label = {"ru": "📤 Загрузить PDF результат", "uz": "📤 PDF Natija Yuklash", "kz": "📤 PDF Нәтиже Жүктеу"}.get(lang, "📤 PDF Natija Yuklash")
+        buttons.append([InlineKeyboardButton(upload_label, callback_data="staff_pdf_upload")])
+    return InlineKeyboardMarkup(buttons)
 
 
 def back_keyboard(lang):
@@ -933,13 +940,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         # ── Deep Linking: agar /start parametri bilan kelgan bo'lsa, shu bo'limga yo'naltiramiz ──
         target = context.user_data.pop("deep_link_target", None)
         DEEP_LINK_MAP = {
-            "guide": "menu_guide",
-            "feedback": "guide_feedback",
-            "rooms": "menu_rooms",
-            "wards": "menu_wards",
-            "doctor": "doctor_question",
+            "guide":       "menu_guide",
+            "feedback":    "guide_feedback",
+            "rooms":       "menu_rooms",
+            "wards":       "menu_wards",
+            "doctor":      "doctor_question",
             "diagnostics": "menu_diagnostics",
-            "faq": "menu_faq",
+            "faq":         "menu_faq",
+            "results":     "get_results",
         }
         if target in DEEP_LINK_MAP:
             return await callback_handler(update, context, override_data=DEEP_LINK_MAP[target])
@@ -950,7 +958,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы — Каттақурғон\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(welcome, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang))
+                                      reply_markup=main_menu_keyboard(lang, query.from_user.id))
 
     # ── Orqaga ──
     elif data == "back_main":
@@ -961,7 +969,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang))
+                                      reply_markup=main_menu_keyboard(lang, query.from_user.id))
 
     # ── FAQ ──
     elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question", "q_work_hours", "back_delete_work_hours"):
@@ -4623,6 +4631,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     # ── Operator ──
+    elif data == "get_results":
+        await get_results_start(update, context)
+
+    elif data == "staff_pdf_upload":
+        await staff_pdf_start(update, context)
+
     elif data in ("menu_operator", "connect_operator"):
         c = d["contacts"]
         text = {
@@ -4634,6 +4648,223 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
 
 # ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
+
+# ── BEMOR NATIJALARI OLISH FSM ───────────────────────────────────────────────
+
+async def get_results_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """QR deep-link yoki callback orqali natija olish bo'limini ochadi"""
+    lang = get_lang(context)
+    context.user_data["results_step"] = "phone"
+    text = {
+        "uz": "📥 *Natijangizni olish*\n\nTelefon raqamingizni kiriting:\n_(+998901234567 formatida)_",
+        "ru": "📥 *Получить результат*\n\nВведите ваш номер телефона:\n_(в формате +998901234567)_",
+        "kz": "📥 *Нәтижені алу*\n\nТелефон нөміріңізді енгізіңіз:\n_(+998901234567 форматында)_",
+    }[lang]
+    back_label = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang]
+    kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+    if hasattr(update, "callback_query") and update.callback_query:
+        await update.callback_query.answer()
+        await update.callback_query.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
+    else:
+        await update.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
+
+
+async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Bemor natija olish FSM — telefon → tug'ilgan sana → PDF yuborish"""
+    step = context.user_data.get("results_step")
+    if not step:
+        return
+    lang = get_lang(context)
+    text = update.message.text.strip() if update.message.text else ""
+
+    if step == "phone":
+        context.user_data["results_phone"] = text
+        context.user_data["results_step"] = "dob"
+        msg = {
+            "uz": "📅 Tug'ilgan kuningizni kiriting:\n_(DD.MM.YYYY formatida, masalan: 15.03.1985)_",
+            "ru": "📅 Введите дату вашего рождения:\n_(в формате DD.MM.YYYY, например: 15.03.1985)_",
+            "kz": "📅 Туған күніңізді енгізіңіз:\n_(DD.MM.YYYY форматында, мысалы: 15.03.1985)_",
+        }[lang]
+        await update.message.reply_text(msg, parse_mode="Markdown")
+
+    elif step == "dob":
+        phone = context.user_data.get("results_phone", "")
+        dob = text
+        context.user_data.pop("results_step", None)
+        context.user_data.pop("results_phone", None)
+
+        d = load_data()
+        natijalari = d.get("bemor_natijalari", [])
+
+        def norm_phone(p):
+            return "".join(c for c in p if c.isdigit())
+
+        def norm_dob(d_):
+            return "".join(c for c in d_ if c.isdigit())
+
+        phone_norm = norm_phone(phone)
+        dob_norm   = norm_dob(dob)
+
+        found = [
+            r for r in natijalari
+            if norm_phone(r.get("phone", "")) == phone_norm
+            and norm_dob(r.get("dob", "")) == dob_norm
+        ]
+
+        if not found:
+            msg = {
+                "uz": "❌ Afsuski, sizning ma'lumotlaringizga mos natija topilmadi.\n\nTelefon raqam va tug'ilgan sanani tekshirib, qaytadan urinib ko'ring yoki klinika bilan bog'laning.",
+                "ru": "❌ К сожалению, результаты по вашим данным не найдены.\n\nПроверьте номер телефона и дату рождения, попробуйте ещё раз или обратитесь в клинику.",
+                "kz": "❌ Кешіріңіз, деректеріңізге сәйкес нәтиже табылмады.\n\nТелефон нөмірі мен туған күнді тексеріп, қайта көріңіз немесе клиникаға хабарласыңыз.",
+            }[lang]
+            back_label = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang]
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+            await update.message.reply_text(msg, reply_markup=kb)
+            return
+
+        # Topilgan natijalarni yuboramiz
+        intro = {
+            "uz": f"✅ *{len(found)} ta natija topildi:*",
+            "ru": f"✅ *Найдено результатов: {len(found)}:*",
+            "kz": f"✅ *{len(found)} нәтиже табылды:*",
+        }[lang]
+        await update.message.reply_text(intro, parse_mode="Markdown")
+        for r in found:
+            try:
+                await context.bot.send_document(
+                    chat_id=update.effective_chat.id,
+                    document=r["file_id"],
+                    filename=r.get("file_name", "natija.pdf"),
+                    caption=f"📄 {r.get('file_name', 'natija.pdf')}\n🗓 {r.get('uploaded_at', '')}"
+                )
+            except Exception as e:
+                logger.error(f"Natija yuborishda xato: {e}")
+        back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+        await update.message.reply_text("✅", reply_markup=kb)
+
+
+# ── STAFF PDF UPLOAD FSM ─────────────────────────────────────────────────────
+
+def _is_staff(user_id: int) -> bool:
+    return user_id == ADMIN_ID or user_id in ALLOWED_STAFF
+
+
+async def staff_pdf_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """'📤 PDF Natija Yuklash' tugmasi bosilganda — faqat ALLOWED_STAFF uchun"""
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    if not _is_staff(user_id):
+        await query.answer("❌ Ruxsat yo'q", show_alert=True)
+        return
+    context.user_data["staff_upload_step"] = "phone"
+    context.user_data["staff_upload_data"] = {}
+    await query.message.reply_text(
+        "📋 *Bemor telefon raqamini kiriting:*\n_(+998901234567 formatida)_",
+        parse_mode="Markdown"
+    )
+
+
+async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Staff PDF yuklash FSM — ketma-ket: telefon → tug'ilgan sana → PDF fayl"""
+    user_id = update.effective_user.id
+    if not _is_staff(user_id):
+        return
+    step = context.user_data.get("staff_upload_step")
+    logger.info(f"STAFF_PDF: user={user_id} step={step} has_text={bool(update.message.text)} has_doc={bool(update.message.document)}")
+    if not step:
+        return
+
+    lang = get_lang(context)
+
+    if step == "phone" and update.message.text:
+        context.user_data["staff_upload_data"]["phone"] = update.message.text.strip()
+        context.user_data["staff_upload_step"] = "dob"
+        await update.message.reply_text(
+            "📅 *Bemor tug'ilgan kunini kiriting:*\n_(DD.MM.YYYY formatida, masalan: 15.03.1985)_",
+            parse_mode="Markdown"
+        )
+
+    elif step == "dob" and update.message.text:
+        context.user_data["staff_upload_data"]["dob"] = update.message.text.strip()
+        context.user_data["staff_upload_step"] = "pdf"
+        await update.message.reply_text(
+            "📄 *PDF natija faylini yuboring:*",
+            parse_mode="Markdown"
+        )
+
+    elif step == "pdf" and update.message.document:
+        doc = update.message.document
+        if doc.mime_type != "application/pdf":
+            await update.message.reply_text("❌ Faqat PDF fayl qabul qilinadi. Qaytadan yuboring.")
+            return
+
+        data = context.user_data.get("staff_upload_data", {})
+        phone = data.get("phone", "")
+        dob   = data.get("dob", "")
+        file_id = doc.file_id
+        file_name = doc.file_name or "natija.pdf"
+        uploaded_by = user_id
+        uploaded_at = datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S")
+
+        # ── ma'lumotlar bazasiga yozish ──
+        d = load_data()
+        if "bemor_natijalari" not in d:
+            d["bemor_natijalari"] = []
+        d["bemor_natijalari"].append({
+            "phone":       phone,
+            "dob":         dob,
+            "file_id":     file_id,
+            "file_name":   file_name,
+            "uploaded_by": uploaded_by,
+            "uploaded_at": uploaded_at,
+        })
+        save_data(d)
+
+        # FSM tozalash
+        context.user_data.pop("staff_upload_step", None)
+        context.user_data.pop("staff_upload_data", None)
+
+        confirm_text = (
+            f"✅ *PDF muvaffaqiyatli yuklandi va saqlandi!*\n\n"
+            f"📞 Telefon: `{phone}`\n"
+            f"🎂 Tug'ilgan kun: `{dob}`\n"
+            f"📄 Fayl nomi: `{file_name}`\n"
+            f"🕐 Vaqt: `{uploaded_at}`\n\n"
+            f"Bemor endi botdan o'z natijasini olishi mumkin."
+        )
+        await update.message.reply_text(
+            confirm_text,
+            parse_mode="Markdown",
+            reply_markup=main_menu_keyboard(lang, user_id)
+        )
+
+
+async def staff_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Document (PDF) yuborilganda faqat staff/admin uchun — staff_pdf_handler'ga yo'naltiradi"""
+    logger.info(f"STAFF_DOC: user={update.effective_user.id} step={context.user_data.get('staff_upload_step')}")
+    await staff_pdf_handler(update, context)
+
+
+async def results_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/results_debug — admin uchun saqlangan natijalarni ko'rish"""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    entries = d.get("bemor_natijalari", [])
+    if not entries:
+        await update.message.reply_text("📭 Hech qanday natija saqlanmagan.")
+        return
+    for i, r in enumerate(entries[-10:], 1):
+        await update.message.reply_text(
+            f"#{i}\n📞 Tel: `{r.get('phone')}`\n"
+            f"🎂 Tug: `{r.get('dob')}`\n"
+            f"📄 Fayl: {r.get('file_name')}\n"
+            f"🕐 Vaqt: {r.get('uploaded_at')}",
+            parse_mode="Markdown"
+        )
+
 
 async def ai_logs_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/ai_logs [N] — faqat admin uchun, AI'ning oxirgi N (default 10) savol-javobini ko'rsatadi."""
@@ -6281,17 +6512,12 @@ SURGI GIYOHI HAQIDA (bemor so'rasa shu tartibni ayt):
 - Ichish vaqti: faqat ovqatlangandan keyin (to'q qoringa), iliq holatda, choy o'rnida.
 - Natija: ich kelishi suriladi (toksin/shlaklar tozalanadi), qorin dam bo'lishi yoki yengil sanchiq — bu tabiiy hol, xavotirga o'rin yo'q. Suv balansi uchun ruxsat etilgan sharbatlardan ichib turish kerak.
 
-UYDA PARHEZ HAQIDA (ICHKI ESLATMA — bu gapni bemorga aytma, faqat o'zing bilib qo'y: parhez har bir bemor uchun alohida tuzilmaydi, hammaga bir xil; lekin javobda buni alohida ta'kidlama, shunchaki to'g'ridan-to'g'ri parhez tartibini ayt):
+UYDA PARHEZ HAQIDA (MUHIM — bu haqida noto'g'ri ma'lumot berma):
+- Uyda qo'llaniladigan parhez BARCHA bemorlar uchun BIR XIL — kasallikka qarab farq qilmaydi, shifokor har bir bemorga alohida shaxsiy parhez jadvali tuzib bermaydi.
 - Taqiqlangan: yog'li, qovurilgan, achchiq taomlar; spirtli ichimliklar va gazli suvlar; un mahsulotlari va shirinliklar (cheklash kerak).
-- Ruxsat etilgan: sabzavot, meva, yengil ovqatlar, iliq suv, giyohli choylar, suyuq sho'rvalar (tovuq, baliq sho'rvasi).
-
-☀️ NONUSHTA: yengil qatiqli taomlar yoki suyuq qatiq, toza tabiiy asal (1-2 choy qoshiq). Dastlabki 3 kun nonsiz, keyin ozroq qora non bilan.
-
-🌤 TUSHLIK: issiq, yengil hazm bo'luvchi suyuq sho'rvalar, go'shti yog'siz bo'lishi kerak — masalan chopma sho'rva, qaynatma sho'rva, tovuq sho'rva, baliqli sho'rva, karam sho'rva.
-
-🌙 KECHKI OVQAT: tushlikdan qolgan yengil sho'rvalar yoki qatiqli taomlar, uxlashdan 3-4 soat oldin yeyilishi kerak.
-
-NON HAQIDA: dastlabki 3 kun davomida umuman non iste'mol qilinmaydi, keyin ozgina qora non bilan ruxsat etiladi.
+- Ruxsat etilgan: sabzavot, meva, yengil ovqatlar, iliq suv, giyohli choylar.
+- Suyuq sho'rvalar (masalan tovuq sho'rva, baliq sho'rvasi) ichish MUMKIN.
+- Bu umumiy parhez tartibi — klinikaga kelganda shifokor alohida-alohida shaxsiy parhez tuzib bermaydi, hammaga bir xil umumiy tartib qo'llaniladi.
 
 PARHEZ (KLINIKADA OVQATLANISH TARTIBI) HAQIDA:
 - Davolanish tabiiy yo'l bilan — maxsus parhez (ochlik rejimi) va shifobaxsh giyohlar yordamida olib boriladi, odatdagi 3 mahal ovqatlanish tartibi YO'Q.
@@ -6330,13 +6556,12 @@ QOIDALAR:
 - Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
 - Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
 - Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil.
-- MUHIM: agar savol xona narxi, xona surati, palatalar, diagnostika, narx hisoblash kabi ANIQ BIR BO'LIMGA tegishli bo'lsa, operatorga yo'naltirishni TAVSIYA QILMA — buning o'rniga pastdagi ROUTE qoidasi bo'yicha to'g'ridan-to'g'ri shu bo'limga yo'naltir, chunki o'sha bo'limda aniq rasmlar va narxlar allaqachon mavjud.
 
 BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona SURATI/RASMI so'ralganda, YOKI xona turlari va ularning narxlari haqida umumiy savol (bu yerda haqiqiy xona rasmlari mavjud)
+- menu_rooms — xona/palata narxlari haqida savol
 - menu_wards — qaysi korpus/palatalar bor, joylashish haqida
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
@@ -6344,7 +6569,7 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
-- calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_rooms ishlat.
+- calc_start — narx hisoblash, necha kun necha pul bo'ladi
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
 ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
@@ -6352,7 +6577,7 @@ ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo
 SECTION_BUTTON_LABELS = {
     "menu_clinic":       {"ru": "🏥 О клинике",              "uz": "🏥 Klinika haqida",          "kz": "🏥 Клиника туралы"},
     "menu_rooms":        {"ru": "🛏 Стоимость номеров",       "uz": "🛏 Xonalar narxi",            "kz": "🛏 Бөлмелер құны"},
-    "menu_wards":        {"ru": "🏨 Палаты",                  "uz": "🏨 Palatalar",                "kz": "🏨 Палаталар"},
+    "menu_wards":        {"ru": "🏨 Палаты (фото)",              "uz": "🏨 Palatalar (rasmlar)",      "kz": "🏨 Палаталар (суреттер)"},
     "menu_diagnostics":  {"ru": "🧲 Диагностика",             "uz": "🧲 Diagnostika",              "kz": "🧲 Диагностика"},
     "menu_guide":        {"ru": "📖 Руководство пациента",    "uz": "📖 Bemor uchun qo'llanma",    "kz": "📖 Науқас нұсқаулығы"},
     "menu_faq":          {"ru": "❓ Частые вопросы",           "uz": "❓ Ko'p so'raladigan savollar", "kz": "❓ Жиі сұралатын сұрақтар"},
@@ -6391,14 +6616,13 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
     """Smart routing: kalit so'zlar yoki AI o'zi yordam bera olmasligini bildirsa — True"""
     if any(kw in text_lower for kw in ROUTE_TO_OPERATOR_KEYWORDS):
         return True
-    fail_markers = ["aniq javob berolmayman", "не могу точно ответить", "нақты жауап бере алмаймын",
-                    "bilmayman", "не знаю", "білмеймін"]
+    fail_markers = ["operatorga", "operator bilan", "оператору", "операторға", "bilmayman", "не знаю", "білмеймін"]
     return any(m in ai_reply.lower() for m in fail_markers)
 
 
 def _build_dynamic_system_prompt() -> str:
     """AI_SYSTEM_PROMPT ga joriy sana, vaqt va hafta kunini qo'shib qaytaradi."""
-    now = datetime.datetime.now(TASHKENT_TZ)
+    now = datetime.datetime.now()
     weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
     return AI_SYSTEM_PROMPT + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
 
@@ -6542,7 +6766,7 @@ def _log_ai_interaction(user, text: str, ai_reply: str, route, needs_operator: b
             with open(AI_LOG_FILE, "r", encoding="utf-8") as f:
                 logs = json.load(f)
         logs.append({
-            "time": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "user_id": user.id,
             "username": user.username or "-",
             "lang": lang,
@@ -6611,6 +6835,39 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     step = context.user_data.get("booking_step")
     btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
+
+    # ── Foydalanuvchi yozgan matn tiliga qarab lang'ni yangilash ──
+    if text and not step:
+        # Kirill yoki o'zbek lotin belgilari asosida tilni aniqlash
+        kz_markers = ["қ", "ғ", "ү", "ұ", "ң", "һ", "ә", "і", "ө"]
+        uz_markers = ["ş", "ğ", "ç", "o'", "g'", "o`", "g`", "ʻ"]
+        ru_markers = ["ы", "э", "ъ", "ё", "щ", "ю", "я", "ж", "ч", "ш"]
+        text_lower = text.lower()
+
+        if any(m in text_lower for m in kz_markers):
+            detected = "kz"
+        elif any(m in text_lower for m in uz_markers) or \
+             (not any(c in text_lower for c in "ыэъёщюяжчш") and
+              any(c in text_lower for c in "abcdefghijklmnopqrstuvwxyz")):
+            detected = "uz"
+        elif any(m in text_lower for m in ru_markers):
+            detected = "ru"
+        else:
+            detected = lang  # aniqlab bo'lmasa — avvalgi til
+
+        if detected != lang:
+            lang = detected
+            context.user_data["lang"] = lang
+
+    # ── Staff PDF yuklash FSM faol bo'lsa ──
+    if context.user_data.get("staff_upload_step") and _is_staff(update.effective_user.id):
+        await staff_pdf_handler(update, context)
+        return
+
+    # ── Bemor natija olish FSM faol bo'lsa ──
+    if context.user_data.get("results_step"):
+        await patient_results_handler(update, context)
+        return
 
     # Ovozli xabar filtri
     if update.message.voice or update.message.audio:
@@ -7212,6 +7469,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
+    app.add_handler(CommandHandler("results_debug", results_debug_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
     app.add_handler(CommandHandler("admin_photo_clear", admin_handler))
@@ -7227,10 +7485,12 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
+    # Staff PDF yuklash
+    app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ALLOWED_STAFF + [ADMIN_ID]), staff_doc_handler))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.VIDEO & ~filters.User(ADMIN_ID), medical_doc_handler))
     app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
-    app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User(ADMIN_ID), medical_doc_handler))
-    app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ADMIN_ID), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
     app.add_handler(MessageHandler(filters.VOICE & ~filters.User(ADMIN_ID), medical_voice_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
