@@ -6561,23 +6561,24 @@ BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona/palata narxlari haqida savol
-- menu_wards — qaysi korpus/palatalar bor, joylashish haqida
+- menu_rooms — FAQAT xona/palata NARXI haqida umumiy savol (masalan "xona narxi qancha", "nechi pul turadi")
+- menu_wards — RASM/SURAT so'ralganda ("xona rasimi bormi", "xona qanday ko'rinadi") VA korpuslar/palatalar haqida savol ("qaysi korpuslar bor", "joylashish qanday") — BU BO'LIMDA HAQIQIY XONA RASMLARI MAVJUD
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
 - menu_faq — tez-tez so'raladigan savollar
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
-- calc_start — narx hisoblash, necha kun necha pul bo'ladi
+- calc_start — FAQAT bemor aniq "necha kun, necha pul" deb o'z holatini hisoblashni so'rasa. "Narxi qancha?" — bu menu_rooms, "menga 21 kun qancha turadi?" — bu calc_start
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
+MUHIM: RASM/SURAT so'rovi kelganda HECH QACHON menu_rooms yoki calc_start ishlaTma — faqat menu_wards ishlat, chunki rasmlar faqat shu bo'limda bor.
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
 ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
 
 SECTION_BUTTON_LABELS = {
     "menu_clinic":       {"ru": "🏥 О клинике",              "uz": "🏥 Klinika haqida",          "kz": "🏥 Клиника туралы"},
     "menu_rooms":        {"ru": "🛏 Стоимость номеров",       "uz": "🛏 Xonalar narxi",            "kz": "🛏 Бөлмелер құны"},
-    "menu_wards":        {"ru": "🏨 Палаты",                  "uz": "🏨 Palatalar",                "kz": "🏨 Палаталар"},
+    "menu_wards":        {"ru": "🏨 Палаты (фото)",              "uz": "🏨 Palatalar (rasmlar)",      "kz": "🏨 Палаталар (суреттер)"},
     "menu_diagnostics":  {"ru": "🧲 Диагностика",             "uz": "🧲 Diagnostika",              "kz": "🧲 Диагностика"},
     "menu_guide":        {"ru": "📖 Руководство пациента",    "uz": "📖 Bemor uchun qo'llanma",    "kz": "📖 Науқас нұсқаулығы"},
     "menu_faq":          {"ru": "❓ Частые вопросы",           "uz": "❓ Ko'p so'raladigan savollar", "kz": "❓ Жиі сұралатын сұрақтар"},
