@@ -6731,6 +6731,19 @@ OVQATLANISH HAQIDA — IKKI XIL BOSQICHNI ADASHTIRMA (bu juda muhim, ko'p xato s
   ⚠️ Baliqli sho'rva haqida MAXSUS ESLATMA: yoz oylarida (issiq mavsumda) baliqli sho'rva tavsiya etilmaydi — agar bemor aynan yoz faslida (yoki "hozir yoz" deb yozsa) baliq sho'rva haqida so'rasa, shuni ayt va o'rniga tovuq sho'rva/chopma sho'rvani tavsiya qil.
 - Agar bemor ro'yxatda YO'Q biror taom haqida so'rasa (masalan palov, osh, manti va h.k.), unga aniq ayt: bu taom uyda parhez ro'yxatida yo'q, shuning uchun uni faqat uyda parhez muddati TUGAGANDAN KEYIN iste'mol qilishni tavsiya qil — o'zingdan "mumkin" yoki "mumkin emas" deb hech qachon to'qima, faqat shu ikki holatdan birini tanlab javob ber.
 
+PSORIAZ KASALLIGI HAQIDA (bemor psoriaz yoki tana toshmalari, teri kasalliklari haqida so'rasa, AYNAN shu ma'lumotni ber):
+- Ha, klinikamizda psoriaz kasalligi davolanadi. Lekin bu oddiy kasallik emas — davolanish uchun bemordan vaqt va sabr talab etiladi.
+- Psoriaz bilan davolanish muddati kamida 24 kun bo'lib, yiliga 2-3 kurs qayta davolanish kerak bo'ladi.
+- Asosiy sabab: psoriazning kelib chiqishi ko'pincha ichki organlar bilan bog'liq — jigar kasalliklari, ichaklar shilimshiq bilan to'lib qolishi, gijjalar va boshqa ichki o'zgarishlar teri kasalligini keltirib chiqaradi. Klinikamiz aynan shu ildiz sababni davolaydi — tashqaridan emas, ichkaridan.
+- Mukammal davolanish uchun sabr, muntazamlik va kurs rejimiga qat'iy rioya qilish kerak.
+- Qo'shimcha ma'lumot uchun operatorga murojaat qilishni tavsiya qil, lekin bu savolda "bilmayman" dema — yuqoridagi ma'lumotni to'liq ber.
+
+KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "avtobus bormi", "qanday borish mumkin", "Toshkentdan kelish", "transport" kabi so'rasa):
+- Aniq transport jadvali (avtobus, marshrutka, taksi) haqida bot ma'lumotga ega emas.
+- Lekin botda "Klinikaga yetib kelish" bo'limi bor — u yerda transport va yo'l yo'nalishlari haqida to'liq ma'lumot berilgan.
+- Shuning uchun bunday savol kelganda ROUTE:menu_route kodni ber (agar bu bo'lim mavjud bo'lsa), aks holda operatorga qo'ng'iroq qilishni tavsiya qil.
+- Lokatsiya (xarita) so'rasa — ROUTE:menu_location.
+
 MALXAM NARXI HAQIDA (bemor "Malxam narxi qancha" deb so'rasa, AYNAN shu ma'lumotni ber):
 - Malxam ALOHIDA SOTILMAYDI va uni sotib olib ketish MUMKIN EMAS — bu faqat statsionar davolanishga yotgan bemorlarga beriladigan muolaja, narxi umumiy davolanish to'lovi (xona to'lovi) ichiga kiritilgan.
 - Agar bemor shunchaki "Malxam narxi qancha" deb so'rasa (aniqlashtirmasdan), unga shuni tushuntir: Malxamning alohida narxi yo'q, chunki u faqat statsionarga yotib davolanayotgan bemorlarga, umumiy to'lov ichida beriladi, tashqariga sotilmaydi.
@@ -6749,6 +6762,14 @@ BODOM YOG'I HAQIDA (mahsulot, klinikada sotiladi, narxi 48 000 so'm):
 - Tashqi qo'llash (massaj/surtish): yuz-tana terisini tarang qiladi, dog'/sepkilni yo'qotadi; bosh-yuzga surtilsa qon aylanishini yaxshilaydi, insult-keyingi falajlikda foydali; quloq og'rig'ida 1 tomchi tomiziladi.
 - Ichishga (ovqatdan oldin 1 choy qoshiq): buyrak/qovuq/o't pufagidagi toshlarni eritishga, bo'g'im-umurtqadagi tuzlarni yo'qotishga, ichki yallig'lanishni bartaraf etishga yordam beradi.
 - Bu — Ibn Sino tavsiya qilgan tabiiy mahsulot, klinika hududida sotib olish mumkin.
+
+DAVOLANISH MUDDATI HAQIDA (bemor "necha kun davolanish kerak", "davolanish muddati qancha" deb so'rasa, AYNAN shu mantiqda javob ber — hech qachon aniq "12 kun" yoki boshqa raqamni "standart muddat" sifatida berma):
+- Davolanish muddati kasallikka qarab shifokor ko'rigidan va tekshiruvlardan so'ng doktor tomonidan individual belgilanadi.
+- Umumiy yo'nalish: davolash kurslari kasallik darajasiga qarab 18, 21, 24 kun va undan ham ko'proq davom etishi mumkin.
+- Profilaktika uchun (sog'lom kishi oldini olish uchun kelganda): kamida 12–14 kun tavsiya etiladi.
+- Eng kam muddat: 10 kundan kam bo'lmasligi kerak — bu ham faqat juda shoshilgan, vaqti cheklangan holatlarda qabul qilinadi. "10 kun bo'ladi" deb tavsiya qilma — bu umumiy ma'lumot sifatida cheklov, tavsiya emas.
+- HECH QACHON "12 kun" raqamini standart muddat sifatida berma — bu noto'g'ri.
+- Bemorga "kelavering, shifokor ko'rigidan keyin o'zi maslahat beradi" degan ma'noni bos — aniq kun raqamini sen belgilama, bu doktorning vazifasi.
 
 KUNLIK PROTSEDURALAR TARTIBI:
 - Ertalab: klizma (ichak yuvish) — majburiy protsedura, keyin xonada dam olish, so'ng Malxam (soat 10:00-12:00), Malxamdan keyin grelka bilan 1.5-2 soat yotish.
@@ -7097,6 +7118,11 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ── BEMOR NATIJA OLISH FSM ──
     if context.user_data.get("results_step"):
         await patient_results_handler(update, context)
+        return
+
+    # ── STAFF PDF YUKLASH FSM ──
+    if context.user_data.get("staff_upload_step"):
+        await staff_pdf_handler(update, context)
         return
 
     # Ovozli xabar filtri
