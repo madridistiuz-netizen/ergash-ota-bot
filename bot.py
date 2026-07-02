@@ -6762,6 +6762,12 @@ TRANSFER XIZMATI (klinikamiz o'z transfer xizmatini taqdim etadi — bu eng muhi
 
 LOKATSIYA (xarita) so'rasa — ROUTE:menu_location (geo-pin yuboriladi).
 
+MALXAMDAN KEYINGI TARTIB — GRELKA VA KLIZMA (bemor "grelkadan qanday foydalanaman", "Malxamdan keyin nima qilaman", "grelka tartibi" so'rasa, AYNAN shu 3 qadamni ber, hech narsa qo'shma):
+1️⃣ Grelka qo'yish (eng muhim bosqich): Malxamni ichgach, darhol xonangizga borib, kamida 1.5–2 soat davomida o'ng qovurg'a ostiga (jigar sohasiga) grelka qo'yib, qimirlamay yotishingiz shart.
+2️⃣ Klizma muolajasi: Grelkada yotib bo'lgandan keyin, shoshmasdan klizma xonasiga borib, navbatdagi tozalash muolajasini olasiz.
+3️⃣ Muolajadan so'ng: Klizmadan keyin kun davomida faol harakatda bo'lish, qo'shimcha belgilangan muolajalarni olish va fito-bardagi giyohli choylarni ichib yurish tavsiya etiladi.
+BU JAVOBGA hech narsa qo'shma (na "yupqa mato", na "kuyish xavfi", na boshqa shaxsiy tavsiyalar) — faqat yuqoridagi 3 qadamni ber.
+
 MALXAM NARXI HAQIDA (bemor "Malxam narxi qancha" deb so'rasa, AYNAN shu ma'lumotni ber):
 - Malxam ALOHIDA SOTILMAYDI va uni sotib olib ketish MUMKIN EMAS — bu faqat statsionar davolanishga yotgan bemorlarga beriladigan muolaja, narxi umumiy davolanish to'lovi (xona to'lovi) ichiga kiritilgan.
 - Agar bemor shunchaki "Malxam narxi qancha" deb so'rasa (aniqlashtirmasdan), unga shuni tushuntir: Malxamning alohida narxi yo'q, chunki u faqat statsionarga yotib davolanayotgan bemorlarga, umumiy to'lov ichida beriladi, tashqariga sotilmaydi.
@@ -7227,6 +7233,19 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
     kb = InlineKeyboardMarkup(buttons) if buttons else None
 
     _log_ai_interaction(update.effective_user, text, ai_reply, route, needs_op, lang)
+
+    # ── GRELKA / MALXAMDAN KEYIN — rasm yuborish ──
+    GRELKA_KEYWORDS = ["grelka", "grелка", "грелка", "malxamdan keyin", "malhamdan keyin",
+                       "после малхам", "после малхама", "malxam ichgandan", "malham ichgandan"]
+    text_lower = text.lower()
+    if any(kw in text_lower for kw in GRELKA_KEYWORDS):
+        try:
+            photo_id = load_data().get("guide_step3_p3_photo", "")
+            if photo_id:
+                await context.bot.send_photo(chat_id=update.effective_chat.id, photo=photo_id)
+        except Exception as e:
+            logger.warning(f"Grelka rasm yuborishda xato: {e}")
+
     await update.message.reply_text(ai_reply, reply_markup=kb)
 
 
