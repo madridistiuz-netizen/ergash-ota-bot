@@ -6837,6 +6837,29 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
 
+    # ── Foydalanuvchi yozgan matn tiliga qarab lang'ni yangilash ──
+    if text and not step:
+        # Kirill yoki o'zbek lotin belgilari asosida tilni aniqlash
+        kz_markers = ["қ", "ғ", "ү", "ұ", "ң", "һ", "ә", "і", "ө"]
+        uz_markers = ["ş", "ğ", "ç", "o'", "g'", "o`", "g`", "ʻ"]
+        ru_markers = ["ы", "э", "ъ", "ё", "щ", "ю", "я", "ж", "ч", "ш"]
+        text_lower = text.lower()
+
+        if any(m in text_lower for m in kz_markers):
+            detected = "kz"
+        elif any(m in text_lower for m in uz_markers) or \
+             (not any(c in text_lower for c in "ыэъёщюяжчш") and
+              any(c in text_lower for c in "abcdefghijklmnopqrstuvwxyz")):
+            detected = "uz"
+        elif any(m in text_lower for m in ru_markers):
+            detected = "ru"
+        else:
+            detected = lang  # aniqlab bo'lmasa — avvalgi til
+
+        if detected != lang:
+            lang = detected
+            context.user_data["lang"] = lang
+
     # ── Staff PDF yuklash FSM faol bo'lsa ──
     if context.user_data.get("staff_upload_step") and _is_staff(update.effective_user.id):
         await staff_pdf_handler(update, context)
