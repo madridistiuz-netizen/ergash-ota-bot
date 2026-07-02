@@ -6741,8 +6741,8 @@ PSORIAZ KASALLIGI HAQIDA (bemor psoriaz yoki tana toshmalari, teri kasalliklari 
 KLINIKAGA KELISH JARAYONI HAQIDA (bemor "borish uchun nima qilish kerak", "qanday yozilaman", "qabul tartibi qanday", "oldindan yozilish kerakmi", "kelavering desangiz nima qilaman" deb so'rasa — bu TRANSPORT emas, KELISH JARAYONI haqida savol, transfer narxlarini BERMA):
 - Oldindan yozilish shart emas — istalgan qulay kunda bevosita kelaversa bo'ladi.
 - Ish kunlari (Dushanba–Shanba) soat 08:00–18:00 oralig'ida kelish mumkin.
-- Yakshanba kuni alohida tartib bor — bu haqida to'liq ma'lumot uchun ROUTE:menu_weekend.
-- Ish vaqtidan keyin (18:00 dan so'ng) kelmoqchi bo'lsa: operatorga oldindan qo'ng'iroq qilib kelishib olish tavsiya etiladi.
+- ISH VAQTIDAN KEYIN KELISH (18:00 dan so'ng): Klinikada navbatchilar bor — ular bemorni mehmonxona sifatida joylashtiradi, ertalabgacha dam olish imkoni beriladi. Ya'ni ish vaqtidan keyin kelsa ham muammo yo'q, klinika yopiq emas. Agar bemor bu xizmat pulimi yoki narxi qancha deb so'rasa — mehmonxona sifatida tunash narxi 200 000 so'm, choyshab va sochiq beriladi.
+- YAKSHANBA KUNI: Yakshanba dam olish kuni, lekin uzoqdan kelgan yangi bemorlar uchun qabul va xona bo'limi ishlaydi — bemor joylashtiriladi, birinchi kun muolajasi o'tkaziladi. Dushanba kundan Malxam ichish boshlanadi. Yakshanba kuni kelgan bemorlar ko'chada qolmaydi — klinika ularni qabul qiladi. "Yakshanba kuni tartibi boshqacha" yoki "yakshanba kuni qabul yo'q" degan noto'g'ri ma'lumot berma.
 - Kelgandan so'ng: shifokor ko'rigidan o'tiladi, tekshiruvlar o'tkaziladi, kasallikka qarab davolanish muddati va xona belgilanadi.
 
 KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "qanday boraman", "avtobus bormi", "transfer bormi", "Toshkentdan kelish", "mashina yuborasizmi", "yo'l qanday" kabi aniq YO'L/TRANSPORT so'rasa):
