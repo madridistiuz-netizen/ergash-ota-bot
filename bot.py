@@ -2200,7 +2200,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🌿 *Малхам и процедуры*\n\nБөлімді таңдаңыз:",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        mal_label  = {"ru": "🟢 Малхам и травы", "uz": "🟢 Малхам va o'tlar", "kz": "🟢 Малхам және шөптер"}[lang]
+        mal_label  = {"ru": "🟢 Малхам и травы", "uz": "🟢 Малхам va giyohlar", "kz": "🟢 Малхам және шөптер"}[lang]
         muo_label  = {"ru": "🔵 Доп. процедуры",          "uz": "🔵 Qo'shimcha muolajalar",     "kz": "🔵 Қосымша процедуралар"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(mal_label, callback_data="sub_malhamlar")],
