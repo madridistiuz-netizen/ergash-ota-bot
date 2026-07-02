@@ -6738,11 +6738,22 @@ PSORIAZ KASALLIGI HAQIDA (bemor psoriaz yoki tana toshmalari, teri kasalliklari 
 - Mukammal davolanish uchun sabr, muntazamlik va kurs rejimiga qat'iy rioya qilish kerak.
 - Qo'shimcha ma'lumot uchun operatorga murojaat qilishni tavsiya qil, lekin bu savolda "bilmayman" dema — yuqoridagi ma'lumotni to'liq ber.
 
-KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "avtobus bormi", "qanday borish mumkin", "Toshkentdan kelish", "transport" kabi so'rasa):
-- Aniq transport jadvali (avtobus, marshrutka, taksi) haqida bot ma'lumotga ega emas.
-- Lekin botda "Klinikaga yetib kelish" bo'limi bor — u yerda transport va yo'l yo'nalishlari haqida to'liq ma'lumot berilgan.
-- Shuning uchun bunday savol kelganda ROUTE:menu_route kodni ber (agar bu bo'lim mavjud bo'lsa), aks holda operatorga qo'ng'iroq qilishni tavsiya qil.
-- Lokatsiya (xarita) so'rasa — ROUTE:menu_location.
+KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "qanday boraman", "avtobus bormi", "transfer bormi", "Toshkentdan kelish", "qachon kelsa bo'ladi", "ish vaqtidan keyin kelsa" kabi so'rasa — AYNAN shu ma'lumotni ber):
+
+QACHON KELISH MUMKIN:
+- Kelish uchun alohida kun tanlanmaydi — o'ziga qulay kunda, ish vaqtida (08:00–18:00) kelsa bo'ladi.
+- Yakshanba kuni: klinika yakshanba kuni ham ishlaydi, lekin davolanish tartibi boshqacha — bu haqida "Yakshanba" bo'limida to'liq ma'lumot bor, u yerga yo'naltir (ROUTE:menu_weekend).
+- Ish vaqtidan keyin (18:00 dan so'ng) kelsa: bu haqida aniq ma'lumot yo'q, operatorga qo'ng'iroq qilib oldindan kelishib olish tavsiya etiladi — chunki qabul 08:00–18:00 oralig'ida.
+
+TRANSFER XIZMATI (klinikamiz o'z transfer xizmatini taqdim etadi — bu eng muhim ma'lumot):
+- Kattaqo'rg'on (vokzal) — 60 000 so'm
+- Samarqand (vokzal/aeroport) — 300 000 so'm
+- Toshkent (aeroport) — 800 000 so'm
+- Transferni kelishdan 2–3 kun oldin buyurtma qilish kerak.
+- Buyurtma uchun botda "🚗 Klinikaga yetib olish" bo'limi bor — u yerda transfer buyurtma qilish mumkin (ROUTE:menu_transfer).
+- Agar bemor "qanday boraman", "transport bormi", "transfer xizmati bormi" deb so'rasa — avval transfer xizmati borligini, narxlarini ayt va ROUTE:menu_transfer ga yo'naltir.
+
+LOKATSIYA (xarita) so'rasa — ROUTE:menu_location (geo-pin yuboriladi).
 
 MALXAM NARXI HAQIDA (bemor "Malxam narxi qancha" deb so'rasa, AYNAN shu ma'lumotni ber):
 - Malxam ALOHIDA SOTILMAYDI va uni sotib olib ketish MUMKIN EMAS — bu faqat statsionar davolanishga yotgan bemorlarga beriladigan muolaja, narxi umumiy davolanish to'lovi (xona to'lovi) ichiga kiritilgan.
@@ -6823,6 +6834,7 @@ Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxir
 - menu_faq — tez-tez so'raladigan savollar
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
+- menu_transfer — bemor klinikaga qanday borish, transfer xizmati, transport haqida so'rasa
 - menu_location — bemor klinikaning LOKATSIYASINI/manzilini xaritada, qayerda joylashganini, qanday borishni so'rasa (bu holatda javob matni yozma, faqat shu kodni ber, xaritadagi haqiqiy nuqta avtomatik yuboriladi)
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
 - calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_wards ishlat.
@@ -6844,6 +6856,7 @@ SECTION_BUTTON_LABELS = {
     "doctor_question":   {"ru": "👨‍⚕️ Вопрос врачу",            "uz": "👨‍⚕️ Shifokorga savol",         "kz": "👨‍⚕️ Дәрігерге сұрақ"},
     "calc_start":        {"ru": "🧮 Рассчитать стоимость",    "uz": "🧮 Narxni hisoblash",         "kz": "🧮 Құнын есептеу"},
     "menu_operator":     {"ru": "📞 Связаться с оператором",  "uz": "📞 Operatorga bog'lanish",    "kz": "📞 Операторға хабарласу"},
+    "menu_transfer":     {"ru": "🚗 Добраться до клиники",    "uz": "🚗 Klinikaga yetib olish",    "kz": "🚗 Клиникаға жету"},
 }
 
 
