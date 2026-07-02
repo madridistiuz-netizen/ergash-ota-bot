@@ -6900,13 +6900,15 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
 
 
 def _build_dynamic_system_prompt() -> str:
-    """AI_SYSTEM_PROMPT ga joriy sana/vaqt va joriy kontakt ma'lumotlarini (data.json dan) qo'shib qaytaradi."""
+    """AI_SYSTEM_PROMPT ga joriy sana/vaqt, kontakt, diagnostika narxlari, xona narxlari, kasalliklar va FAQ ma'lumotlarini qo'shib qaytaradi."""
     now = datetime.datetime.now(TASHKENT_TZ)
     weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
     try:
-        c = load_data().get("contacts", {})
+        d = load_data()
     except Exception:
-        c = {}
+        d = {}
+
+    c = d.get("contacts", {})
     contacts_block = (
         "\n\nJORIY KONTAKT MA'LUMOTLARI (bemor telefon/manzil/ish vaqti/Instagram/vebsayt so'rasa, shu yerdan TO'G'RIDAN-TO'G'RI ber):\n"
         f"- Telefon: {c.get('phone1', '')}, {c.get('phone2', '')} (qabul vaqti: 08:00–18:00)\n"
@@ -6917,10 +6919,97 @@ def _build_dynamic_system_prompt() -> str:
         f"- Vebsayt: {c.get('website', '')}\n"
         f"- Ish vaqti (uz): {c.get('work_hours_uz', '')}"
     )
+
+    # ── Diagnostika narxlari ──
+    try:
+        diag_lines = ["MRT 1.5T narxlari:"]
+        diag_lines += [f"  • {x}" for x in d.get("mrt_15", [])]
+        diag_lines.append("MRT 3T narxlari (guruhlarga ko'ra):")
+        for group, items in d.get("mrt_3t_groups", {}).items():
+            diag_lines.append(f"  [{group}]")
+            diag_lines += [f"    • {x}" for x in items]
+        diag_lines.append("MSKT 256 narxlari:")
+        diag_lines += [f"  • {x}" for x in d.get("mskt_256", [])]
+        diag_lines.append("MSKT 128 narxlari:")
+        diag_lines += [f"  • {x}" for x in d.get("mskt_128", [])]
+        diag_lines.append("UZI va boshqa diagnostika:")
+        diag_lines += [f"  • {x}" for x in d.get("other_diagnostics", [])]
+        diag_lines.append("Laboratoriya tahlillari:")
+        diag_lines += [f"  • {x}" for x in d.get("lab", [])]
+        diag_block = "\n\nDIAGNOSTIKA NARXLARI (bemor diagnostika, MRT, MSKT, UZI, tahlil narxi so'rasa, AYNAN shu narxlarni ber — o'zingdan to'qima):\n" + "\n".join(diag_lines)
+    except Exception:
+        diag_block = ""
+
+    # ── Xona narxlari ──
+    try:
+        rooms_uz = d.get("rooms_uz", [])
+        room_lines = ["O'zbekiston fuqarolari uchun xona narxlari (1 kun, 1 kishi):"]
+        for r in rooms_uz[:10]:  # top 10, token tejash
+            room_lines.append(f"  • {r['name']} ({r['people']} kishi): katta — {r['adult']} so'm, bola — {r['child']} so'm")
+        rooms_foreign = d.get("rooms_foreign", [])
+        room_lines.append("Xorijiy fuqarolar uchun xona narxlari (1 kun, 1 kishi):")
+        for r in rooms_foreign[:8]:
+            room_lines.append(f"  • {r['name']} ({r['people']} kishi): katta — {r['adult']} so'm, bola — {r['child']} so'm")
+        rooms_block = "\n\nXONA NARXLARI (bemor xona narxi, qancha turadi so'rasa — aniq raqam berish uchun shu ma'lumotdan foydalan, lekin narxlar o'zgarishi mumkin deb eslatma qo'sh):\n" + "\n".join(room_lines)
+    except Exception:
+        rooms_block = ""
+
+    # ── Davolanadigan kasalliklar ──
+    try:
+        diseases = d.get("diseases", [])
+        if diseases:
+            dis_block = "\n\nDAVOLANADIGAN KASALLIKLAR RO'YXATI (bemor 'shu kasallikni davolaysizmi' deb so'rasa, shu ro'yxatdan tekshir — ro'yxatda bo'lsa 'Ha, davolaymiz', bo'lmasa operatorga yo'naltir):\n" + "\n".join(diseases[:20])
+        else:
+            dis_block = ""
+    except Exception:
+        dis_block = ""
+
+    # ── FAQ javoblari (oddiy matn bo'lganlari) ──
+    try:
+        faq_uz = FAQ_DATA.get("uz", [])
+        faq_lines = []
+        for q, a in faq_uz:
+            if isinstance(a, str) and not a.startswith("q_"):
+                clean = a.replace("*", "").replace("_", "")[:300]
+                faq_lines.append(f"  Savol: {q.replace('📅','').replace('💰','').replace('🧲','').strip()}\n  Javob: {clean}")
+        faq_block = "\n\nKO'P SO'RALADIGAN SAVOLLAR VA JAVOBLAR (bemorga shu javoblarni ber, to'g'ri ma'lumotni o'zingdan to'qima):\n" + "\n".join(faq_lines[:6])
+    except Exception:
+        faq_block = ""
+
+    # ── Bemorlar uchun qo'llanma (Guide) ──
+    try:
+        guide = d.get("guide", {})
+        guide_block_lines = []
+
+        for key, label in [
+            ("arrival_step1", "Klinikaga joylashish 1-bosqich (ro'yxatdan o'tish)"),
+            ("arrival_step2", "2-bosqich (shifokor ko'rigi)"),
+            ("arrival_step3", "3-bosqich (xona tanlash va joylashish)"),
+            ("malham",        "Malham — asosiy protsedura tartibi"),
+            ("procedures",    "Kunlik protseduralar va kun tartibi"),
+            ("infrastructure","Kompleks infratuzilmasi (korpuslar, oshxona, do'kon, WiFi)"),
+            ("rules",         "Umumiy qoidalar"),
+            ("shopping",      "Uyga nima sotib olish tavsiya etiladi"),
+        ]:
+            section = guide.get(key, {})
+            uz_text = section.get("uz", "") if isinstance(section, dict) else ""
+            if uz_text:
+                clean = uz_text.replace("*", "").replace("_", "")[:600]
+                guide_block_lines.append(f"\n[{label}]:\n{clean}")
+
+        guide_block = "\n\nBEMOR UCHUN QO'LLANMA (bemor joylashish, Malham tartibi, kun tartibi, oshxona, kompleks, qoidalar, nima olish haqida so'rasa — AYNAN shu ma'lumotni ber, o'zingdan to'qima):" + "".join(guide_block_lines)
+    except Exception:
+        guide_block = ""
+
     return (
         AI_SYSTEM_PROMPT
         + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
         + contacts_block
+        + diag_block
+        + rooms_block
+        + dis_block
+        + faq_block
+        + guide_block
     )
 
 
