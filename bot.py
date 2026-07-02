@@ -6738,7 +6738,14 @@ PSORIAZ KASALLIGI HAQIDA (bemor psoriaz yoki tana toshmalari, teri kasalliklari 
 - Mukammal davolanish uchun sabr, muntazamlik va kurs rejimiga qat'iy rioya qilish kerak.
 - Qo'shimcha ma'lumot uchun operatorga murojaat qilishni tavsiya qil, lekin bu savolda "bilmayman" dema — yuqoridagi ma'lumotni to'liq ber.
 
-KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "qanday boraman", "avtobus bormi", "transfer bormi", "Toshkentdan kelish", "qachon kelsa bo'ladi", "ish vaqtidan keyin kelsa" kabi so'rasa — AYNAN shu ma'lumotni ber):
+KLINIKAGA KELISH JARAYONI HAQIDA (bemor "borish uchun nima qilish kerak", "qanday yozilaman", "qabul tartibi qanday", "oldindan yozilish kerakmi", "kelavering desangiz nima qilaman" deb so'rasa — bu TRANSPORT emas, KELISH JARAYONI haqida savol, transfer narxlarini BERMA):
+- Oldindan yozilish shart emas — istalgan qulay kunda bevosita kelaversa bo'ladi.
+- Ish kunlari (Dushanba–Shanba) soat 08:00–18:00 oralig'ida kelish mumkin.
+- Yakshanba kuni alohida tartib bor — bu haqida to'liq ma'lumot uchun ROUTE:menu_weekend.
+- Ish vaqtidan keyin (18:00 dan so'ng) kelmoqchi bo'lsa: operatorga oldindan qo'ng'iroq qilib kelishib olish tavsiya etiladi.
+- Kelgandan so'ng: shifokor ko'rigidan o'tiladi, tekshiruvlar o'tkaziladi, kasallikka qarab davolanish muddati va xona belgilanadi.
+
+KLINIKAGA YETIB KELISH / TRANSPORT HAQIDA (bemor "qanday boraman", "avtobus bormi", "transfer bormi", "Toshkentdan kelish", "mashina yuborasizmi", "yo'l qanday" kabi aniq YO'L/TRANSPORT so'rasa):
 
 QACHON KELISH MUMKIN:
 - Kelish uchun alohida kun tanlanmaydi — o'ziga qulay kunda, ish vaqtida (08:00–18:00) kelsa bo'ladi.
