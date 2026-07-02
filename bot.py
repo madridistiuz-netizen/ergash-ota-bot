@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import re
 import asyncio
 import datetime
 import httpx
@@ -16,7 +17,6 @@ logger = logging.getLogger(__name__)
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 OPERATOR_PHONE = os.getenv("OPERATOR_PHONE", "+998932264567")
-# ── Diagnostika xodimlari: PDF natija yuklashga ruxsat berilgan Telegram ID lar ──
 # Railway Variables'ga: ALLOWED_STAFF=123456789,987654321 formatida kiriting
 ALLOWED_STAFF = [int(x) for x in os.getenv("ALLOWED_STAFF", "").split(",") if x.strip().isdigit()]
 
@@ -30,6 +30,8 @@ TRANSFER_CHANNEL = int(os.getenv("TRANSFER_CHANNEL", "-1003939453314"))
 DATA_FILE = os.getenv("DATA_FILE", "/app/data/data.json")
 AI_LOG_FILE = os.getenv("AI_LOG_FILE", "/app/data/ai_logs.json")
 TASHKENT_TZ = datetime.timezone(datetime.timedelta(hours=5))
+CLINIC_LATITUDE = 39.892639
+CLINIC_LONGITUDE = 66.307028
 
 DEFAULT_DATA = {
     "contacts": {
@@ -940,14 +942,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         # ── Deep Linking: agar /start parametri bilan kelgan bo'lsa, shu bo'limga yo'naltiramiz ──
         target = context.user_data.pop("deep_link_target", None)
         DEEP_LINK_MAP = {
-            "guide":       "menu_guide",
-            "feedback":    "guide_feedback",
-            "rooms":       "menu_rooms",
-            "wards":       "menu_wards",
-            "doctor":      "doctor_question",
+            "guide": "menu_guide",
+            "feedback": "guide_feedback",
+            "rooms": "menu_rooms",
+            "wards": "menu_wards",
+            "doctor": "doctor_question",
             "diagnostics": "menu_diagnostics",
-            "faq":         "menu_faq",
-            "results":     "get_results",
+            "faq": "menu_faq",
+            "results": "get_results",
         }
         if target in DEEP_LINK_MAP:
             return await callback_handler(update, context, override_data=DEEP_LINK_MAP[target])
@@ -958,7 +960,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы — Каттақурғон\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(welcome, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang, query.from_user.id))
+                                      reply_markup=main_menu_keyboard(lang))
 
     # ── Orqaga ──
     elif data == "back_main":
@@ -969,7 +971,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🏥 *Эргаш-Ота* клиникасы\n\nБөлімді таңдаңыз:",
         }[lang]
         await query.edit_message_text(title, parse_mode="Markdown",
-                                      reply_markup=main_menu_keyboard(lang, query.from_user.id))
+                                      reply_markup=main_menu_keyboard(lang))
 
     # ── FAQ ──
     elif data in ("menu_faq",) or data.startswith("faq_") or data in ("m_kelish_tartibi", "back_delete_registration", "q_no_surgery", "back_delete_surgery_question", "q_diet_food", "back_delete_diet_question", "q_work_hours", "back_delete_work_hours"):
@@ -4722,7 +4724,6 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
             await update.message.reply_text(msg, reply_markup=kb)
             return
 
-        # Topilgan natijalarni yuboramiz
         intro = {
             "uz": f"✅ *{len(found)} ta natija topildi:*",
             "ru": f"✅ *Найдено результатов: {len(found)}:*",
@@ -4801,41 +4802,33 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         data = context.user_data.get("staff_upload_data", {})
-        phone = data.get("phone", "")
-        dob   = data.get("dob", "")
-        file_id = doc.file_id
+        phone     = data.get("phone", "")
+        dob       = data.get("dob", "")
+        file_id   = doc.file_id
         file_name = doc.file_name or "natija.pdf"
-        uploaded_by = user_id
         uploaded_at = datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
-        # ── ma'lumotlar bazasiga yozish ──
         d = load_data()
-        if "bemor_natijalari" not in d:
-            d["bemor_natijalari"] = []
-        d["bemor_natijalari"].append({
+        d.setdefault("bemor_natijalari", []).append({
             "phone":       phone,
             "dob":         dob,
             "file_id":     file_id,
             "file_name":   file_name,
-            "uploaded_by": uploaded_by,
+            "uploaded_by": user_id,
             "uploaded_at": uploaded_at,
         })
         save_data(d)
 
-        # FSM tozalash
         context.user_data.pop("staff_upload_step", None)
         context.user_data.pop("staff_upload_data", None)
 
-        confirm_text = (
+        await update.message.reply_text(
             f"✅ *PDF muvaffaqiyatli yuklandi va saqlandi!*\n\n"
             f"📞 Telefon: `{phone}`\n"
             f"🎂 Tug'ilgan kun: `{dob}`\n"
             f"📄 Fayl nomi: `{file_name}`\n"
             f"🕐 Vaqt: `{uploaded_at}`\n\n"
-            f"Bemor endi botdan o'z natijasini olishi mumkin."
-        )
-        await update.message.reply_text(
-            confirm_text,
+            f"Bemor endi botdan o'z natijasini olishi mumkin.",
             parse_mode="Markdown",
             reply_markup=main_menu_keyboard(lang, user_id)
         )
@@ -5391,7 +5384,7 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     msg = update.message or update.channel_post
     if not msg or not msg.reply_to_message:
         return
-    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL}
+    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, FEEDBACK_GROUP_ID}
     logger.info(f"doctor_reply_handler: chat_id={msg.chat.id}, allowed={allowed}")
     if msg.chat.id not in allowed:
         return
@@ -5866,6 +5859,210 @@ def confirm_keyboard(lang):
 
 # ─── BOOKING HANDLER ──────────────────────────────────────────────────────────
 
+OY_NOMLARI = {
+    "yanvar": 1, "fevral": 2, "mart": 3, "aprel": 4, "may": 5, "iyun": 6,
+    "iyul": 7, "avgust": 8, "sentyabr": 9, "oktyabr": 10, "noyabr": 11, "dekabr": 12,
+    "январ": 1, "феврал": 2, "март": 3, "апрел": 4, "май": 5, "июн": 6,
+    "июл": 7, "август": 8, "сентябр": 9, "октябр": 10, "ноябр": 11, "декабр": 12,
+}
+
+
+def normalize_sana_to_iso(sana_text: str):
+    """Bemor yozgan erkin sanani YYYY-MM-DD formatiga o'tkazadi. Aniqlab bo'lmasa None."""
+    if not sana_text:
+        return None
+    text = sana_text.strip().lower()
+    bugun = datetime.datetime.now(TASHKENT_TZ).date()
+
+    m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})$", text)
+    if m:
+        y, mo, d = map(int, m.groups())
+        try:
+            return datetime.date(y, mo, d).isoformat()
+        except ValueError:
+            return None
+
+    m = re.match(r"^(\d{1,2})[./](\d{1,2})(?:[./](\d{4}))?$", text)
+    if m:
+        d, mo, y = m.groups()
+        d, mo = int(d), int(mo)
+        y_given = bool(y)
+        y = int(y) if y else bugun.year
+        try:
+            natija = datetime.date(y, mo, d)
+            if not y_given and natija < bugun:
+                natija = datetime.date(y + 1, mo, d)
+            return natija.isoformat()
+        except ValueError:
+            return None
+
+    m = re.match(r"^(\d{1,2})\s+([a-zа-яʻ']+)", text)
+    if m:
+        d = int(m.group(1))
+        for nom, raqam in OY_NOMLARI.items():
+            if m.group(2).startswith(nom):
+                try:
+                    natija = datetime.date(bugun.year, raqam, d)
+                    if natija < bugun:
+                        natija = datetime.date(bugun.year + 1, raqam, d)
+                    return natija.isoformat()
+                except ValueError:
+                    return None
+
+    # Faqat kun raqami (oy/yil ko'rsatilmagan) — masalan "25", "25.", "25-kun"
+    # Joriy oyda shu kun bugundan keyin bo'lsa — joriy oy, aks holda keyingi oy deb hisoblanadi
+    m = re.match(r"^(\d{1,2})\s*[.\-]?\s*(?:kun|кун)?$", text)
+    if m:
+        d = int(m.group(1))
+        if 1 <= d <= 31:
+            for oy_offset in (0, 1, 2):
+                yil, oy = bugun.year, bugun.month + oy_offset
+                if oy > 12:
+                    yil += 1
+                    oy -= 12
+                try:
+                    natija = datetime.date(yil, oy, d)
+                    if natija >= bugun:
+                        return natija.isoformat()
+                except ValueError:
+                    continue
+    return None
+
+
+def save_statsionar_lid(name: str, phone: str, sana_text: str, kasallik: str = "", xona: str = ""):
+    """Tasdiqlangan statsionar lidni data.json ichiga, kelish_sanasi alohida ustun bilan saqlaydi."""
+    d = load_data()
+    lid = {
+        "ism": name,
+        "telefon": phone,
+        "kasallik": kasallik or "—",
+        "xona": xona or "—",
+        "sana_matn": sana_text,
+        "kelish_sanasi": normalize_sana_to_iso(sana_text),
+        "holat": "tasdiqlangan",
+        "yaratilgan": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    d.setdefault("statsionar_lidlar", []).append(lid)
+    save_data(d)
+
+
+def get_lidlar_by_sana(kelish_sanasi_iso: str) -> list:
+    """Berilgan sanaga (YYYY-MM-DD) teng, holati 'tasdiqlangan' bo'lgan barcha lidlarni qaytaradi."""
+    d = load_data()
+    return [
+        lid for lid in d.get("statsionar_lidlar", [])
+        if lid.get("kelish_sanasi") == kelish_sanasi_iso
+        and lid.get("holat") == "tasdiqlangan"
+    ]
+
+
+async def lidlar_fix_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lidlar_fix — faqat admin: barcha saqlangan lidlarning sana_matn'ini qayta tahlil qilib,
+    kelish_sanasi (ISO) qiymatini yangilaydi (parser yaxshilangandan keyin eski None'larni tuzatish uchun)."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    lidlar = d.get("statsionar_lidlar", [])
+    if not lidlar:
+        await update.message.reply_text("📭 statsionar_lidlar ro'yxati bo'sh.")
+        return
+    tuzatildi = 0
+    for lid in lidlar:
+        yangi_iso = normalize_sana_to_iso(lid.get("sana_matn", ""))
+        if yangi_iso and yangi_iso != lid.get("kelish_sanasi"):
+            lid["kelish_sanasi"] = yangi_iso
+            tuzatildi += 1
+    save_data(d)
+    await update.message.reply_text(f"✅ Tekshirildi: {len(lidlar)} ta yozuv. Tuzatildi: {tuzatildi} ta.")
+
+
+async def lid_add_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lid_add Ism|Telefon|YYYY-MM-DD|Kasallik|Xona — faqat admin: eski/qo'lda lidni tizimga qo'shadi.
+    Kasallik va Xona ixtiyoriy — bo'lmasa '—' qo'yiladi."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    raw = update.message.text.replace("/lid_add", "", 1).strip()
+    if not raw:
+        await update.message.reply_text(
+            "Format: /lid_add Ism Familiya|+998901234567|2026-06-25|Kasallik nomi|Xona turi\n\n"
+            "Kasallik va Xona ixtiyoriy, qoldirib ketsa bo'ladi:\n"
+            "/lid_add Ism Familiya|+998901234567|2026-06-25"
+        )
+        return
+    parts = [p.strip() for p in raw.split("|")]
+    if len(parts) < 3:
+        await update.message.reply_text("❌ Kamida Ism|Telefon|Sana (YYYY-MM-DD) kerak.")
+        return
+    name, phone, sana_iso = parts[0], parts[1], parts[2]
+    kasallik = parts[3] if len(parts) > 3 else ""
+    xona = parts[4] if len(parts) > 4 else ""
+    try:
+        datetime.date.fromisoformat(sana_iso)
+    except ValueError:
+        await update.message.reply_text(f"❌ Sana formati noto'g'ri: '{sana_iso}'. To'g'ri format: YYYY-MM-DD (masalan 2026-06-25)")
+        return
+
+    d = load_data()
+    lid = {
+        "ism": name,
+        "telefon": phone,
+        "kasallik": kasallik or "—",
+        "xona": xona or "—",
+        "sana_matn": sana_iso,
+        "kelish_sanasi": sana_iso,
+        "holat": "tasdiqlangan",
+        "yaratilgan": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    d.setdefault("statsionar_lidlar", []).append(lid)
+    save_data(d)
+    await update.message.reply_text(f"✅ Qo'shildi: {name} | {sana_iso}")
+
+
+async def lidlar_debug_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lidlar_debug — faqat admin: statsionar_lidlar ro'yxatidagi BARCHA yozuvlarni xom holda ko'rsatadi (sana formatini tekshirish uchun)."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    d = load_data()
+    lidlar = d.get("statsionar_lidlar", [])
+    if not lidlar:
+        await update.message.reply_text("📭 statsionar_lidlar ro'yxati hozircha bo'sh (hech narsa saqlanmagan).")
+        return
+    lines = [f"📋 Jami: {len(lidlar)} ta yozuv\n"]
+    for i, lid in enumerate(lidlar[-20:], 1):  # oxirgi 20 tasi
+        lines.append(
+            f"{i}. {lid.get('ism', '—')} | "
+            f"sana_matn: '{lid.get('sana_matn', '—')}' | "
+            f"kelish_sanasi (ISO): {lid.get('kelish_sanasi', '—')} | "
+            f"holat: {lid.get('holat', '—')}"
+        )
+    await update.message.reply_text("\n".join(lines))
+
+
+async def ertaga_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/ertaga — faqat admin: ertaga keladigan tasdiqlangan bemorlar ro'yxati."""
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    ertangi_sana = datetime.datetime.now(TASHKENT_TZ).date() + datetime.timedelta(days=1)
+    bemorlar = get_lidlar_by_sana(ertangi_sana.isoformat())
+
+    if not bemorlar:
+        await update.message.reply_text(
+            f"📅 {ertangi_sana.strftime('%d.%m.%Y')}\n\n🟡 Ertaga keladigan bemorlar yo'q."
+        )
+        return
+
+    lines = [f"📅 *{ertangi_sana.strftime('%d.%m.%Y')} — Ertaga keladigan bemorlar ({len(bemorlar)} ta):*\n"]
+    for i, b in enumerate(bemorlar, 1):
+        lines.append(
+            f"{i}. 👤 {b.get('ism', '—')}\n"
+            f"   📞 {b.get('telefon', '—')}\n"
+            f"   🩺 {b.get('kasallik', '—')}\n"
+            f"   🛏 {b.get('xona', '—')}\n"
+        )
+    await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
 async def send_lid(context, channel_id, text):
     try:
         await context.bot.send_message(chat_id=channel_id, text=text)
@@ -6102,6 +6299,13 @@ async def handle_booking_callbacks(query, context, data, lang, chat_id):
                     f"🟢 QO'NG'IROQ QILING!"
                 )
             await send_lid(context, STATSIONAR_CHANNEL, lid)
+            save_statsionar_lid(
+                name=name,
+                phone=phone_num,
+                sana_text=sana,
+                kasallik="",
+                xona=booking.get("calc_room", "—") if from_calc else xona,
+            )
 
         else:  # diagnostika
             name = booking.get("name", "—")
@@ -6512,18 +6716,34 @@ SURGI GIYOHI HAQIDA (bemor so'rasa shu tartibni ayt):
 - Ichish vaqti: faqat ovqatlangandan keyin (to'q qoringa), iliq holatda, choy o'rnida.
 - Natija: ich kelishi suriladi (toksin/shlaklar tozalanadi), qorin dam bo'lishi yoki yengil sanchiq — bu tabiiy hol, xavotirga o'rin yo'q. Suv balansi uchun ruxsat etilgan sharbatlardan ichib turish kerak.
 
-UYDA PARHEZ HAQIDA (MUHIM — bu haqida noto'g'ri ma'lumot berma):
-- Uyda qo'llaniladigan parhez BARCHA bemorlar uchun BIR XIL — kasallikka qarab farq qilmaydi, shifokor har bir bemorga alohida shaxsiy parhez jadvali tuzib bermaydi.
-- Taqiqlangan: yog'li, qovurilgan, achchiq taomlar; spirtli ichimliklar va gazli suvlar; un mahsulotlari va shirinliklar (cheklash kerak).
-- Ruxsat etilgan: sabzavot, meva, yengil ovqatlar, iliq suv, giyohli choylar.
-- Suyuq sho'rvalar (masalan tovuq sho'rva, baliq sho'rvasi) ichish MUMKIN.
-- Bu umumiy parhez tartibi — klinikaga kelganda shifokor alohida-alohida shaxsiy parhez tuzib bermaydi, hammaga bir xil umumiy tartib qo'llaniladi.
+OVQATLANISH HAQIDA — IKKI XIL BOSQICHNI ADASHTIRMA (bu juda muhim, ko'p xato shu yerda bo'ladi):
 
-PARHEZ (KLINIKADA OVQATLANISH TARTIBI) HAQIDA:
-- Davolanish tabiiy yo'l bilan — maxsus parhez (ochlik rejimi) va shifobaxsh giyohlar yordamida olib boriladi, odatdagi 3 mahal ovqatlanish tartibi YO'Q.
-- Giyohlar (qaynatma, malham) organizmni tozalash bilan birga vitamin bilan oziqlantiradi — bular bemor uchun "shifobaxsh ovqat" hisoblanadi.
-- Ovqatlanishga ruxsat berilgan kunlar: shanba kuni — 1 mahal, yakshanba kuni — 2 mahal. Boshqa kunlarda oshxona taomi berilmaydi, faqat giyohlar/sharbat.
-- Ruxsat berilgan kunlarda klinika oshxonasida shifokorlar tasdiqlagan maxsus parhez taomlari tayyorlanadi.
+1-BOSQICH — "DAVOLANISH DAVOMIDA" (bemor hali klinikada statsionarda yotgan, kurs tugamagan):
+- Bu davrda bemor ERKIN HOLDA hech qanday taomni o'zi tanlab yeyolmaydi — FAQAT klinika oshxonasida, shifokor RUXSAT BERGAN parhez taomlar beriladi, va bu ham faqat shanba kuni (1 mahal) va yakshanba kuni (2 mahal) beriladi. Boshqa kunlarda oshxona taomi umuman berilmaydi, faqat giyohli choylar va sharbatlar bo'ladi.
+- Agar bemor davolanish DAVOMIDA "shu taomni yesam bo'ladimi" deb so'rasa (masalan baliq sho'rva, palov va h.k.) — unga ANIQ tushuntir: davolanish davomida faqat klinika oshxonasida doktor ruxsat bergan parhez taom yeyish mumkun, ko'chadagi oshxona/restoranlarda ovqatlanish tavsiya etilmaydi, va pastda sanab o'tilgan taomlar ro'yxati (qatiq, sho'rva turlari va h.k.) bu DAVOLANISH DAVOMIDA uchun emas, balki davolanish TUGAGANDAN KEYIN, UYGA QAYTGANDA tavsiya etiladigan ro'yxat.
+- Hech qachon "ha, bu taomni davolanish davomida yeyishingiz mumkin" deb javob berma — buning o'rniga klinika oshxonasi tartibini va shifokor ruxsatini ta'kidla.
+
+2-BOSQICH — "UYDA PARHEZ" (davolanish kursi TUGAGANDAN KEYIN, bemor uyiga qaytgandan keyingi parhez):
+- Aynan shu bosqichda quyidagi ro'yxat amal qiladi. Bemor "uyda nima yeyish mumkin" yoki "qanday ovqatlar ro'yxati" deb so'rasa, FAQAT pastdagi ro'yxatni ber, undan tashqari hech narsani o'zingdan to'qib qo'shma:
+  ✅ Ruxsat etilgan: yengil qatiqli taomlar/suyuq qatiq, toza tabiiy asal (1-2 choy qoshiq), chopma sho'rva, qaynatma sho'rva, tovuq sho'rva (yog'siz), baliqli sho'rva, karam sho'rva, iliq suv, giyohli choylar, sabzavot/meva, yengil sharbatlar.
+  ❌ Taqiqlangan: yog'li/qovurilgan taomlar, achchiq taomlar, spirtli ichimliklar va gazli suvlar, un mahsulotlari va shirinliklar (cheklash kerak).
+  🍞 Non: dastlabki 3 kun umuman non yemang, keyin ozgina qora non bilan ruxsat etiladi.
+  ⚠️ Baliqli sho'rva haqida MAXSUS ESLATMA: yoz oylarida (issiq mavsumda) baliqli sho'rva tavsiya etilmaydi — agar bemor aynan yoz faslida (yoki "hozir yoz" deb yozsa) baliq sho'rva haqida so'rasa, shuni ayt va o'rniga tovuq sho'rva/chopma sho'rvani tavsiya qil.
+- Agar bemor ro'yxatda YO'Q biror taom haqida so'rasa (masalan palov, osh, manti va h.k.), unga aniq ayt: bu taom uyda parhez ro'yxatida yo'q, shuning uchun uni faqat uyda parhez muddati TUGAGANDAN KEYIN iste'mol qilishni tavsiya qil — o'zingdan "mumkin" yoki "mumkin emas" deb hech qachon to'qima, faqat shu ikki holatdan birini tanlab javob ber.
+
+MALXAM NARXI HAQIDA (bemor "Malxam narxi qancha" deb so'rasa, AYNAN shu ma'lumotni ber):
+- Malxam ALOHIDA SOTILMAYDI va uni sotib olib ketish MUMKIN EMAS — bu faqat statsionar davolanishga yotgan bemorlarga beriladigan muolaja, narxi umumiy davolanish to'lovi (xona to'lovi) ichiga kiritilgan.
+- Agar bemor shunchaki "Malxam narxi qancha" deb so'rasa (aniqlashtirmasdan), unga shuni tushuntir: Malxamning alohida narxi yo'q, chunki u faqat statsionarga yotib davolanayotgan bemorlarga, umumiy to'lov ichida beriladi, tashqariga sotilmaydi.
+- FAQAT agar bemor aniq "ikkinchi Malxam" (ikkinchi marta, kechqurun qo'shimcha sifatida sotib olinadigan Malxam) haqida so'rasa — shunda uning narxi 156 000 so'm ekanini ayt. Bu alohida, kechqurun sotib olinadigan qo'shimcha Malxam haqida savol bo'lganda ishlatiladi, oddiy "Malxam narxi" savoliga bu raqamni berma.
+
+NIMA OLIB KELISH KERAK (bemor "o'zim bilan nima olib kelay" deb so'rasa, AYNAN shu ma'lumotni ber — o'zingdan boshqa narsa to'qima):
+- 📋 Pasport (yoki shaxsiy guvohnoma) — albatta kerak.
+- 🧴 Shaxsiy gigiena vositalari — ehtiyot uchun o'zingiz bilan olib kelishingiz tavsiya etiladi (qulaylik uchun).
+- ☕ Bitta bokal/krujka — fito-bardagi shifobaxsh choylar va olma sharbatini ichish uchun kerak bo'ladi.
+- 👕 Qulay uy kiyimi va shippak.
+- ❌ Qoshiq, vilka, choyshab, yostiq jild OLIB KELISH SHART EMAS — bularning barchasi klinika tomonidan beriladi.
+- ✨ Pol/Lyuks, Lyuks va VIP toifadagi xonalarda yashovchi bemorlarga QO'SHIMCHA ravishda sochiq, shampun, tish pastasi va sovun ham klinika tomonidan beriladi.
+MUHIM OHANG QOIDASI: javobni shunday yoz — bemorda "agar oddiy/standart xona olsam, sochiq-sovun berilmaydi" degan salbiy taassurot QOLDIRMASLIGI kerak. Shuning uchun standart xona uchun "berilmaydi" deb hech qachon yozma — buning o'rniga, agar bemor aniq standart xona haqida so'rasa, shunchaki ehtiyot uchun shaxsiy gigiena buyumlarini va sochiqni o'zi bilan olib kelishi qulayroq bo'lishini tavsiya qil, bu cheklov emas, qulaylik tavsiyasi sifatida.
 
 BODOM YOG'I HAQIDA (mahsulot, klinikada sotiladi, narxi 48 000 so'm):
 - Tashqi qo'llash (massaj/surtish): yuz-tana terisini tarang qiladi, dog'/sepkilni yo'qotadi; bosh-yuzga surtilsa qon aylanishini yaxshilaydi, insult-keyingi falajlikda foydali; quloq og'rig'ida 1 tomchi tomiziladi.
@@ -6550,39 +6770,46 @@ INFRATUZILMA (korpuslar va xizmatlar):
 QABUL QILINMAYDIGAN HOLATLAR HAQIDA:
 - Agar bemor og'ir holat (onkologiya, gemodializ, XPN 3-4-5 bosqich va h.k.) haqida yozsa, buni ochiq ayt va operatorga/shifokorga murojaat qilishni tavsiya qil — lekin doctor_question yo'naltirishini FAQAT bemor aniq o'z tashxisini/tibbiy hujjatini ko'rsatib shifokor fikrini so'rasa qo'll, har qanday oddiy savol uchun emas.
 
+ALOQA MA'LUMOTLARI (bu ma'lumotlar pastda JORIY KONTAKT bo'limida har doim aniq beriladi — agar bemor telefon raqami, ish vaqti, Instagram yoki vebsayt so'rasa, "bilmayman" DEB HECH QACHON AYTMA, shu ma'lumotni TO'G'RIDAN-TO'G'RI ber, operatorga yo'naltirish kerak emas). LOKATSIYA/manzil/xarita/qanday borish so'ralganda esa matn yozish O'RNIGA pastdagi ROUTE qoidasi bo'yicha menu_location kodini ishlat — bu holatda haqiqiy xaritadagi nuqta avtomatik yuboriladi.
+
 QOIDALAR:
-- Foydalanuvchi qaysi tilda yozsa (o'zbek, rus, qozoq), shu tilda javob ber — juda muloyim, professional shifoxona xodimi ohangida.
+- Foydalanuvchi qaysi tilda yozsa (o'zbek lotin, rus yoki qozoq krill), albatta AYNAN shu tilda javob ber. Qozoqcha krill yozuvini o'zbekcha bilan ADASHTIRMA — agar matnda "қанша", "болады", "тенге", "қалай" kabi qozoqcha so'zlar yoki krill yozuv aralashgan bo'lsa, bu qozoqcha, javobni ham qozoq tilida yoz.
 - "Malxam" so'zini barcha tillarda o'zgarishsiz, lotin/krill holida yoz (tarjima qilma).
 - Aniq tashxis qo'yma, dori dozasini belgilama — bu shifokorning vazifasi. Umumiy, xavfsiz ma'lumot ber va klinikaga murojaat qilishni tavsiya qil.
 - Javoblaring qisqa va aniq bo'lsin (3-5 gap atrofida).
 - Agar savolga ishonchli javob bera olmasang yoki bemor noroziligini bildirsa, buni ochiq ayt va operatorga ulanishni tavsiya qil.
+- MUHIM: agar savol xona narxi, xona surati, palatalar, diagnostika, narx hisoblash kabi ANIQ BIR BO'LIMGA tegishli bo'lsa, operatorga yo'naltirishni TAVSIYA QILMA — buning o'rniga pastdagi ROUTE qoidasi bo'yicha to'g'ridan-to'g'ri shu bo'limga yo'naltir, chunki o'sha bo'limda aniq rasmlar va narxlar allaqachon mavjud.
+- VALYUTA KURSI HAQIDA QAT'IY TAQIQ: hech qachon so'm/dollar/tenge/rubl orasida o'zing kurs hisoblama va konvertatsiya qilma — sening bilimingda joriy kurs yo'q, har qanday raqam o'zingdan TO'QILGAN bo'ladi va bemorni chalg'itadi. Bunday savol kelsa, aniq ayt: "Kechirasiz, joriy valyuta kursi haqida aniq ma'lumotga ega emasman, bank yoki ayirboshlash shoxobchasidan joriy kursni tekshirib ko'ring." — hech qanday raqam, hech qanday "taxminan" degan hisob-kitob qilma.
 
 BO'LIMGA YO'NALTIRISH (juda muhim):
 Agar bemorning savoli quyidagi bo'limlardan biriga aniq mos kelsa, javobing oxiriga albatta yangi qatorda
 "ROUTE:<kod>" yoz (kod faqat quyidagi ro'yxatdan, boshqa hech narsa qo'shma):
 - menu_clinic — klinika haqida umumiy ma'lumot
-- menu_rooms — xona/palata narxlari haqida savol
-- menu_wards — qaysi korpus/palatalar bor, joylashish haqida
+- menu_rooms — xona turlari va ularning narxlari haqida umumiy savol (BU YERDA RASM YO'Q, faqat narx ro'yxati)
+- menu_wards — xona/palata SURATI/RASMI so'ralganda, YOKI qaysi korpus/palatalar bor, joylashish haqida (bu yerda har bir xonaning haqiqiy rasmlari mavjud)
 - menu_diagnostics — MRT, UZI, tahlil, diagnostika haqida savol
 - menu_guide — kelishdan oldin/birinchi kun nima qilish, Malxam ichish tartibi haqida
 - menu_faq — tez-tez so'raladigan savollar
 - menu_booking — qabulga kelish/yozilish jarayoni haqida
 - menu_weekend — yakshanba kuni ish tartibi haqida
+- menu_location — bemor klinikaning LOKATSIYASINI/manzilini xaritada, qayerda joylashganini, qanday borishni so'rasa (bu holatda javob matni yozma, faqat shu kodni ber, xaritadagi haqiqiy nuqta avtomatik yuboriladi)
 - doctor_question — FAQAT bemor aniq o'zining tashxisini/tibbiy hujjatini/rasmlarini yuborib, shifokordan shaxsiy fikr so'ramoqchi bo'lsa (oddiy umumiy savollar uchun BU KODNI ISHLATMA)
-- calc_start — narx hisoblash, necha kun necha pul bo'ladi
+- calc_start — FAQAT bemor o'zining aniq holatini kiritib (necha kun, necha kishi, qaysi fuqarolik) shaxsiy narx hisoblashni so'rasa. RASM/SURAT so'ralganda BU KODNI HECH QACHON ISHLATMA — bu yerda rasm yo'q, faqat hisoblash formasi bor, shuning uchun rasm so'ralganda albatta menu_wards ishlat.
 - menu_operator — bemor aniq odam/operator bilan gaplashmoqchi yoki shikoyat qilmoqchi
 Agar hech qaysi bo'lim aniq mos kelmasa, ROUTE qatorini umuman yozma — bu holatda faqat to'liq matnli javob ber, hech qanday tugma kerak emas.
+MAXSUS QOIDA — menu_location: agar javobing menu_location bo'lsa, HECH QANDAY matn yozma, faqat "ROUTE:menu_location" qatorining o'zini yoz — chunki bemorga shu o'rniga haqiqiy xaritadagi nuqta (geolokatsiya) yuboriladi, undan oldin matn kerak emas.
 ESLATMA: oddiy savollarga (masalan "qachon kelsam bo'ladi", "kechqurun kelsam bo'ladimi", "bugun qaysi kun") HECH QACHON doctor_question yoki menu_operator yo'naltirma — bu savollarga to'g'ridan-to'g'ri, to'liq matn bilan javob ber, yuqoridagi QABUL TARTIBI va BIRINCHI KUN MUOLAJASI ma'lumotlaridan foydalanib."""
 
 SECTION_BUTTON_LABELS = {
     "menu_clinic":       {"ru": "🏥 О клинике",              "uz": "🏥 Klinika haqida",          "kz": "🏥 Клиника туралы"},
     "menu_rooms":        {"ru": "🛏 Стоимость номеров",       "uz": "🛏 Xonalar narxi",            "kz": "🛏 Бөлмелер құны"},
-    "menu_wards":        {"ru": "🏨 Палаты (фото)",              "uz": "🏨 Palatalar (rasmlar)",      "kz": "🏨 Палаталар (суреттер)"},
+    "menu_wards":        {"ru": "🏨 Палаты",                  "uz": "🏨 Palatalar",                "kz": "🏨 Палаталар"},
     "menu_diagnostics":  {"ru": "🧲 Диагностика",             "uz": "🧲 Diagnostika",              "kz": "🧲 Диагностика"},
     "menu_guide":        {"ru": "📖 Руководство пациента",    "uz": "📖 Bemor uchun qo'llanma",    "kz": "📖 Науқас нұсқаулығы"},
     "menu_faq":          {"ru": "❓ Частые вопросы",           "uz": "❓ Ko'p so'raladigan savollar", "kz": "❓ Жиі сұралатын сұрақтар"},
     "menu_booking":      {"ru": "📅 Записаться на приём",     "uz": "📅 Qabulga yozilish",         "kz": "📅 Қабылдауға жазылу"},
     "menu_weekend":      {"ru": "🌅 Воскресенье",             "uz": "🌅 Yakshanba",                "kz": "🌅 Жексенбі"},
+    "menu_location":     {"ru": "📍 Локация клиники",         "uz": "📍 Klinika lokatsiyasi",      "kz": "📍 Клиника локациясы"},
     "doctor_question":   {"ru": "👨‍⚕️ Вопрос врачу",            "uz": "👨‍⚕️ Shifokorga savol",         "kz": "👨‍⚕️ Дәрігерге сұрақ"},
     "calc_start":        {"ru": "🧮 Рассчитать стоимость",    "uz": "🧮 Narxni hisoblash",         "kz": "🧮 Құнын есептеу"},
     "menu_operator":     {"ru": "📞 Связаться с оператором",  "uz": "📞 Operatorga bog'lanish",    "kz": "📞 Операторға хабарласу"},
@@ -6616,15 +6843,34 @@ def _ai_needs_operator(text_lower: str, ai_reply: str) -> bool:
     """Smart routing: kalit so'zlar yoki AI o'zi yordam bera olmasligini bildirsa — True"""
     if any(kw in text_lower for kw in ROUTE_TO_OPERATOR_KEYWORDS):
         return True
-    fail_markers = ["operatorga", "operator bilan", "оператору", "операторға", "bilmayman", "не знаю", "білмеймін"]
+    fail_markers = ["aniq javob berolmayman", "не могу точно ответить", "нақты жауап бере алмаймын",
+                    "bilmayman", "не знаю", "білмеймін"]
     return any(m in ai_reply.lower() for m in fail_markers)
 
 
 def _build_dynamic_system_prompt() -> str:
-    """AI_SYSTEM_PROMPT ga joriy sana, vaqt va hafta kunini qo'shib qaytaradi."""
-    now = datetime.datetime.now()
+    """AI_SYSTEM_PROMPT ga joriy sana/vaqt va joriy kontakt ma'lumotlarini (data.json dan) qo'shib qaytaradi."""
+    now = datetime.datetime.now(TASHKENT_TZ)
     weekday_uz = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"][now.weekday()]
-    return AI_SYSTEM_PROMPT + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
+    try:
+        c = load_data().get("contacts", {})
+    except Exception:
+        c = {}
+    contacts_block = (
+        "\n\nJORIY KONTAKT MA'LUMOTLARI (bemor telefon/manzil/ish vaqti/Instagram/vebsayt so'rasa, shu yerdan TO'G'RIDAN-TO'G'RI ber):\n"
+        f"- Telefon: {c.get('phone1', '')}, {c.get('phone2', '')} (qabul vaqti: 08:00–18:00)\n"
+        f"- Manzil (uz): {c.get('address_uz', '')}\n"
+        f"- Manzil (ru): {c.get('address_ru', '')}\n"
+        f"- Manzil (kz): {c.get('address_kz', '')}\n"
+        f"- Instagram: {c.get('instagram', '')}\n"
+        f"- Vebsayt: {c.get('website', '')}\n"
+        f"- Ish vaqti (uz): {c.get('work_hours_uz', '')}"
+    )
+    return (
+        AI_SYSTEM_PROMPT
+        + f"\n\nJORIY VAQT: bugun {weekday_uz}, {now.strftime('%Y-%m-%d')}, soat {now.strftime('%H:%M')} (klinika vaqti bo'yicha). Shu ma'lumotdan foydalanib, bugun ish kuni yoki dam olish kunimi, hozir klinika ochiq yoki yopiqligini to'g'ri hisobla."
+        + contacts_block
+    )
 
 
 def _call_anthropic_sync(user_text: str, history: list = None) -> str:
@@ -6766,7 +7012,7 @@ def _log_ai_interaction(user, text: str, ai_reply: str, route, needs_operator: b
             with open(AI_LOG_FILE, "r", encoding="utf-8") as f:
                 logs = json.load(f)
         logs.append({
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "time": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
             "user_id": user.id,
             "username": user.username or "-",
             "lang": lang,
@@ -6812,6 +7058,18 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
 
     ai_reply, route = _extract_route(ai_reply)
 
+    # LOKATSIYA so'ralganda — matn yubormasdan, FAQAT haqiqiy xaritadagi geo-pin yuboriladi
+    if route == "menu_location":
+        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": "[lokatsiya yuborildi]"}]
+        context.user_data["ai_history"] = history[-6:]
+        _log_ai_interaction(update.effective_user, text, "[lokatsiya yuborildi]", route, False, lang)
+        await context.bot.send_location(
+            chat_id=update.effective_chat.id,
+            latitude=CLINIC_LATITUDE,
+            longitude=CLINIC_LONGITUDE,
+        )
+        return
+
     # Suhbat tarixini yangilaymiz (oxirgi 3 juft — 6 xabar — saqlanadi)
     history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": ai_reply}]
     context.user_data["ai_history"] = history[-6:]
@@ -6836,35 +7094,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btype = context.user_data.get("booking_type", "statsionar")
     text = update.message.text.strip() if update.message.text else ""
 
-    # ── Foydalanuvchi yozgan matn tiliga qarab lang'ni yangilash ──
-    if text and not step:
-        # Kirill yoki o'zbek lotin belgilari asosida tilni aniqlash
-        kz_markers = ["қ", "ғ", "ү", "ұ", "ң", "һ", "ә", "і", "ө"]
-        uz_markers = ["ş", "ğ", "ç", "o'", "g'", "o`", "g`", "ʻ"]
-        ru_markers = ["ы", "э", "ъ", "ё", "щ", "ю", "я", "ж", "ч", "ш"]
-        text_lower = text.lower()
-
-        if any(m in text_lower for m in kz_markers):
-            detected = "kz"
-        elif any(m in text_lower for m in uz_markers) or \
-             (not any(c in text_lower for c in "ыэъёщюяжчш") and
-              any(c in text_lower for c in "abcdefghijklmnopqrstuvwxyz")):
-            detected = "uz"
-        elif any(m in text_lower for m in ru_markers):
-            detected = "ru"
-        else:
-            detected = lang  # aniqlab bo'lmasa — avvalgi til
-
-        if detected != lang:
-            lang = detected
-            context.user_data["lang"] = lang
-
-    # ── Staff PDF yuklash FSM faol bo'lsa ──
-    if context.user_data.get("staff_upload_step") and _is_staff(update.effective_user.id):
-        await staff_pdf_handler(update, context)
-        return
-
-    # ── Bemor natija olish FSM faol bo'lsa ──
+    # ── BEMOR NATIJA OLISH FSM ──
     if context.user_data.get("results_step"):
         await patient_results_handler(update, context)
         return
@@ -7397,6 +7627,13 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🟢 QO'NG'IROQ QILING!"
             )
             await send_lid(context, STATSIONAR_CHANNEL, lid)
+            save_statsionar_lid(
+                name=booking.get("name", "—"),
+                phone=booking.get("phone", "—"),
+                sana_text=booking.get("sana", ""),
+                kasallik="",
+                xona=booking.get("xona", "—"),
+            )
             context.user_data["booking"] = {}
             context.user_data["booking_step"] = None
             context.user_data["booking_type"] = None
@@ -7469,6 +7706,10 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_handler))
     app.add_handler(CommandHandler("ai_logs", ai_logs_handler))
+    app.add_handler(CommandHandler("ertaga", ertaga_handler))
+    app.add_handler(CommandHandler("lidlar_debug", lidlar_debug_handler))
+    app.add_handler(CommandHandler("lid_add", lid_add_handler))
+    app.add_handler(CommandHandler("lidlar_fix", lidlar_fix_handler))
     app.add_handler(CommandHandler("results_debug", results_debug_handler))
     app.add_handler(CommandHandler("admin_help", admin_handler))
     app.add_handler(CommandHandler("admin_photo", admin_handler))
@@ -7483,24 +7724,23 @@ def main():
     app.add_handler(CommandHandler("stats", admin_handler))
     app.add_handler(CommandHandler("broadcast", admin_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
-    # Staff PDF yuklash
-    app.add_handler(MessageHandler(filters.Document.ALL & filters.User(ALLOWED_STAFF + [ADMIN_ID]), staff_doc_handler))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
-    app.add_handler(MessageHandler(filters.VIDEO & ~filters.User(ADMIN_ID), medical_doc_handler))
-    app.add_handler(MessageHandler(filters.PHOTO & ~filters.User(ADMIN_ID), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.VIDEO & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
+    app.add_handler(MessageHandler(filters.PHOTO & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
     app.add_handler(MessageHandler(filters.VOICE & ~filters.User(ADMIN_ID), medical_voice_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(FEEDBACK_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     # Kanal postlari uchun (channel_post)
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
-    app.add_handler(MessageHandler(filters.VOICE, unknown))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
+    app.add_handler(MessageHandler(filters.VOICE & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
