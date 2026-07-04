@@ -2200,7 +2200,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             "kz": "🌿 *Малхам и процедуры*\n\nБөлімді таңдаңыз:",
         }[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        mal_label  = {"ru": "🟢 Малхам и травы", "uz": "🟢 Малхам va giyohlar", "kz": "🟢 Малхам және шөптер"}[lang]
+        mal_label  = {"ru": "🟢 Малхам и травы", "uz": "🟢 Малхам va o'tlar", "kz": "🟢 Малхам және шөптер"}[lang]
         muo_label  = {"ru": "🔵 Доп. процедуры",          "uz": "🔵 Qo'shimcha muolajalar",     "kz": "🔵 Қосымша процедуралар"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(mal_label, callback_data="sub_malhamlar")],
@@ -6759,6 +6759,10 @@ XONA TO'LOVI ICHIDA NIMA BOR VA NIMA YO'Q (bemor "to'lovga nimalar kiradi", "nim
 
 MUHIM: "Kafe", "transfer xizmati", "cho'zilish mashqlari (rastyajka)", "olma sharbati" haqida bemor so'RAMAGANDA O'ZINGDAN QO'SHMA — faqat so'ralgan narsaga javob ber.
 
+SPORT ZAL HAQIDA (bemor so'rasa, aynan shu ma'lumotni ber):
+- Ha, klinikada sport zali mavjud.
+- Davolanish davomida massaj, fizioterapiya va cho'zilish (rastyajka) muolajalari bilan bir qatorda sport zaliga borish imkoniyati ham bor.
+
  (bemor psoriaz yoki tana toshmalari, teri kasalliklari haqida so'rasa, AYNAN shu ma'lumotni ber):
 - Ha, klinikamizda psoriaz kasalligi davolanadi. Lekin bu oddiy kasallik emas — davolanish uchun bemordan vaqt va sabr talab etiladi.
 - Psoriaz bilan davolanish muddati kamida 24 kun bo'lib, yiliga 2-3 kurs qayta davolanish kerak bo'ladi.
@@ -7049,6 +7053,322 @@ def _build_dynamic_system_prompt() -> str:
     )
 
 
+# ── AI PRE-FILTER: takrorlanuvchi statik savollarga AI chaqirmasdan javob ──
+
+_THANKS_WORDS = {
+    "rahmat", "raxmat", "рахмат", "рахмет", "спасибо", "спс", "ok", "ок",
+    "хоп", "xop", "хўп", "yaxshi", "яхши", "tushunarli", "тушунарли",
+    "добро", "хорошо", "круто", "рахмат!", "спасибо!",
+}
+
+_PAYMENT_INCLUDES_KEYWORDS = [
+    "нима кирад", "нималар кирад", "to'lovga kirad", "tolovga kirad",
+    "то'ловга кирад", "толовга кирад", "дори дармон ичид", "дори-дармон ичид",
+    "входит в сумму", "входит в стоимост", "что входит", "какое лечение входит",
+    "включ", "kiradimi to'lov", "to'lov ichida", "толов ичида",
+]
+
+_ROOM_DAILY_DAY_TERMS = [
+    "kunlik", "кунлик", "бир кун", "1 kun", "за день", "в сутки", "сутки",
+]
+_ROOM_DAILY_PRICE_TERMS = [
+    "нарх", "narx", "цена", "стоимост", "қанча", "qancha", "канча",
+]
+
+_PHONE_KEYWORDS = [
+    "tel nomer", "telefon raqam", "телефон раqам", "телефон рақам",
+    "номер телефон", "телефон бера", "raqam beraolas", "номер бераолас",
+    "дайте номер", "скиньте номер", "телефонингиз", "raqamingiz bormi",
+]
+
+_DURATION_KEYWORDS = [
+    "неше күн", "неча кун", "нечта кун", "сколько дней", "муддат",
+    "davolanish muddati", "канча кун ёт", "қанча кун жату", "неча кун ётиш",
+    "неча кун туриш", "сколько дней надо", "сколько нужно лежать", "неча кун керак",
+    "сколько лежать", "неча кун ятиш",
+]
+
+_FOOD_KEYWORDS = [
+    "ovqat kirad", "ovqatlan", "питание вход", "тамак кирад", "тамақ кіреді",
+    "тамақпен қамтамасыз", "кормят", "еда вход", "питание в стоимост",
+    "овкат кирад", "тамак киради", "питание включ",
+]
+
+_CURRENCY_KEYWORDS = [
+    "тенге", "теңге", "доллар", "dollar", "юань", "рубл", "рубль",
+    "конверт", "курс валют", "valyuta kurs", "обмен курс", "валюта курс",
+]
+
+
+def _normalize(text: str) -> str:
+    return text.strip().lower()
+
+
+PAYMENT_INCLUDES_REPLY = {
+    "uz": (
+        "✅ To'lov ichida (bepul):\n"
+        "- Yotoq joyi (karavot, ko'rpa-to'shak, yostiq jild, choyshab)\n"
+        "- Malxam muolajasi (kunlik)\n"
+        "- Klizma (ichak tozalash)\n"
+        "- Giyohli choylar (fito-bardan)\n"
+        "- Massaj\n"
+        "- Apparat fizioterapiya (oyoqlar, qorin, orqa)\n"
+        "- Shifokor ko'rigi va nazorat\n"
+        "- EKG\n"
+        "- UZI, qon tahlili\n"
+        "- MRT 1.5T yoki MSKT (1 organ)\n"
+        "- WiFi\n\n"
+        "✨ Lyuks va yuqori toifali xonalarda qo'shimcha:\n"
+        "- Sochiq, shampun, tish pastasi, sovun\n\n"
+        "❌ To'lovga kirmaydi (alohida to'lanadi):\n"
+        "- Olma sharbati\n"
+        "- Cho'zilish (rastyajka)\n"
+        "- MRT 3T, MSKT 256, Mammografiya, Kriolipoliz, Zarba-to'lqin terapiyasi\n"
+        "- Laboratoriya tahlillari (insulin, tireoid gormonlar va h.k.)\n"
+        "- Kir yuvish xizmati\n"
+        "- Kafe va qo'shimcha ovqatlar"
+    ),
+    "ru": (
+        "✅ Включено (бесплатно):\n"
+        "- Спальное место (кровать, постельное бельё, подушка, простынь)\n"
+        "- Процедура Malxam (ежедневно)\n"
+        "- Клизма (очищение кишечника)\n"
+        "- Травяные чаи (фито-бар)\n"
+        "- Массаж\n"
+        "- Аппаратная физиотерапия (ноги, живот, спина)\n"
+        "- Осмотр и наблюдение врача\n"
+        "- ЭКГ\n"
+        "- УЗИ, анализ крови\n"
+        "- МРТ 1.5T или МСКТ (1 орган)\n"
+        "- WiFi\n\n"
+        "✨ В люкс и номерах высокой категории дополнительно:\n"
+        "- Полотенце, шампунь, зубная паста, мыло\n\n"
+        "❌ Оплачивается отдельно:\n"
+        "- Яблочный сок (продаётся в магазине у столовой)\n"
+        "- Растяжка\n"
+        "- МРТ 3T, МСКТ 256, Маммография, Криолиполиз, Ударно-волновая терапия\n"
+        "- Лабораторные анализы (инсулин, тиреоидные гормоны и др.)\n"
+        "- Стирка одежды\n"
+        "- Кафе и дополнительное питание"
+    ),
+    "kz": (
+        "✅ Ақысыз кіреді:\n"
+        "- Төсек орны (кереует, төсек-орын, жастық, жаялық)\n"
+        "- Malxam процедурасы (күнделікті)\n"
+        "- Клизма (ішекті тазалау)\n"
+        "- Шипалы шайлар (фито-бар)\n"
+        "- Массаж\n"
+        "- Аппараттық физиотерапия (аяқ, іш, арқа)\n"
+        "- Дәрігердің қарауы мен бақылауы\n"
+        "- ЭКГ\n"
+        "- УЗИ, қан талдауы\n"
+        "- МРТ 1.5T немесе МСКТ (1 мүше)\n"
+        "- WiFi\n\n"
+        "✨ Люкс және жоғары санатты бөлмелерде қосымша:\n"
+        "- Сүлгі, шампунь, тіс пастасы, сабын\n\n"
+        "❌ Бөлек төленеді:\n"
+        "- Алма шырыны\n"
+        "- Созылу (растяжка)\n"
+        "- МРТ 3T, МСКТ 256, Маммография, Криолиполиз, Соққы-толқын терапиясы\n"
+        "- Зертханалық талдаулар (инсулин, қалқанша без гормондары және т.б.)\n"
+        "- Кір жуу қызметі\n"
+        "- Кафе және қосымша тамақтану"
+    ),
+}
+
+THANKS_REPLY = {
+    "uz": "Xush kelibsiz! Sog'lig'ingiz tez tiklansin! 🌿",
+    "ru": "Пожалуйста! Скорейшего выздоровления! 🌿",
+    "kz": "Өтінемін! Тезірек сауығып кетіңіз! 🌿",
+}
+
+DURATION_REPLY = {
+    "uz": (
+        "Davolanish muddati har bir bemor uchun individual, shifokor ko'rigi va "
+        "tekshiruvlardan so'ng belgilanadi.\n\n"
+        "Umumiy yo'nalish:\n"
+        "🩺 Davolanish kursi — kasallik darajasiga qarab 18, 21 yoki 24 kun va undan ko'p\n"
+        "🛡 Profilaktika (oldini olish) — kamida 12–14 kun\n"
+        "⏱ Eng qisqa muddat — 10 kundan kam bo'lmasligi kerak\n\n"
+        "Aniq muddatni shifokor ko'rikdan keyin o'zi belgilaydi."
+    ),
+    "ru": (
+        "Срок лечения определяется индивидуально, после осмотра врача и обследования.\n\n"
+        "Общие ориентиры:\n"
+        "🩺 Курс лечения — 18, 21 или 24 дня и более, в зависимости от степени заболевания\n"
+        "🛡 Профилактика — минимум 12–14 дней\n"
+        "⏱ Минимальный срок — не менее 10 дней\n\n"
+        "Точный срок врач назначит после осмотра."
+    ),
+    "kz": (
+        "Емдеу мерзімі әр науқасқа жеке түрде, дәрігер қарағаннан және тексерулерден "
+        "кейін белгіленеді.\n\n"
+        "Жалпы бағдар:\n"
+        "🩺 Емдеу курсы — ауру дәрежесіне қарай 18, 21 немесе 24 күн және одан да көп\n"
+        "🛡 Профилактика — кемінде 12–14 күн\n"
+        "⏱ Ең аз мерзім — 10 күннен кем болмауы керек\n\n"
+        "Нақты мерзімді дәрігер тексергеннен кейін өзі белгілейді."
+    ),
+}
+
+FOOD_REPLY = {
+    "uz": (
+        "🍽 Ovqatlanish tartibi:\n\n"
+        "✅ Klinika oshxonasidan beriladi:\n"
+        "- Shanba kuni kechqurun — 1 mahal\n"
+        "- Yakshanba kuni — 2 mahal\n\n"
+        "❌ Boshqa kunlarda (Du–Ju) oshxona taomi berilmaydi — bu davolanish rejimining bir qismi.\n\n"
+        "🍵 Har kuni beriladigan:\n"
+        "- Giyohli choylar (fito-bardan, bepul)\n"
+        "- Olma sharbati (alohida to'lanadi, oshxona yonidagi do'kondan)\n\n"
+        "Qo'shimcha ovqat kerak bo'lsa — klinikada kafe bor (alohida to'lov bilan)."
+    ),
+    "ru": (
+        "🍽 Режим питания:\n\n"
+        "✅ Из столовой предоставляется:\n"
+        "- Суббота вечером — 1 приём пищи\n"
+        "- Воскресенье — 2 приёма пищи\n\n"
+        "❌ В остальные дни (Пн–Пт) питание из столовой не предоставляется — это часть режима лечения.\n\n"
+        "🍵 Ежедневно:\n"
+        "- Травяные чаи (фито-бар, бесплатно)\n"
+        "- Яблочный сок (оплачивается отдельно, магазин у столовой)\n\n"
+        "Если нужно дополнительное питание — в клинике есть кафе (платно)."
+    ),
+    "kz": (
+        "🍽 Тамақтану тәртібі:\n\n"
+        "✅ Асханадан беріледі:\n"
+        "- Сенбі кешкісі — 1 рет\n"
+        "- Жексенбі — 2 рет\n\n"
+        "❌ Қалған күндері (Дс–Жм) асханадан тамақ берілмейді — бұл емделу режимінің бір бөлігі.\n\n"
+        "🍵 Күн сайын:\n"
+        "- Шипалы шайлар (фито-бар, тегін)\n"
+        "- Алма шырыны (бөлек төленеді, асхана жанындағы дүкен)\n\n"
+        "Қосымша тамақ керек болса — клиникада кафе бар (ақылы)."
+    ),
+}
+
+CURRENCY_REPLY = {
+    "uz": (
+        "Kechirasiz, joriy valyuta kursi haqida aniq ma'lumotga ega emasman, shuning uchun "
+        "narxlarni boshqa valyutaga o'zim konvertatsiya qila olmayman.\n\n"
+        "Bank yoki ayirboshlash shoxobchasidan joriy kursni tekshirib, kerakli summani "
+        "hisoblab olishingiz mumkin. Klinikadagi barcha narxlar so'mda belgilangan."
+    ),
+    "ru": (
+        "Извините, у меня нет точной информации о текущем курсе валют, поэтому я не могу "
+        "самостоятельно конвертировать цены в другую валюту.\n\n"
+        "Проверьте актуальный курс в банке или обменном пункте и пересчитайте нужную сумму. "
+        "Все цены в клинике указаны в сумах."
+    ),
+    "kz": (
+        "Кешіріңіз, қазіргі валюта бағамы туралы нақты мәліметім жоқ, сондықтан бағаларды "
+        "басқа валютаға өзім аудара алмаймын.\n\n"
+        "Банктен немесе айырбастау пунктінен ағымдағы бағамды тексеріп, керекті соманы "
+        "есептеп алыңыз. Клиникадағы барлық бағалар сумда көрсетілген."
+    ),
+}
+
+_ROOM_PRICE_INCLUDES_NOTE = {
+    "uz": "\n\nℹ️ Bu narxlarga Malxam muolajasi, klizma, massaj, giyohli choylar, shifokor ko'rigi, EKG, UZI, qon tahlili va MRT 1.5T (1 organ) kiritilgan.",
+    "ru": "\n\nℹ️ В эту стоимость входят: процедура Malxam, клизма, массаж, травяные чаи, осмотр врача, ЭКГ, УЗИ, анализ крови и МРТ 1.5T (1 орган).",
+    "kz": "\n\nℹ️ Бұл құнға Malxam процедурасы, клизма, массаж, шипалы шайлар, дәрігер қарауы, ЭКГ, УЗИ, қан талдауы және МРТ 1.5T (1 мүше) кіреді.",
+}
+
+_ROOM_PRICE_HEADER = {
+    "uz": {"local": "O'zbekiston fuqarolari uchun xona narxlari (1 kun, 1 kishi):",
+           "foreign": "Xorijiy fuqarolar uchun xona narxlari (1 kun, 1 kishi):",
+           "unit": "so'm", "people": "kishi", "adult": "Katta", "child": "Bola"},
+    "ru": {"local": "Цены на номера для граждан Узбекистана (1 день, 1 человек):",
+           "foreign": "Цены на номера для иностранных граждан (1 день, 1 человек):",
+           "unit": "сум", "people": "чел.", "adult": "Взрослый", "child": "Ребёнок"},
+    "kz": {"local": "Өзбекстан азаматтары үшін бөлме бағасы (1 күн, 1 адам):",
+           "foreign": "Шетелдік азаматтар үшін бөлме бағасы (1 күн, 1 адам):",
+           "unit": "сум", "people": "адам", "adult": "Үлкен", "child": "Бала"},
+}
+
+
+def _build_room_price_reply(lang: str) -> str:
+    """rooms_uz/rooms_foreign to'liq ma'lumotidan tayyor javob quradi (token/kesilish muammosi yo'q)."""
+    try:
+        d = load_data()
+    except Exception:
+        d = {}
+    h = _ROOM_PRICE_HEADER[lang]
+    lines = [h["local"]]
+    for r in d.get("rooms_uz", []):
+        lines.append(f"• {r['name']} ({r['people']} {h['people']}): {h['adult']} — {r['adult']} {h['unit']}, {h['child']} — {r['child']} {h['unit']}")
+    rooms_foreign = d.get("rooms_foreign", [])
+    if rooms_foreign:
+        lines.append("")
+        lines.append(h["foreign"])
+        for r in rooms_foreign:
+            lines.append(f"• {r['name']} ({r['people']} {h['people']}): {h['adult']} — {r['adult']} {h['unit']}, {h['child']} — {r['child']} {h['unit']}")
+    return "\n".join(lines) + _ROOM_PRICE_INCLUDES_NOTE[lang]
+
+
+def _build_phone_reply(lang: str) -> str:
+    try:
+        c = load_data().get("contacts", {})
+    except Exception:
+        c = {}
+    p1, p2 = c.get("phone1", ""), c.get("phone2", "")
+    return {
+        "uz": f"📞 Telefon raqamlarimiz:\n\n☎️ {p1}\n☎️ {p2}\n\n🕐 Qabul vaqti: 08:00–18:00 (Dushanba–Shanba)",
+        "ru": f"📞 Наши телефоны:\n\n☎️ {p1}\n☎️ {p2}\n\n🕐 Время приёма: 08:00–18:00 (Пн–Сб)",
+        "kz": f"📞 Біздің телефондар:\n\n☎️ {p1}\n☎️ {p2}\n\n🕐 Қабылдау уақыты: 08:00–18:00 (Дс–Сб)",
+    }[lang]
+
+
+def ai_prefilter_reply(text: str, lang: str) -> str | None:
+    """
+    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — tayyor javob qaytaradi
+    (AI umuman chaqirilmaydi, token sarflanmaydi). Mos kelmasa — None qaytaradi,
+    va oddiy AI oqimi davom etadi.
+    """
+    t = _normalize(text)
+
+    # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "Ha", "?")
+    stripped_short = t.strip("!.,?- ")
+    if len(stripped_short) <= 2 and stripped_short != "":
+        return {
+            "uz": "Salom! 😊 \"Ergash Ota\" klinikasiga xush kelibsiz.\n\nQanday savol yoki muammo bilan yordam bera olaman?",
+            "ru": "Здравствуйте! 😊 Добро пожаловать в клинику \"Эргаш Ота\".\n\nЧем могу помочь?",
+            "kz": "Сәлеметсіз бе! 😊 \"Эргаш Ота\" клиникасына қош келдіңіз.\n\nҚандай сұрақпен көмектесе аламын?",
+        }[lang]
+
+    # 1) Minnatdorchilik/tasdiqlash — endi IBORA ICHIDA ham topadi (masalan "Хуш рахмат сизга"),
+    #    lekin faqat QISQA xabarlarda (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
+    if len(t) <= 25 and any(w in t for w in _THANKS_WORDS):
+        return THANKS_REPLY[lang]
+
+    # 2) "To'lovga nima kiradi" turkumi
+    if any(kw in t for kw in _PAYMENT_INCLUDES_KEYWORDS):
+        return PAYMENT_INCLUDES_REPLY[lang]
+
+    # 3) Davolanish muddati ("necha kun yotish kerak")
+    if any(kw in t for kw in _DURATION_KEYWORDS):
+        return DURATION_REPLY[lang]
+
+    # 4) Ovqatlanish/питание kirad-kirmasligi
+    if any(kw in t for kw in _FOOD_KEYWORDS):
+        return FOOD_REPLY[lang]
+
+    # 5) Bir kunlik xona narxi
+    if any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS):
+        return _build_room_price_reply(lang)
+
+    # 6) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
+    #    AI o'zi javob berishi kerak, chunki u yerda boshqa muhim savollar ham bo'lishi mumkin)
+    if len(t) <= 60 and any(kw in t for kw in _CURRENCY_KEYWORDS):
+        return CURRENCY_REPLY[lang]
+
+    # 7) Telefon raqam so'ralganda
+    if any(kw in t for kw in _PHONE_KEYWORDS):
+        return _build_phone_reply(lang)
+
+    return None
+
+
 def _call_anthropic_sync(user_text: str, history: list = None) -> str:
     """Anthropic Claude API ga sinxron so'rov, suhbat tarixi bilan (executor ichida ishlaydi)"""
     messages = (history or []) + [{"role": "user", "content": user_text}]
@@ -7214,6 +7534,16 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
             "kz": "Мәзірден бөлім таңдаңыз 👇",
         }[lang]
         await update.message.reply_text(msg, reply_markup=main_menu_keyboard(lang, update.effective_user.id if update.effective_user else 0))
+        return
+
+    # ── PRE-FILTER: takrorlanuvchi statik savolga AI chaqirmasdan javob ──
+    prefiltered = ai_prefilter_reply(text, lang)
+    if prefiltered is not None:
+        history = context.user_data.get("ai_history", [])
+        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": prefiltered}]
+        context.user_data["ai_history"] = history[-6:]
+        _log_ai_interaction(update.effective_user, text, prefiltered, None, False, lang)
+        await update.message.reply_text(prefiltered)
         return
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
