@@ -7136,6 +7136,30 @@ def _normalize(text: str) -> str:
     return text.strip().lower()
 
 
+_KZ_ONLY_LETTERS = set("әғқңөұүһі")
+
+
+def _detect_msg_lang(text: str, fallback: str) -> str:
+    """
+    Xabar matnidan tilni tахминий aniqlaydi (saqlangan `lang`ga qaramasdan):
+    - lotin harflar ustunlik qilsa -> "uz"
+    - kirillcha va qozoqchaga xos harflar bo'lsa -> "kz"
+    - kirillcha, lekin qozoqcha harf yo'q -> "ru"
+    - harf umuman bo'lmasa (masalan faqat raqam) -> saqlangan `fallback`
+    """
+    latin_count = sum(1 for ch in text if ch.isalpha() and ch.lower() in "abcdefghijklmnopqrstuvwxyz")
+    cyrillic_count = sum(1 for ch in text if ch.isalpha() and (
+        "а" <= ch.lower() <= "я" or ch.lower() in "ёіңғқөұүһә"
+    ))
+    if latin_count == 0 and cyrillic_count == 0:
+        return fallback
+    if latin_count >= cyrillic_count:
+        return "uz"
+    if any(ch in text.lower() for ch in _KZ_ONLY_LETTERS):
+        return "kz"
+    return "ru"
+
+
 PAYMENT_INCLUDES_REPLY = {
     "uz": (
         "✅ To'lov ichida (bepul):\n"
@@ -7353,12 +7377,14 @@ def _build_phone_reply(lang: str) -> str:
 
 def ai_prefilter_reply(text: str, lang: str):
     """
-    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — (javob_matni, route) qaytaradi
-    (route odatda None, faqat calc_start holatida tugma kerak bo'ladi).
-    AI umuman chaqirilmaydi, token sarflanmaydi. Mos kelmasa — None qaytaradi,
-    va oddiy AI oqimi davom etadi.
+    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — (javob_matni, route, aniqlangan_til)
+    qaytaradi. `lang` argumenti — saqlangan (fallback) til, lekin funksiya xabar matnidan
+    o'zi ham tilni aniqlashga harakat qiladi (lotin -> uz, qozoqcha harf -> kz, boshqa
+    kirill -> ru), shunda foydalanuvchi saqlangan tildan boshqa tilda yozsa ham to'g'ri
+    tilda javob beriladi. Mos kelmasa — None qaytadi, oddiy AI oqimi davom etadi.
     """
     t = _normalize(text)
+    lang = _detect_msg_lang(text, lang)
 
     # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "Ha", "?")
     stripped_short = t.strip("!.,?- ")
@@ -7367,47 +7393,47 @@ def ai_prefilter_reply(text: str, lang: str):
             "uz": "Salom! 😊 \"Ergash Ota\" klinikasiga xush kelibsiz.\n\nQanday savol yoki muammo bilan yordam bera olaman?",
             "ru": "Здравствуйте! 😊 Добро пожаловать в клинику \"Эргаш Ота\".\n\nЧем могу помочь?",
             "kz": "Сәлеметсіз бе! 😊 \"Эргаш Ота\" клиникасына қош келдіңіз.\n\nҚандай сұрақпен көмектесе аламын?",
-        }[lang], None)
+        }[lang], None, lang)
 
     # 1) Minnatdorchilik/tasdiqlash — endi IBORA ICHIDA ham topadi (masalan "Хуш рахмат сизга"),
     #    lekin faqat QISQA xabarlarda (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
     if len(t) <= 25 and any(w in t for w in _THANKS_WORDS):
-        return (THANKS_REPLY[lang], None)
+        return (THANKS_REPLY[lang], None, lang)
 
     # 2) "To'lovga nima kiradi" turkumi
     if any(kw in t for kw in _PAYMENT_INCLUDES_KEYWORDS):
-        return (PAYMENT_INCLUDES_REPLY[lang], None)
+        return (PAYMENT_INCLUDES_REPLY[lang], None, lang)
 
     # 3) Davolanish muddati ("necha kun yotish kerak")
     if any(kw in t for kw in _DURATION_KEYWORDS):
-        return (DURATION_REPLY[lang], None)
+        return (DURATION_REPLY[lang], None, lang)
 
     # 4) Ovqatlanish/питание kirad-kirmasligi
     if any(kw in t for kw in _FOOD_KEYWORDS):
-        return (FOOD_REPLY[lang], None)
+        return (FOOD_REPLY[lang], None, lang)
 
     # 5) "N kunga necha pul" — bemor SHAXSIY hisoblash so'ragan (aniq kun soni bor).
     #    Bu yerda AI'ga o'zi hisoblatib, savol-javobga tortilmaslik uchun —
     #    to'g'ridan-to'g'ri hisoblash tugmasi (calc_start) beriladi.
     has_diag_exclude = any(kw in t for kw in _PRICE_EXCLUDE_KEYWORDS)
     if not has_diag_exclude and _CALC_DAY_PATTERN.search(t) and any(w in t for w in _CALC_PRICE_WORDS):
-        return (CALC_ROUTE_REPLY[lang], "calc_start")
+        return (CALC_ROUTE_REPLY[lang], "calc_start", lang)
 
     # 6) Xona/stastionar narxi — kunlik/сутки so'zi bilan YOKI umumiy narx so'rovi bilan,
     #    lekin aniq diagnostika/muolaja narxi so'ralganda AI'ga qoldiriladi
     has_day_price = any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS)
     has_generic_price = any(kw in t for kw in _ROOM_PRICE_GENERIC_KEYWORDS)
     if not has_diag_exclude and (has_day_price or has_generic_price):
-        return (_build_room_price_reply(lang), None)
+        return (_build_room_price_reply(lang), None, lang)
 
     # 7) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
     #    AI o'zi javob berishi kerak, chunki u yerda boshqa muhim savollar ham bo'lishi mumkin)
     if len(t) <= 60 and any(kw in t for kw in _CURRENCY_KEYWORDS):
-        return (CURRENCY_REPLY[lang], None)
+        return (CURRENCY_REPLY[lang], None, lang)
 
     # 8) Telefon raqam so'ralganda
     if any(kw in t for kw in _PHONE_KEYWORDS):
-        return (_build_phone_reply(lang), None)
+        return (_build_phone_reply(lang), None, lang)
 
     return None
 
@@ -7582,14 +7608,14 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
     # ── PRE-FILTER: takrorlanuvchi statik savolga AI chaqirmasdan javob ──
     prefiltered = ai_prefilter_reply(text, lang)
     if prefiltered is not None:
-        prefiltered_text, prefiltered_route = prefiltered
+        prefiltered_text, prefiltered_route, prefiltered_lang = prefiltered
         history = context.user_data.get("ai_history", [])
         history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": prefiltered_text}]
         context.user_data["ai_history"] = history[-6:]
-        _log_ai_interaction(update.effective_user, text, prefiltered_text, prefiltered_route, False, lang)
+        _log_ai_interaction(update.effective_user, text, prefiltered_text, prefiltered_route, False, prefiltered_lang)
         pf_kb = None
         if prefiltered_route:
-            pf_label = SECTION_BUTTON_LABELS[prefiltered_route][lang]
+            pf_label = SECTION_BUTTON_LABELS[prefiltered_route][prefiltered_lang]
             pf_kb = InlineKeyboardMarkup([[InlineKeyboardButton(pf_label, callback_data=prefiltered_route)]])
         await update.message.reply_text(prefiltered_text, reply_markup=pf_kb)
         return
