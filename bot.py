@@ -7075,6 +7075,23 @@ _ROOM_DAILY_PRICE_TERMS = [
     "нарх", "narx", "цена", "стоимост", "қанча", "qancha", "канча",
 ]
 
+# Umumiy narx so'rovlari (kun so'zi bo'lmasa ham) — deyarli har doim xona/stastionar narxi haqida
+_ROOM_PRICE_GENERIC_KEYWORDS = [
+    "нечпул", "неча пул", "нечапул", "неча пул туради", "нархлари",
+    "narxlari", "narxi qancha", "нархи канча", "нархи қанша", "қанша тұрады",
+    "канша турадi", "сколько стоит", "стоимость лечения", "стоимость прожив",
+    "цена за лечение", "цены", "какие цены", "даволаниш нархи", "лечение нархи",
+    "неча пул турады", "неча сум", "неча сўм",
+]
+
+# Bu so'zlar bo'lsa — bu aniq diagnostika/muolaja narxi (boshqa ma'lumot), xona jadvali BERILMAYDI,
+# AI o'ziga qoldiriladi
+_PRICE_EXCLUDE_KEYWORDS = [
+    "мрт", "мскт", "mrt", "mskt", "кт нарх", "узи нарх", "экг нарх",
+    "тахлил нарх", "tahlil narx", "анализ цена", "массаж нарх", "transfer нарх",
+    "трансфер нарх",
+]
+
 _PHONE_KEYWORDS = [
     "tel nomer", "telefon raqam", "телефон раqам", "телефон рақам",
     "номер телефон", "телефон бера", "raqam beraolas", "номер бераолас",
@@ -7353,8 +7370,12 @@ def ai_prefilter_reply(text: str, lang: str) -> str | None:
     if any(kw in t for kw in _FOOD_KEYWORDS):
         return FOOD_REPLY[lang]
 
-    # 5) Bir kunlik xona narxi
-    if any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS):
+    # 5) Xona/stastionar narxi — kunlik/сутки so'zi bilan YOKI umumiy narx so'rovi bilan,
+    #    lekin aniq diagnostika/muolaja narxi so'ralganda AI'ga qoldiriladi
+    has_diag_exclude = any(kw in t for kw in _PRICE_EXCLUDE_KEYWORDS)
+    has_day_price = any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS)
+    has_generic_price = any(kw in t for kw in _ROOM_PRICE_GENERIC_KEYWORDS)
+    if not has_diag_exclude and (has_day_price or has_generic_price):
         return _build_room_price_reply(lang)
 
     # 6) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
