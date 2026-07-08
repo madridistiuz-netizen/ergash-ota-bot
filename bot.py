@@ -7054,6 +7054,7 @@ def _build_dynamic_system_prompt() -> str:
 
 
 # ── AI PRE-FILTER: takrorlanuvchi statik savollarga AI chaqirmasdan javob ──
+import re
 
 _THANKS_WORDS = {
     "rahmat", "raxmat", "рахмат", "рахмет", "спасибо", "спс", "ok", "ок",
@@ -7091,6 +7092,20 @@ _PRICE_EXCLUDE_KEYWORDS = [
     "тахлил нарх", "tahlil narx", "анализ цена", "массаж нарх", "transfer нарх",
     "трансфер нарх",
 ]
+
+# "N kunga necha pul" — bemor aniq kunlar sonini ko'rsatib shaxsiy hisoblash so'ragan —
+# bunda AI'ga qoldirmasdan, to'g'ridan-to'g'ri hisoblash tugmasini (calc_start) beramiz
+_CALC_DAY_PATTERN = re.compile(r"\d+\s*(kun|кун|күн)")
+_CALC_PRICE_WORDS = [
+    "нечпул", "nechpul", "неча пул", "necha pul", "нечта пул", "нечапул",
+    "қанча", "qancha", "канча", "нарх", "narx", "цена", "стоимост", "неше сум",
+]
+
+CALC_ROUTE_REPLY = {
+    "uz": "Aniq narxni hisoblash uchun quyidagi tugmani bosing — xona turi va necha kishi ekanligini kiritsangiz, tayyor summani chiqarib beradi:",
+    "ru": "Чтобы точно рассчитать стоимость, нажмите кнопку ниже — укажете тип палаты и количество человек, и получите готовую сумму:",
+    "kz": "Нақты құнын есептеу үшін төмендегі батырманы басыңыз — бөлме түрі мен адам санын көрсетсеңіз, дайын соманы аласыз:",
+}
 
 _PHONE_KEYWORDS = [
     "tel nomer", "telefon raqam", "телефон раqам", "телефон рақам",
@@ -7336,10 +7351,11 @@ def _build_phone_reply(lang: str) -> str:
     }[lang]
 
 
-def ai_prefilter_reply(text: str, lang: str) -> str | None:
+def ai_prefilter_reply(text: str, lang: str):
     """
-    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — tayyor javob qaytaradi
-    (AI umuman chaqirilmaydi, token sarflanmaydi). Mos kelmasa — None qaytaradi,
+    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — (javob_matni, route) qaytaradi
+    (route odatda None, faqat calc_start holatida tugma kerak bo'ladi).
+    AI umuman chaqirilmaydi, token sarflanmaydi. Mos kelmasa — None qaytaradi,
     va oddiy AI oqimi davom etadi.
     """
     t = _normalize(text)
@@ -7347,45 +7363,51 @@ def ai_prefilter_reply(text: str, lang: str) -> str | None:
     # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "Ha", "?")
     stripped_short = t.strip("!.,?- ")
     if len(stripped_short) <= 2 and stripped_short != "":
-        return {
+        return ({
             "uz": "Salom! 😊 \"Ergash Ota\" klinikasiga xush kelibsiz.\n\nQanday savol yoki muammo bilan yordam bera olaman?",
             "ru": "Здравствуйте! 😊 Добро пожаловать в клинику \"Эргаш Ота\".\n\nЧем могу помочь?",
             "kz": "Сәлеметсіз бе! 😊 \"Эргаш Ота\" клиникасына қош келдіңіз.\n\nҚандай сұрақпен көмектесе аламын?",
-        }[lang]
+        }[lang], None)
 
     # 1) Minnatdorchilik/tasdiqlash — endi IBORA ICHIDA ham topadi (masalan "Хуш рахмат сизга"),
     #    lekin faqat QISQA xabarlarda (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
     if len(t) <= 25 and any(w in t for w in _THANKS_WORDS):
-        return THANKS_REPLY[lang]
+        return (THANKS_REPLY[lang], None)
 
     # 2) "To'lovga nima kiradi" turkumi
     if any(kw in t for kw in _PAYMENT_INCLUDES_KEYWORDS):
-        return PAYMENT_INCLUDES_REPLY[lang]
+        return (PAYMENT_INCLUDES_REPLY[lang], None)
 
     # 3) Davolanish muddati ("necha kun yotish kerak")
     if any(kw in t for kw in _DURATION_KEYWORDS):
-        return DURATION_REPLY[lang]
+        return (DURATION_REPLY[lang], None)
 
     # 4) Ovqatlanish/питание kirad-kirmasligi
     if any(kw in t for kw in _FOOD_KEYWORDS):
-        return FOOD_REPLY[lang]
+        return (FOOD_REPLY[lang], None)
 
-    # 5) Xona/stastionar narxi — kunlik/сутки so'zi bilan YOKI umumiy narx so'rovi bilan,
-    #    lekin aniq diagnostika/muolaja narxi so'ralganda AI'ga qoldiriladi
+    # 5) "N kunga necha pul" — bemor SHAXSIY hisoblash so'ragan (aniq kun soni bor).
+    #    Bu yerda AI'ga o'zi hisoblatib, savol-javobga tortilmaslik uchun —
+    #    to'g'ridan-to'g'ri hisoblash tugmasi (calc_start) beriladi.
     has_diag_exclude = any(kw in t for kw in _PRICE_EXCLUDE_KEYWORDS)
+    if not has_diag_exclude and _CALC_DAY_PATTERN.search(t) and any(w in t for w in _CALC_PRICE_WORDS):
+        return (CALC_ROUTE_REPLY[lang], "calc_start")
+
+    # 6) Xona/stastionar narxi — kunlik/сутки so'zi bilan YOKI umumiy narx so'rovi bilan,
+    #    lekin aniq diagnostika/muolaja narxi so'ralganda AI'ga qoldiriladi
     has_day_price = any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS)
     has_generic_price = any(kw in t for kw in _ROOM_PRICE_GENERIC_KEYWORDS)
     if not has_diag_exclude and (has_day_price or has_generic_price):
-        return _build_room_price_reply(lang)
+        return (_build_room_price_reply(lang), None)
 
-    # 6) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
+    # 7) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
     #    AI o'zi javob berishi kerak, chunki u yerda boshqa muhim savollar ham bo'lishi mumkin)
     if len(t) <= 60 and any(kw in t for kw in _CURRENCY_KEYWORDS):
-        return CURRENCY_REPLY[lang]
+        return (CURRENCY_REPLY[lang], None)
 
-    # 7) Telefon raqam so'ralganda
+    # 8) Telefon raqam so'ralganda
     if any(kw in t for kw in _PHONE_KEYWORDS):
-        return _build_phone_reply(lang)
+        return (_build_phone_reply(lang), None)
 
     return None
 
@@ -7560,11 +7582,16 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
     # ── PRE-FILTER: takrorlanuvchi statik savolga AI chaqirmasdan javob ──
     prefiltered = ai_prefilter_reply(text, lang)
     if prefiltered is not None:
+        prefiltered_text, prefiltered_route = prefiltered
         history = context.user_data.get("ai_history", [])
-        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": prefiltered}]
+        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": prefiltered_text}]
         context.user_data["ai_history"] = history[-6:]
-        _log_ai_interaction(update.effective_user, text, prefiltered, None, False, lang)
-        await update.message.reply_text(prefiltered)
+        _log_ai_interaction(update.effective_user, text, prefiltered_text, prefiltered_route, False, lang)
+        pf_kb = None
+        if prefiltered_route:
+            pf_label = SECTION_BUTTON_LABELS[prefiltered_route][lang]
+            pf_kb = InlineKeyboardMarkup([[InlineKeyboardButton(pf_label, callback_data=prefiltered_route)]])
+        await update.message.reply_text(prefiltered_text, reply_markup=pf_kb)
         return
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
