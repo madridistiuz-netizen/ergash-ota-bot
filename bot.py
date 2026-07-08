@@ -7138,26 +7138,86 @@ def _normalize(text: str) -> str:
 
 _KZ_ONLY_LETTERS = set("әғқңөұүһі")
 
+# O'zbekcha-kirillcha matnlarda tez-tez uchraydigan so'zlar (ruschadan ajratish uchun)
+_UZ_CYRILLIC_MARKER_WORDS = [
+    "киради", "кирмайди", "бўлади", "керак", "нима", "қанча", "қачон",
+    "яхши", "хона", "тўлов", "касал", "шифокор", "даволаниш", "рахмат",
+    "нарх", "куни", "борми", "керакми", "мумкин", "қилиш", "келади",
+    "кетади", "билан", "учун", "хуш", "яна",
+]
 
-def _detect_msg_lang(text: str, fallback: str) -> str:
+
+def _detect_msg_lang(text: str, fallback: str):
     """
-    Xabar matnidan tilni tахминий aniqlaydi (saqlangan `lang`ga qaramasdan):
-    - lotin harflar ustunlik qilsa -> "uz"
-    - kirillcha va qozoqchaga xos harflar bo'lsa -> "kz"
-    - kirillcha, lekin qozoqcha harf yo'q -> "ru"
-    - harf umuman bo'lmasa (masalan faqat raqam) -> saqlangan `fallback`
+    Xabar matnidan tilni tахминий aniqlaydi (saqlangan `lang`ga qaramasdan).
+    Qaytaradi: (dict_uchun_til_kodi, uz_kirillcha_flag)
+    - lotin harflar ustunlik qilsa -> ("uz", False)
+    - kirillcha, qozoqchaga xos harf bo'lsa -> ("kz", False)
+    - kirillcha, o'zbekcha marker so'z topilsa -> ("uz", True)  # javob "uz" matnidan translit qilinadi
+    - kirillcha, aks holda -> ("ru", False)
+    - harf umuman bo'lmasa -> (fallback, False)
     """
-    latin_count = sum(1 for ch in text if ch.isalpha() and ch.lower() in "abcdefghijklmnopqrstuvwxyz")
-    cyrillic_count = sum(1 for ch in text if ch.isalpha() and (
-        "а" <= ch.lower() <= "я" or ch.lower() in "ёіңғқөұүһә"
-    ))
+    low = text.lower()
+    latin_count = sum(1 for ch in low if ch in "abcdefghijklmnopqrstuvwxyz")
+    cyrillic_count = sum(1 for ch in low if "а" <= ch <= "я" or ch in "ёіңғқөұүһә")
     if latin_count == 0 and cyrillic_count == 0:
-        return fallback
+        return (fallback, False)
     if latin_count >= cyrillic_count:
-        return "uz"
-    if any(ch in text.lower() for ch in _KZ_ONLY_LETTERS):
-        return "kz"
-    return "ru"
+        return ("uz", False)
+    if any(ch in low for ch in _KZ_ONLY_LETTERS):
+        return ("kz", False)
+    if any(w in low for w in _UZ_CYRILLIC_MARKER_WORDS):
+        return ("uz", True)
+    return ("ru", False)
+
+
+_UZ_APOSTROPHE_NORMALIZE = str.maketrans({"ʻ": "'", "ʼ": "'", "’": "'", "‘": "'", "`": "'"})
+
+_UZ_DIGRAPH_ORDER = [
+    ("yo'", "йў"),  # "yo'nalish" -> "йўналиш" (oddiy "yo"+"'" bilan aralashib ketmasligi uchun OLDIN tekshiriladi)
+    ("o'", "ў"), ("g'", "ғ"),
+    ("sh", "ш"), ("ch", "ч"), ("ng", "нг"),
+    ("yo", "ё"), ("ya", "я"), ("yu", "ю"),
+]
+
+_UZ_SINGLE_MAP = {
+    "a": "а", "b": "б", "d": "д", "e": "е", "f": "ф", "g": "г",
+    "h": "ҳ", "i": "и", "j": "ж", "k": "к", "l": "л", "m": "м",
+    "n": "н", "o": "о", "p": "п", "q": "қ", "r": "р", "s": "с",
+    "t": "т", "u": "у", "v": "в", "x": "х", "y": "й", "z": "з",
+    "'": "ъ",
+}
+
+
+def _translit_uz_latin_to_cyrillic(text: str) -> str:
+    """
+    O'zbekcha-lotin matnni o'zbekcha-kirillga o'giradi (taxminiy qoidalar bilan;
+    murakkab holatlarda 100% aniq bo'lmasligi mumkin, lekin FAQ/statik matnlar uchun yetarli).
+    """
+    text = text.translate(_UZ_APOSTROPHE_NORMALIZE)
+    out = []
+    i, n = 0, len(text)
+    while i < n:
+        matched = False
+        for lat, cyr in _UZ_DIGRAPH_ORDER:
+            L = len(lat)
+            chunk = text[i:i + L]
+            if chunk.lower() == lat:
+                out.append(cyr.capitalize() if chunk[0].isupper() else cyr)
+                i += L
+                matched = True
+                break
+        if matched:
+            continue
+        ch = text[i]
+        low_ch = ch.lower()
+        if low_ch in _UZ_SINGLE_MAP:
+            cyr = _UZ_SINGLE_MAP[low_ch]
+            out.append(cyr.upper() if ch.isupper() else cyr)
+        else:
+            out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 PAYMENT_INCLUDES_REPLY = {
@@ -7375,17 +7435,11 @@ def _build_phone_reply(lang: str) -> str:
     }[lang]
 
 
-def ai_prefilter_reply(text: str, lang: str):
+def _prefilter_core(t: str, lang: str):
     """
-    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — (javob_matni, route, aniqlangan_til)
-    qaytaradi. `lang` argumenti — saqlangan (fallback) til, lekin funksiya xabar matnidan
-    o'zi ham tilni aniqlashga harakat qiladi (lotin -> uz, qozoqcha harf -> kz, boshqa
-    kirill -> ru), shunda foydalanuvchi saqlangan tildan boshqa tilda yozsa ham to'g'ri
-    tilda javob beriladi. Mos kelmasa — None qaytadi, oddiy AI oqimi davom etadi.
+    `lang` bu yerda faqat "uz"/"ru"/"kz" bo'ladi (dict kalitlari uchun).
+    Mos kelsa (javob_matni, route) qaytaradi, aks holda None.
     """
-    t = _normalize(text)
-    lang = _detect_msg_lang(text, lang)
-
     # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "Ha", "?")
     stripped_short = t.strip("!.,?- ")
     if len(stripped_short) <= 2 and stripped_short != "":
@@ -7393,49 +7447,76 @@ def ai_prefilter_reply(text: str, lang: str):
             "uz": "Salom! 😊 \"Ergash Ota\" klinikasiga xush kelibsiz.\n\nQanday savol yoki muammo bilan yordam bera olaman?",
             "ru": "Здравствуйте! 😊 Добро пожаловать в клинику \"Эргаш Ота\".\n\nЧем могу помочь?",
             "kz": "Сәлеметсіз бе! 😊 \"Эргаш Ота\" клиникасына қош келдіңіз.\n\nҚандай сұрақпен көмектесе аламын?",
-        }[lang], None, lang)
+        }[lang], None)
 
     # 1) Minnatdorchilik/tasdiqlash — endi IBORA ICHIDA ham topadi (masalan "Хуш рахмат сизга"),
     #    lekin faqat QISQA xabarlarda (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
     if len(t) <= 25 and any(w in t for w in _THANKS_WORDS):
-        return (THANKS_REPLY[lang], None, lang)
+        return (THANKS_REPLY[lang], None)
 
     # 2) "To'lovga nima kiradi" turkumi
     if any(kw in t for kw in _PAYMENT_INCLUDES_KEYWORDS):
-        return (PAYMENT_INCLUDES_REPLY[lang], None, lang)
+        return (PAYMENT_INCLUDES_REPLY[lang], None)
 
     # 3) Davolanish muddati ("necha kun yotish kerak")
     if any(kw in t for kw in _DURATION_KEYWORDS):
-        return (DURATION_REPLY[lang], None, lang)
+        return (DURATION_REPLY[lang], None)
 
     # 4) Ovqatlanish/питание kirad-kirmasligi
     if any(kw in t for kw in _FOOD_KEYWORDS):
-        return (FOOD_REPLY[lang], None, lang)
+        return (FOOD_REPLY[lang], None)
 
     # 5) "N kunga necha pul" — bemor SHAXSIY hisoblash so'ragan (aniq kun soni bor).
     #    Bu yerda AI'ga o'zi hisoblatib, savol-javobga tortilmaslik uchun —
     #    to'g'ridan-to'g'ri hisoblash tugmasi (calc_start) beriladi.
     has_diag_exclude = any(kw in t for kw in _PRICE_EXCLUDE_KEYWORDS)
     if not has_diag_exclude and _CALC_DAY_PATTERN.search(t) and any(w in t for w in _CALC_PRICE_WORDS):
-        return (CALC_ROUTE_REPLY[lang], "calc_start", lang)
+        return (CALC_ROUTE_REPLY[lang], "calc_start")
 
     # 6) Xona/stastionar narxi — kunlik/сутки so'zi bilan YOKI umumiy narx so'rovi bilan,
     #    lekin aniq diagnostika/muolaja narxi so'ralganda AI'ga qoldiriladi
     has_day_price = any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS)
     has_generic_price = any(kw in t for kw in _ROOM_PRICE_GENERIC_KEYWORDS)
     if not has_diag_exclude and (has_day_price or has_generic_price):
-        return (_build_room_price_reply(lang), None, lang)
+        return (_build_room_price_reply(lang), None)
 
     # 7) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
     #    AI o'zi javob berishi kerak, chunki u yerda boshqa muhim savollar ham bo'lishi mumkin)
     if len(t) <= 60 and any(kw in t for kw in _CURRENCY_KEYWORDS):
-        return (CURRENCY_REPLY[lang], None, lang)
+        return (CURRENCY_REPLY[lang], None)
 
     # 8) Telefon raqam so'ralganda
     if any(kw in t for kw in _PHONE_KEYWORDS):
-        return (_build_phone_reply(lang), None, lang)
+        return (_build_phone_reply(lang), None)
 
     return None
+
+
+def ai_prefilter_reply(text: str, lang: str):
+    """
+    AI chaqirilishidan OLDIN tekshiriladi. Mos kelsa — (javob_matni, route, aniqlangan_til)
+    qaytaradi. `lang` argumenti — saqlangan (fallback) til, lekin funksiya xabar matnidan
+    o'zi ham tilni aniqlashga harakat qiladi:
+    - lotin harflar -> "uz" (o'zgarishsiz)
+    - qozoqchaga xos harf -> "kz"
+    - kirillcha, lekin o'zbekcha marker so'z bor -> "uz" matni olinib, KIRILLGA
+      avtomatik translit qilinadi (bemor o'zbekchani kirillcha yozgan bo'lsa ham
+      kirillcha javob oladi)
+    - kirillcha, aks holda -> "ru"
+    Mos kelmasa — None qaytadi, oddiy AI oqimi davom etadi.
+    """
+    t = _normalize(text)
+    dict_lang, is_uz_cyrillic = _detect_msg_lang(text, lang)
+
+    result = _prefilter_core(t, dict_lang)
+    if result is None:
+        return None
+
+    reply_text, route = result
+    if is_uz_cyrillic:
+        reply_text = _translit_uz_latin_to_cyrillic(reply_text)
+
+    return (reply_text, route, dict_lang)
 
 
 def _call_anthropic_sync(user_text: str, history: list = None) -> str:
