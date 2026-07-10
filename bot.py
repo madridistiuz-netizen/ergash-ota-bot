@@ -6733,7 +6733,7 @@ OVQATLANISH HAQIDA — IKKI XIL BOSQICHNI ADASHTIRMA (bu juda muhim, ko'p xato s
 
 XONA TO'LOVI ICHIDA NIMA BOR VA NIMA YO'Q (bemor "to'lovga nimalar kiradi", "nima bepul" deb so'rasa — AYNAN shu ro'yxatni ber, o'zingdan hech narsa qo'shma):
 
-✅ TO'LOV ICHIDA (bepul, alohida to'lov shart emas):
+✅ TO'LOV ICHIDA (bepul, alohida to'lov shart emas, BARCHA xona turlarida):
 - Yotoq joyi (karavot, ko'rpa-to'shak, yostiq jild, choyshab)
 - Malxam muolajasi (kunlik)
 - Klizma (ichak tozalash)
@@ -6743,11 +6743,13 @@ XONA TO'LOVI ICHIDA NIMA BOR VA NIMA YO'Q (bemor "to'lovga nimalar kiradi", "nim
 - Shifokor ko'rigi va nazorat
 - EKG
 - UZI, qon tahlili
-- MRT 1.5T yoki MSKT (1 organ)
 - WiFi
+
+⚠️ MRT 1.5T yoki MSKT (1 organ) — MUHIM ISTISNO: bu FAQAT narxi 340 000 so'mdan yuqori bo'lgan xona turlarida (Lyuks va undan yuqori toifadagi xonalarda) to'lovga bepul kiritilgan. Narxi 340 000 so'mdan PAST xonalarda (masalan Umumiy, O'rta miyona, Pol/Lyuks va h.k.) MRT/MSKT to'lovga KIRMAYDI — bu holatda alohida to'lanadi. Bemor arzon xona (185 000-314 000 so'm oralig'idagi) narxini so'raganda, MRT/MSKT'ni "bepul kiradi" deb HECH QACHON AYTMA.
 
 ✨ LYUKS VA YUQORI TOIFALI XONALARDA QO'SHIMCHA BERILADI:
 - Sochiq, shampun, tish pastasi, sovun
+- MRT 1.5T yoki MSKT (1 organ) — yuqorida aytilganidek
 
 ❌ TO'LOVGA KIRMAYDI (alohida to'lanadi):
 - Olma sharbati (oshxona o'ng tomonidagi do'kondan sotib olinadi)
@@ -6838,7 +6840,8 @@ DAVOLANISH MUDDATI HAQIDA (bemor "necha kun davolanish kerak", "davolanish mudda
 - Bemorga "kelavering, shifokor ko'rigidan keyin o'zi maslahat beradi" degan ma'noni bos — aniq kun raqamini sen belgilama, bu doktorning vazifasi.
 
 KUNLIK PROTSEDURALAR TARTIBI:
-- Ertalab: klizma (ichak yuvish) — majburiy protsedura, keyin xonada dam olish, so'ng Malxam (soat 10:00-12:00), Malxamdan keyin grelka bilan 1.5-2 soat yotish.
+- Ertalab: klizma (ichak yuvish) — ODATDA KUN ORA qilinadi (har kuni emas), keyin xonada dam olish, so'ng Malxam (soat 10:00-12:00), Malxamdan keyin grelka bilan 1.5-2 soat yotish.
+- ISTISNO: teri kasalligi (psoriaz, ekzema va h.k.) yoki gijja muammosi bilan kelgan bemorlarga ertalabgi giyohli klizma HAR KUNI beriladi (kun ora emas). Bemor "klizma har kuni bo'ladimi" deb so'rasa, aynan shu farqni tushuntir: odatiy holatda kun ora, lekin teri kasalligi/gijja uchun kelganlarga har kuni.
 - Kunduzi: massaj, apparat fizioterapiya (oyoq, qorin, orqa), cho'zilish mashqlari, sport zal, apparat kosmetologiya, quloqqa ukol, tahlillar.
 - Payshanba kuni — qisqa kun (subbotnik). Payshanba va yakshanba kechqurun (21:00 dan keyin) — musiqali dam olish kechki ovqatdan keyin.
 
@@ -6990,7 +6993,7 @@ def _build_dynamic_system_prompt() -> str:
         room_lines.append("Xorijiy fuqarolar uchun xona narxlari (1 kun, 1 kishi):")
         for r in rooms_foreign[:8]:
             room_lines.append(f"  • {r['name']} ({r['people']} kishi): katta — {r['adult']} so'm, bola — {r['child']} so'm")
-        rooms_block = "\n\nXONA NARXLARI (bemor xona narxi, qancha turadi so'rasa — aniq raqam berish uchun shu ma'lumotdan foydalan, lekin narxlar o'zgarishi mumkin deb eslatma qo'sh):\n" + "\n".join(room_lines)
+        rooms_block = "\n\nXONA NARXLARI (bemor xona narxi, qancha turadi so'rasa — aniq raqam berish uchun shu ma'lumotdan foydalan, lekin narxlar o'zgarishi mumkin deb eslatma qo'sh):\n" + "\n".join(room_lines) + "\n\nMUHIM (fuqarolik): Agar bemor O'zbekiston fuqarosi yoki xorijiy fuqaro ekanligini ANIQ aytmagan bo'lsa, faqat bitta jadvaldan (masalan faqat mahalliy narxdan) hisoblab, aniq bitta summani BERMA. Buning o'rniga: (1) fuqaroligini so'ra, YOKI (2) ikkala jadvalni (mahalliy va xorijiy) aniq ajratib ko'rsatib, bemor o'zi mos kelganini tanlasin. Fuqarolik bo'yicha noto'g'ri taxmin qilish — jiddiy xato hisoblanadi."
     except Exception:
         rooms_block = ""
 
@@ -7222,7 +7225,7 @@ def _translit_uz_latin_to_cyrillic(text: str) -> str:
 
 PAYMENT_INCLUDES_REPLY = {
     "uz": (
-        "✅ To'lov ichida (bepul):\n"
+        "✅ To'lov ichida (bepul, barcha xona turlarida):\n"
         "- Yotoq joyi (karavot, ko'rpa-to'shak, yostiq jild, choyshab)\n"
         "- Malxam muolajasi (kunlik)\n"
         "- Klizma (ichak tozalash)\n"
@@ -7232,8 +7235,8 @@ PAYMENT_INCLUDES_REPLY = {
         "- Shifokor ko'rigi va nazorat\n"
         "- EKG\n"
         "- UZI, qon tahlili\n"
-        "- MRT 1.5T yoki MSKT (1 organ)\n"
         "- WiFi\n\n"
+        "⚠️ MRT 1.5T yoki MSKT (1 organ) — FAQAT narxi 340 000 so'mdan yuqori xonalarda (Lyuks va undan yuqori toifada) bepul kiradi. Arzonroq xonalarda (185 000–314 000 so'm) MRT/MSKT alohida to'lanadi.\n\n"
         "✨ Lyuks va yuqori toifali xonalarda qo'shimcha:\n"
         "- Sochiq, shampun, tish pastasi, sovun\n\n"
         "❌ To'lovga kirmaydi (alohida to'lanadi):\n"
@@ -7245,7 +7248,7 @@ PAYMENT_INCLUDES_REPLY = {
         "- Kafe va qo'shimcha ovqatlar"
     ),
     "ru": (
-        "✅ Включено (бесплатно):\n"
+        "✅ Включено (бесплатно, во всех типах палат):\n"
         "- Спальное место (кровать, постельное бельё, подушка, простынь)\n"
         "- Процедура Malxam (ежедневно)\n"
         "- Клизма (очищение кишечника)\n"
@@ -7255,8 +7258,8 @@ PAYMENT_INCLUDES_REPLY = {
         "- Осмотр и наблюдение врача\n"
         "- ЭКГ\n"
         "- УЗИ, анализ крови\n"
-        "- МРТ 1.5T или МСКТ (1 орган)\n"
         "- WiFi\n\n"
+        "⚠️ МРТ 1.5T или МСКТ (1 орган) — включено бесплатно ТОЛЬКО в палатах дороже 340 000 сум (Люкс и выше). В более дешёвых палатах (185 000–314 000 сум) МРТ/МСКТ оплачивается отдельно.\n\n"
         "✨ В люкс и номерах высокой категории дополнительно:\n"
         "- Полотенце, шампунь, зубная паста, мыло\n\n"
         "❌ Оплачивается отдельно:\n"
@@ -7268,7 +7271,7 @@ PAYMENT_INCLUDES_REPLY = {
         "- Кафе и дополнительное питание"
     ),
     "kz": (
-        "✅ Ақысыз кіреді:\n"
+        "✅ Ақысыз кіреді (барлық бөлме түрлерінде):\n"
         "- Төсек орны (кереует, төсек-орын, жастық, жаялық)\n"
         "- Malxam процедурасы (күнделікті)\n"
         "- Клизма (ішекті тазалау)\n"
@@ -7278,8 +7281,8 @@ PAYMENT_INCLUDES_REPLY = {
         "- Дәрігердің қарауы мен бақылауы\n"
         "- ЭКГ\n"
         "- УЗИ, қан талдауы\n"
-        "- МРТ 1.5T немесе МСКТ (1 мүше)\n"
         "- WiFi\n\n"
+        "⚠️ МРТ 1.5T немесе МСКТ (1 мүше) — ТЕК 340 000 сумнан қымбат бөлмелерде (Люкс және одан жоғары) ақысыз кіреді. Арзанырақ бөлмелерде (185 000–314 000 сум) МРТ/МСКТ бөлек төленеді.\n\n"
         "✨ Люкс және жоғары санатты бөлмелерде қосымша:\n"
         "- Сүлгі, шампунь, тіс пастасы, сабын\n\n"
         "❌ Бөлек төленеді:\n"
@@ -7363,6 +7366,64 @@ FOOD_REPLY = {
     ),
 }
 
+# Umumiy "Лечение", "даволаш кандай", "qanday muolajalar bor" so'rovlari —
+# faqat QISQA/sodda xabarlarda (aniq kasallik nomi yozilgan uzun savolda AI o'zi ishlaydi)
+_TREATMENT_KEYWORDS = [
+    "лечение", "лечения", "лечение какое", "какое лечение", "какие процедуры",
+    "даволаш", "даволаш кандай", "даволаниш кандай", "даволайсизлар",
+    "davolash", "davolanish qanday", "qanday davolaysiz", "qanaqa davolash",
+    "muolajalar bor", "qanday muolaja", "процедуры есть",
+    "емдеу", "қандай емдеу", "емдеу қандай",
+]
+
+TREATMENT_LIST_REPLY = {
+    "uz": (
+        "Klinikamiz \"Ergash Ota\"da quyidagi kasalliklar tabiiy usulda, jarrohliksiz davolanadi:\n\n"
+        "🫀 Asosiy yo'nalishlar:\n"
+        "- Jigar, o't pufagi kasalliklari\n"
+        "- Oshqozon-ichak tizimi kasalliklari\n"
+        "- Buyrak va siydik yo'llari kasalliklari\n"
+        "- Suyak-bo'g'im kasalliklari (osteoxondroz, artrit)\n"
+        "- Teri kasalliklari (psoriaz, ekzema, dermatit)\n"
+        "- Surunkali bronxit va o'pka kasalliklari\n"
+        "- Semizlik va vazn muammolari\n"
+        "- Prostatit, gijja kasalliklari va boshqalar\n\n"
+        "🌿 Davolash usuli:\n"
+        "32 xil maxsus shifobaxsh giyohlar va Malxam yordamida — faqat statsionar sharoitida beriladi.\n\n"
+        "Qaysi kasallik bo'yicha aniqroq bilmoqchisiz?"
+    ),
+    "ru": (
+        "В нашей клинике \"Эргаш Ота\" следующие заболевания лечатся естественным путём, без операции:\n\n"
+        "🫀 Основные направления:\n"
+        "- Заболевания печени и желчного пузыря\n"
+        "- Заболевания желудочно-кишечного тракта\n"
+        "- Заболевания почек и мочевыводящих путей\n"
+        "- Заболевания костей и суставов (остеохондроз, артрит)\n"
+        "- Кожные заболевания (псориаз, экзема, дерматит)\n"
+        "- Хронический бронхит и заболевания лёгких\n"
+        "- Ожирение и проблемы с весом\n"
+        "- Простатит, гельминтозы и другое\n\n"
+        "🌿 Метод лечения:\n"
+        "32 вида лечебных трав и Malxam — только в условиях стационара.\n\n"
+        "Какое заболевание вас интересует подробнее?"
+    ),
+    "kz": (
+        "«Эргаш Ота» клиникасында келесі аурулар табиғи жолмен, операциясыз емделеді:\n\n"
+        "🫀 Негізгі бағыттар:\n"
+        "- Бауыр, өт қабы аурулары\n"
+        "- Асқазан-ішек жүйесі аурулары\n"
+        "- Бүйрек және несеп жолдары аурулары\n"
+        "- Сүйек-буын аурулары (остеохондроз, артрит)\n"
+        "- Тері аурулары (псориаз, экзема, дерматит)\n"
+        "- Созылмалы бронхит және өкпе аурулары\n"
+        "- Семіздік және салмақ мәселелері\n"
+        "- Простатит, гельминтоздар және басқалар\n\n"
+        "🌿 Емдеу әдісі:\n"
+        "32 түрлі шипалы шөп және Malxam арқылы — тек стационарда беріледі.\n\n"
+        "Қай ауру туралы нақтырақ білгіңіз келеді?"
+    ),
+}
+
 CURRENCY_REPLY = {
     "uz": (
         "Kechirasiz, joriy valyuta kursi haqida aniq ma'lumotga ega emasman, shuning uchun "
@@ -7385,9 +7446,9 @@ CURRENCY_REPLY = {
 }
 
 _ROOM_PRICE_INCLUDES_NOTE = {
-    "uz": "\n\nℹ️ Bu narxlarga Malxam muolajasi, klizma, massaj, giyohli choylar, shifokor ko'rigi, EKG, UZI, qon tahlili va MRT 1.5T (1 organ) kiritilgan.",
-    "ru": "\n\nℹ️ В эту стоимость входят: процедура Malxam, клизма, массаж, травяные чаи, осмотр врача, ЭКГ, УЗИ, анализ крови и МРТ 1.5T (1 орган).",
-    "kz": "\n\nℹ️ Бұл құнға Malxam процедурасы, клизма, массаж, шипалы шайлар, дәрігер қарауы, ЭКГ, УЗИ, қан талдауы және МРТ 1.5T (1 мүше) кіреді.",
+    "uz": "\n\nℹ️ Bu narxlarga Malxam muolajasi, klizma, massaj, giyohli choylar, shifokor ko'rigi, EKG, UZI, qon tahlili kiritilgan. ⚠️ MRT 1.5T/MSKT (1 organ) FAQAT 340 000 so'mdan yuqori xonalarda (Lyuks va undan yuqori) bepul kiradi — arzonroq xonalarda alohida to'lanadi.",
+    "ru": "\n\nℹ️ В эту стоимость входят: процедура Malxam, клизма, массаж, травяные чаи, осмотр врача, ЭКГ, УЗИ, анализ крови. ⚠️ МРТ 1.5T/МСКТ (1 орган) включено бесплатно ТОЛЬКО в палатах дороже 340 000 сум (Люкс и выше) — в более дешёвых палатах оплачивается отдельно.",
+    "kz": "\n\nℹ️ Бұл құнға Malxam процедурасы, клизма, массаж, шипалы шайлар, дәрігер қарауы, ЭКГ, УЗИ, қан талдауы кіреді. ⚠️ МРТ 1.5T/МСКТ (1 мүше) ТЕК 340 000 сумнан қымбат бөлмелерде (Люкс және одан жоғары) ақысыз кіреді — арзанырақ бөлмелерде бөлек төленеді.",
 }
 
 _ROOM_PRICE_HEADER = {
@@ -7465,6 +7526,11 @@ def _prefilter_core(t: str, lang: str):
     # 4) Ovqatlanish/питание kirad-kirmasligi
     if any(kw in t for kw in _FOOD_KEYWORDS):
         return (FOOD_REPLY[lang], None)
+
+    # 4.5) Umumiy "Лечение"/"qanday davolash" so'rovi — FAQAT qisqa xabarda
+    #      (aniq kasallik nomi bilan yozilgan uzun savolda AI o'zi ishlashi kerak)
+    if len(t) <= 40 and any(kw in t for kw in _TREATMENT_KEYWORDS):
+        return (TREATMENT_LIST_REPLY[lang], None)
 
     # 5) "N kunga necha pul" — bemor SHAXSIY hisoblash so'ragan (aniq kun soni bor).
     #    Bu yerda AI'ga o'zi hisoblatib, savol-javobga tortilmaslik uchun —
