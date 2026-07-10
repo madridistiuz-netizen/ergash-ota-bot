@@ -731,11 +731,14 @@ def rooms_type_keyboard(lang, category):
 def diagnostics_keyboard(lang):
     labels = {
         "ru": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ", "🔬 Лаборатория", "🩺 Маммография", "🫀 Фиброскан", "⬅️ Назад"),
+               "📡 УЗИ", "🔬 Лаборатория", "🩺 Маммография", "🫀 Фиброскан",
+               "📄 Получить результаты анализов", "⬅️ Назад"),
         "uz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УЗИ", "🔬 Laboratoriya", "🩺 Mammografiya", "🫀 Fibroskan", "⬅️ Orqaga"),
+               "📡 УЗИ", "🔬 Laboratoriya", "🩺 Mammografiya", "🫀 Fibroskan",
+               "📄 Tahlil natijalarini olish", "⬅️ Orqaga"),
         "kz": ("🧲 МРТ 1.5Т", "🧲 МРТ 3Т", "🖥 МСКТ 256", "🖥 МСКТ 128",
-               "📡 УДЗ", "🔬 Зертхана", "🩺 Маммография", "🫀 Фибросканерлеу", "⬅️ Артқа"),
+               "📡 УДЗ", "🔬 Зертхана", "🩺 Маммография", "🫀 Фибросканерлеу",
+               "📄 Талдау нәтижелерін алу", "⬅️ Артқа"),
     }[lang]
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="diag_mrt15"),
@@ -746,7 +749,8 @@ def diagnostics_keyboard(lang):
         [InlineKeyboardButton(labels[5], callback_data="diag_lab")],
         [InlineKeyboardButton(labels[6], callback_data="diag_mammografiya"),
          InlineKeyboardButton(labels[7], callback_data="diag_fibroskan")],
-        [InlineKeyboardButton(labels[8], callback_data="back_main")],
+        [InlineKeyboardButton(labels[8], callback_data="get_results")],
+        [InlineKeyboardButton(labels[9], callback_data="back_main")],
     ])
 
 
@@ -4794,8 +4798,12 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
                 "ru": "❌ К сожалению, результаты по вашим данным не найдены.\n\nПроверьте номер телефона и дату рождения, попробуйте ещё раз или обратитесь в клинику.",
                 "kz": "❌ Кешіріңіз, деректеріңізге сәйкес нәтиже табылмады.\n\nТелефон нөмірі мен туған күнді тексеріп, қайта көріңіз немесе клиникаға хабарласыңыз.",
             }[lang]
-            back_label = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang]
-            kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
+            retry_label = {"uz": "🔄 Qayta urinish", "ru": "🔄 Попробовать снова", "kz": "🔄 Қайта көру"}[lang]
+            back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(retry_label, callback_data="get_results")],
+                [InlineKeyboardButton(back_label, callback_data="back_main")],
+            ])
             await update.message.reply_text(msg, reply_markup=kb)
             return
 
