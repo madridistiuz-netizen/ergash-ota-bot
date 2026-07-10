@@ -3961,38 +3961,113 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
 
     elif data.startswith("calc_days_"):
-        # 5-qadam: Odam sonini so'rash
+        # 5-qadam: Natijani DARHOL ko'rsatish (1 kishi uchun, "necha kishi" savoli OLIB TASHLANDI)
         parts = data.split("_")
         cit = parts[2]
         age = parts[3]
         idx = int(parts[4])
         days = int(parts[5])
+        people = 1
 
         context.user_data["calc_cit"] = cit
         context.user_data["calc_age"] = age
         context.user_data["calc_room_idx"] = idx
         context.user_data["calc_days"] = days
+        context.user_data["calc_people"] = people
 
         rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
         room = rooms[idx]
-        price = room["adult"] if age == "adult" else room["child"]
-        narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
-        day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
+        price_str = room["adult"] if age == "adult" else room["child"]
+        price_num = int(price_str.replace(" ", "").replace("\u00a0", ""))
+        total = price_num * days * people
 
-        text = {
-            "ru": f"🧮 *Расчёт стоимости*\n\n🛏 *{room['name']}*\n💰 1 день / 1 чел.: *{price} {narx_word}*\n📅 Дней: *{days}*\n\nСколько человек будет лечиться?",
-            "uz": f"🧮 *Narxni hisoblash*\n\n🛏 *{room['name']}*\n💰 1 kun / 1 kishi: *{price} {narx_word}*\n📅 Muddat: *{days} {day_word}*\n\nNecha kishi davolanadi?",
-            "kz": f"🧮 *Құнын есептеу*\n\n🛏 *{room['name']}*\n💰 1 күн / 1 адам: *{price} {narx_word}*\n📅 Мерзім: *{days} {day_word}*\n\nНеше адам емделеді?",
+        def fmt(n):
+            return f"{n:,}".replace(",", " ")
+
+        narx_word = {"ru": "сум", "uz": "so'm", "kz": "сум"}[lang]
+        kishi_word = {"ru": "чел.", "uz": "kishi", "kz": "адам"}[lang]
+        day_word = {"ru": "дней", "uz": "kun", "kz": "күн"}[lang]
+        day_word1 = {"ru": "день", "uz": "kun", "kz": "күн"}[lang]
+        muddat_label = {"ru": "Срок лечения", "uz": "Davolanish muddati", "kz": "Емдеу мерзімі"}[lang]
+
+        cit_label = {
+            "ru": {"uz": "Граждане Узбекистана", "foreign": "Иностранные граждане"}[cit],
+            "uz": {"uz": "O'zbekiston fuqarolari", "foreign": "Chet el fuqarolari"}[cit],
+            "kz": {"uz": "Өзбекстан азаматтары", "foreign": "Шетел азаматтары"}[cit],
+        }[lang]
+        age_label = {
+            "ru": {"adult": "Взрослые", "child": "Дети (до 10 лет)"}[age],
+            "uz": {"adult": "Kattalar", "child": "Bolalar (10 yoshgacha)"}[age],
+            "kz": {"adult": "Ересектер", "child": "Балалар (10 жасқа дейін)"}[age],
         }[lang]
 
-        back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
+        # Narx >= 340 000: Fizioterapiya+manual terapiya + MRT kiradi
+        # Narx < 340 000: faqat Fizioterapiya (manual terapiya yo'q), MRT yo'q
+        if price_num >= 340000:
+            included = {
+                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия и мануальная терапия\n✔ УЗИ, анализ крови, ЭКГ\n✔ МРТ 1.5Т или МСКТ — 1 орган",
+                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya va manual terapiya\n✔ UZI, qon tahlili, EKG\n✔ MRT 1.5T yoki MSKT — 1 organ",
+                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия және мануалды терапия\n✔ УДЗ, қан анализі, ЭКГ\n✔ МРТ 1.5Т немесе МСКТ — 1 орган",
+            }[lang]
+        else:
+            included = {
+                "ru": "✔ Проживание\n✔ Лечение\n✔ Физиотерапия\n✔ УЗИ, анализ крови, ЭКГ",
+                "uz": "✔ Turar joy\n✔ Davolanish\n✔ Fizioterapiya\n✔ UZI, qon tahlili, EKG",
+                "kz": "✔ Тұрғын үй\n✔ Емдеу\n✔ Физиотерапия\n✔ УДЗ, қан анализі, ЭКГ",
+            }[lang]
+        extra = {
+            "ru": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Растяжка, Ударно-волновая терапия",
+            "uz": "MRT 3T, MSKT 256, Mammografiya, Kriolipoliz, Cho'zilish, Zarba-to'lqin terapiyasi",
+            "kz": "МРТ 3Т, МСКТ 256, Маммография, Криолиполиз, Созылу, Соққы-толқын терапиясы",
+        }[lang]
+        note = {
+            "ru": "📌 *Примечание:* Точный срок лечения определяется врачом после осмотра.",
+            "uz": "📌 *Eslatma:* Aniq davolanish muddati shifokor ko'rigidan keyin belgilanadi.",
+            "kz": "📌 *Ескерту:* Нақты емдеу мерзімі дәрігер тексерісінен кейін белгіленеді.",
+        }[lang]
+
+        formula_label = {
+            "ru": f"📌 *Расчёт:* {fmt(price_num)} × {days} дн = *{fmt(total)} {narx_word}*",
+            "uz": f"📌 *Hisoblash:* {fmt(price_num)} × {days} kun = *{fmt(total)} {narx_word}*",
+            "kz": f"📌 *Есептеу:* {fmt(price_num)} × {days} күн = *{fmt(total)} {narx_word}*",
+        }[lang]
+        narx_turi = {
+            "ru": "⚠️ Тип цены: за 1 день / 1 человека",
+            "uz": "⚠️ Narx turi: 1 kun / 1 kishi uchun",
+            "kz": "⚠️ Баға түрі: 1 күн / 1 адам үшін",
+        }[lang]
+        result_title = {
+            "ru": "✅ *Результат расчёта*",
+            "uz": "✅ *Hisoblash natijasi*",
+            "kz": "✅ *Есептеу нәтижесі*",
+        }[lang]
+
+        incl_title = {"ru": "В стоимость входит", "uz": "Narx tarkibiga kiradi", "kz": "Құнға кіреді"}[lang]
+        extra_title = {"ru": "Дополнительно", "uz": "Qo'shimcha xizmatlar alohida", "kz": "Қосымша жеке"}[lang]
+
+        text = (
+            f"{result_title}\n\n"
+            f"🏨 *{room['name']}* ({room['people']} {kishi_word})\n"
+            f"{narx_turi}\n"
+            f"👤 {cit_label} | {age_label}\n"
+            f"💰 1 {day_word1}: *{fmt(price_num)} {narx_word}*\n"
+            f"📅 {muddat_label}: *{days} {day_word}*\n\n"
+            f"✅ *Jami to'lov: {fmt(total)} {narx_word}*\n\n"
+            f"{formula_label}\n\n"
+            f"📦 *{incl_title}:*\n{included}\n\n"
+            f"➕ *{extra_title}:*\n_{extra}_\n\n"
+            f"{note}"
+        )
+
+        calc_book_label = {"ru": "🏨 Записаться на эту палату", "uz": "🏨 Shu xona bo'yicha qabulga yozilish", "kz": "🏨 Осы палатаға жазылу"}[lang]
+        operator_label = {"ru": "💬 Связаться с оператором", "uz": "💬 Operator bilan bog'lanish", "kz": "💬 Операторға хабарласу"}[lang]
+        recalc_label = {"ru": "🔁 Пересчитать", "uz": "🔁 Qayta hisoblash", "kz": "🔁 Қайта есептеу"}[lang]
+        back_label = {"ru": "🔙 Назад", "uz": "🔙 Orqaga", "kz": "🔙 Артқа"}[lang]
+
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("1", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_1"),
-             InlineKeyboardButton("2", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_2"),
-             InlineKeyboardButton("3", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_3")],
-            [InlineKeyboardButton("4", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_4"),
-             InlineKeyboardButton("5", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_5"),
-             InlineKeyboardButton("6", callback_data=f"calc_people_{cit}_{age}_{idx}_{days}_6")],
+            [InlineKeyboardButton(calc_book_label, callback_data="calc_book_statsionar")],
+            [InlineKeyboardButton(operator_label, callback_data="menu_operator")],
+            [InlineKeyboardButton(recalc_label, callback_data="calc_start")],
             [InlineKeyboardButton(back_label, callback_data=f"calc_room_{cit}_{age}_{idx}")],
         ])
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
