@@ -7176,7 +7176,7 @@ _ROOM_PRICE_GENERIC_KEYWORDS = [
 _PRICE_EXCLUDE_KEYWORDS = [
     "мрт", "мскт", "mrt", "mskt", "кт нарх", "узи нарх", "экг нарх",
     "тахлил нарх", "tahlil narx", "анализ цена", "массаж нарх", "transfer нарх",
-    "трансфер нарх",
+    "трансфер нарх", "малхам", "malham", "малхэм",
 ]
 
 # "N kunga necha pul" — bemor aniq kunlar sonini ko'rsatib shaxsiy hisoblash so'ragan —
@@ -7223,6 +7223,13 @@ def _normalize(text: str) -> str:
 
 
 _KZ_ONLY_LETTERS = set("әғқңөұүһі")
+
+# "ha", "ok", "да" kabi qisqa, LEKIN ma'noli javoblar — bularga "mazmunsiz xabar"
+# (greeting) qoidasi qo'llanmaydi, chunki bular oldingi savolga javob bo'lishi mumkin
+_SHORT_MEANINGFUL_WORDS = {
+    "ha", "ха", "hа", "йа", "да", "ок", "ok", "иә", "ия", "жоқ", "yoq",
+    "yo'q", "yoʻq", "нет", "yes", "no",
+}
 
 # O'zbekcha-kirillcha matnlarda tez-tez uchraydigan so'zlar (ruschadan ajratish uchun)
 _UZ_CYRILLIC_MARKER_WORDS = [
@@ -7584,9 +7591,11 @@ def _prefilter_core(t: str, lang: str):
     `lang` bu yerda faqat "uz"/"ru"/"kz" bo'ladi (dict kalitlari uchun).
     Mos kelsa (javob_matni, route) qaytaradi, aks holda None.
     """
-    # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "Ha", "?")
+    # 0) Juda qisqa, mazmunsiz xabar (masalan "A", "?") — lekin "ha", "ok", "да" kabi
+    #    MA'NOLI qisqa javoblarga TEGILMAYDI, chunki bular oldingi savolga javob bo'lishi
+    #    mumkin va AI kontekstni ko'rib to'g'ri javob berishi kerak.
     stripped_short = t.strip("!.,?- ")
-    if len(stripped_short) <= 2 and stripped_short != "":
+    if len(stripped_short) <= 2 and stripped_short != "" and stripped_short not in _SHORT_MEANINGFUL_WORDS:
         return ({
             "uz": "Salom! 😊 \"Ergash Ota\" klinikasiga xush kelibsiz.\n\nQanday savol yoki muammo bilan yordam bera olaman?",
             "ru": "Здравствуйте! 😊 Добро пожаловать в клинику \"Эргаш Ота\".\n\nЧем могу помочь?",
@@ -7627,7 +7636,12 @@ def _prefilter_core(t: str, lang: str):
     has_day_price = any(dterm in t for dterm in _ROOM_DAILY_DAY_TERMS) and any(pterm in t for pterm in _ROOM_DAILY_PRICE_TERMS)
     has_generic_price = any(kw in t for kw in _ROOM_PRICE_GENERIC_KEYWORDS)
     if not has_diag_exclude and (has_day_price or has_generic_price):
-        return (_build_room_price_reply(lang), None)
+        short_reply = {
+            "uz": "Xona narxlari xona turiga va fuqaroligingizga qarab farq qiladi. Quyidagi tugma orqali barcha xona turlari va narxlarini to'liq ko'rishingiz mumkin:",
+            "ru": "Цены на палаты зависят от типа палаты и гражданства. Все типы палат и цены можно посмотреть по кнопке ниже:",
+            "kz": "Бөлме бағасы бөлме түрі мен азаматтығыңызға қарай өзгереді. Барлық бөлме түрлері мен бағаларды төмендегі батырма арқылы көре аласыз:",
+        }[lang]
+        return (short_reply, "menu_rooms")
 
     # 7) Valyuta konvertatsiyasi — FAQAT qisqa/sodda savolda (uzun, ko'p mavzuli xabarda
     #    AI o'zi javob berishi kerak, chunki u yerda boshqa muhim savollar ham bo'lishi mumkin)
@@ -7854,10 +7868,20 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
 
     history = context.user_data.get("ai_history", [])
 
+    # Xabar matnidan tilni aniqlab, AI'ga ANIQ qaysi tilda javob berish kerakligini
+    # eslatib qo'yamiz (saqlangan `lang` sozlamasiga emas, joriy xabarga asoslanib)
+    detected_lang, _ = _detect_msg_lang(text, lang)
+    _lang_instruction = {
+        "uz": "[MUHIM: quyidagi xabarga albatta O'ZBEK TILIDA javob yoz]",
+        "ru": "[ВАЖНО: ответь на следующее сообщение строго на РУССКОМ языке]",
+        "kz": "[МАҢЫЗДЫ: төмендегі хабарға міндетті түрде ҚАЗАҚ тілінде жауап жаз]",
+    }[detected_lang]
+    ai_call_text = f"{_lang_instruction}\n{text}"
+
     loop = asyncio.get_running_loop()
     try:
         caller = _call_anthropic_sync if AI_PROVIDER == "anthropic" else _call_openai_sync
-        ai_reply = await loop.run_in_executor(None, caller, text, history)
+        ai_reply = await loop.run_in_executor(None, caller, ai_call_text, history)
     except Exception as e:
         logger.error(f"AI Administrator xatosi: {e}")
         ai_reply = {
