@@ -6848,6 +6848,14 @@ SPORT ZAL HAQIDA (bemor so'rasa, aynan shu ma'lumotni ber):
 - Ha, klinikada sport zali mavjud.
 - Davolanish davomida massaj, fizioterapiya va cho'zilish (rastyajka) muolajalari bilan bir qatorda sport zaliga borish imkoniyati ham bor.
 
+MUHIM (qisqalik): "Xonalarda sharoit qanaqa", "umumiy sharoit qanday" kabi UMUMIY so'rovlarga JUDA QISQA javob ber (3-4 qator, xona turlarini bir-ikki so'z bilan sanab o't) — har bir xona turini batafsil tavsiflab, uzun ro'yxat qilib yozma. Batafsil ma'lumot va rasmlar uchun ROUTE:menu_wards qo'sh.
+
+BEMORLAR GURUHI/CHATI HAQIDA: Klinikada bemorlar uchun umumiy chat yoki guruh MAVJUD EMAS. Agar bemor "bemorlar guruhi", "umumiy chat", "guruhga qo'shilsam bo'ladimi" deb so'rasa — buni GURUH BO'LIB DAVOLANISHGA KELISH (necha kishi kelishi) bilan ADASHTIRMA. Aniq ayt: umumiy bemorlar chati yo'q, agar kerak bo'lsa operatorga murojaat qilsin.
+
+"SILKA"/LINK SO'RALGANDA: Bemor "silka", "ssылка", "link" kabi so'z bilan aniq NIMANING linkini so'rayotgani noaniq bo'lsa (masalan lokatsiya linkimi, guruh linkimi, boshqa narsami — kontekstdan aniq bo'lmasa), avtomatik ROUTE:menu_location YUBORMA. Buning o'rniga aniqlashtiruvchi savol ber: "Qaysi link kerak — manzil (lokatsiya)mi yoki boshqa narsami?"
+
+QULOQQA QILINADIGAN IN'EKSIYA (UKOL) HAQIDA (bemor "quloqqa ukol", "quloqdan ukol" haqida so'rasa, AYNAN shu ma'lumotni ber): Bu xizmat XONA TO'LOVI ICHIGA KIRMAYDI — ALOHIDA to'lanadi, narxi 199 000 so'm. Faqat shifokor tavsiyasi bilan beriladi (o'zi so'rab olib bo'lmaydi). Foydasi: bosh og'rig'i va migren, bosh miya qon aylanishini yaxshilash, quloqdagi shovqin (tinnitus)ga yordam beradi. Necha marta/necha kurs olish kerakligini shifokor belgilaydi.
+
  (bemor psoriaz yoki tana toshmalari, teri kasalliklari haqida so'rasa, AYNAN shu ma'lumotni ber):
 - Ha, klinikamizda psoriaz kasalligi davolanadi. Lekin bu oddiy kasallik emas — davolanish uchun bemordan vaqt va sabr talab etiladi.
 - Psoriaz bilan davolanish muddati kamida 24 kun bo'lib, yiliga 2-3 kurs qayta davolanish kerak bo'ladi.
@@ -7076,7 +7084,7 @@ def _build_dynamic_system_prompt() -> str:
         room_lines.append("Xorijiy fuqarolar uchun xona narxlari (1 kun, 1 kishi):")
         for r in rooms_foreign[:8]:
             room_lines.append(f"  • {r['name']} ({r['people']} kishi): katta — {r['adult']} so'm, bola — {r['child']} so'm")
-        rooms_block = "\n\nXONA NARXLARI (bemor xona narxi, qancha turadi so'rasa — aniq raqam berish uchun shu ma'lumotdan foydalan, lekin narxlar o'zgarishi mumkin deb eslatma qo'sh):\n" + "\n".join(room_lines) + "\n\nMUHIM (fuqarolik): Agar bemor O'zbekiston fuqarosi yoki xorijiy fuqaro ekanligini ANIQ aytmagan bo'lsa, faqat bitta jadvaldan (masalan faqat mahalliy narxdan) hisoblab, aniq bitta summani BERMA. Buning o'rniga: (1) fuqaroligini so'ra, YOKI (2) ikkala jadvalni (mahalliy va xorijiy) aniq ajratib ko'rsatib, bemor o'zi mos kelganini tanlasin. Fuqarolik bo'yicha noto'g'ri taxmin qilish — jiddiy xato hisoblanadi."
+        rooms_block = "\n\nXONA NARXLARI (ICHKI MA'LUMOT — o'zing uchun, lekin bemorga TO'G'RIDAN-TO'G'RI YOZIB BERMA, pastdagi qoidaga qara):\n" + "\n".join(room_lines) + "\n\nMUHIM QOIDA (xona narxi so'ralganda): Bemor xona/palata narxini so'rasa — ANIQ bitta xona turi aytilgan bo'lsa ham (masalan \"Lyuks 2 kishi narxi qancha\", \"Pol lyuks qancha\"), HECH QACHON yozma ravishda raqam/jadval BERMA. Buning o'rniga har doim QISQA javob ber (masalan: \"Xona narxlari xona turiga va fuqaroligingizga qarab farq qiladi.\") va ROUTE:menu_rooms qo'sh — shunda bemor tugma orqali aniq narxni o'zi ko'radi yoki hisoblash tugmasidan (calc_start) foydalanadi. Bu qoida ISTISNOSIZ — yozma narx jadvali umuman berilmaydi, faqat tugmaga yo'naltiriladi. MUHIM QOIDA-2 (odam soni/kun soni berilganda ham O'ZING HISOBLAMA): Bemor \"2 kishi uchun qancha\", \"10 kunga qancha bo'ladi\" deb aniq son bilan so'rasa ham — bitta narxni (masalan bitta 'Standart' turi) tanlab ko'paytirib, YAKUNIY SUMMANI O'ZING HISOBLAB BERMA, chunki bir xil nomdagi xona turi (masalan 'Standart') turli korpuslarda turlicha narxda bo'lishi mumkin va sen qaysi aniq xona bemorga mos kelishini bilmaysan. Buning o'rniga tushuntir: \"Narxlar 1 kishi, 1 kun uchun ko'rsatilgan — necha kishi va necha kun bo'lsa, shunga ko'paytirib umumiy summani hisoblab olasiz\" va ROUTE:calc_start qo'sh."
     except Exception:
         rooms_block = ""
 
@@ -7164,11 +7172,12 @@ _ROOM_DAILY_PRICE_TERMS = [
 
 # Umumiy narx so'rovlari (kun so'zi bo'lmasa ham) — deyarli har doim xona/stastionar narxi haqida
 _ROOM_PRICE_GENERIC_KEYWORDS = [
-    "нечпул", "неча пул", "нечапул", "неча пул туради", "нархлари",
-    "narxlari", "narxi qancha", "нархи канча", "нархи қанша", "қанша тұрады",
+    "нечпул", "неча пул", "нечапул", "неча пул туради", "нархлари", "нархлар",
+    "narxlari", "narxlar", "narxi qancha", "нархи канча", "нархи қанша", "қанша тұрады",
     "канша турадi", "сколько стоит", "стоимость лечения", "стоимость прожив",
     "цена за лечение", "цены", "какие цены", "даволаниш нархи", "лечение нархи",
-    "неча пул турады", "неча сум", "неча сўм",
+    "неча пул турады", "неча сум", "неча сўм", "хона турлари", "хона нарх",
+    "хона нархлари", "палата нарх", "бөлме баға", "бөлме нарх",
 ]
 
 # Bu so'zlar bo'lsa — bu aniq diagnostika/muolaja narxi (boshqa ma'lumot), xona jadvali BERILMAYDI,
@@ -7233,10 +7242,11 @@ _SHORT_MEANINGFUL_WORDS = {
 
 # O'zbekcha-kirillcha matnlarda tez-tez uchraydigan so'zlar (ruschadan ajratish uchun)
 _UZ_CYRILLIC_MARKER_WORDS = [
-    "киради", "кирмайди", "бўлади", "керак", "нима", "қанча", "қачон",
+    "киради", "кирмайди", "бўлади", "булади", "керак", "нима", "қанча", "қачон",
     "яхши", "хона", "тўлов", "касал", "шифокор", "даволаниш", "рахмат",
     "нарх", "куни", "борми", "керакми", "мумкин", "қилиш", "келади",
-    "кетади", "билан", "учун", "хуш", "яна",
+    "кетади", "билан", "учун", "хуш", "яна", "неча", "кун", "турлари",
+    "неча кун", "канча", "етказиш", "яхшими",
 ]
 
 
