@@ -669,7 +669,6 @@ def main_menu_keyboard(lang, user_id: int = 0):
     buttons = [
         [InlineKeyboardButton(labels["clinic"],          callback_data="menu_clinic")],
         [InlineKeyboardButton(labels["rooms"],           callback_data="menu_rooms")],
-        [InlineKeyboardButton(labels["wards"],           callback_data="menu_wards")],
         [InlineKeyboardButton(labels["diagnostics"],     callback_data="menu_diagnostics")],
         [InlineKeyboardButton(labels["guide"],           callback_data="menu_guide")],
         [InlineKeyboardButton(labels["faq"],             callback_data="menu_faq")],
@@ -691,15 +690,16 @@ def back_keyboard(lang):
 
 def rooms_keyboard(lang):
     labels = {
-        "ru": ("🇺🇿 Граждане Узбекистана", "🌍 Иностранные граждане", "🧮 Рассчитать стоимость", "⬅️ Назад"),
-        "uz": ("🇺🇿 O'zbekiston fuqarolari", "🌍 Xorijiy fuqarolar", "🧮 Narxni hisoblash", "⬅️ Orqaga"),
-        "kz": ("🇺🇿 Өзбекстан азаматтары", "🌍 Шетел азаматтары", "🧮 Құнын есептеу", "⬅️ Артқа"),
+        "ru": ("🇺🇿 Граждане Узбекистана", "🌍 Иностранные граждане", "🧮 Рассчитать стоимость", "📸 Вид палат", "⬅️ Назад"),
+        "uz": ("🇺🇿 O'zbekiston fuqarolari", "🌍 Xorijiy fuqarolar", "🧮 Narxni hisoblash", "📸 Palatalar ko'rinishi", "⬅️ Orqaga"),
+        "kz": ("🇺🇿 Өзбекстан азаматтары", "🌍 Шетел азаматтары", "🧮 Құнын есептеу", "📸 Палата көрінісі", "⬅️ Артқа"),
     }[lang]
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(labels[0], callback_data="rooms_uz")],
         [InlineKeyboardButton(labels[1], callback_data="rooms_foreign")],
         [InlineKeyboardButton(labels[2], callback_data="calc_start")],
-        [InlineKeyboardButton(labels[3], callback_data="back_main")],
+        [InlineKeyboardButton(labels[3], callback_data="menu_wards")],
+        [InlineKeyboardButton(labels[4], callback_data="back_main")],
     ])
 
 
@@ -3568,7 +3568,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 f"{k['emoji']} {name}",
                 callback_data=f"korpus_{k['id']}")])
         back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
+        buttons.append([InlineKeyboardButton(back, callback_data="menu_rooms")])
         await query.edit_message_text(title, parse_mode="Markdown",
                                       reply_markup=InlineKeyboardMarkup(buttons))
 
