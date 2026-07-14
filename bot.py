@@ -674,6 +674,7 @@ def main_menu_keyboard(lang, user_id: int = 0):
         [InlineKeyboardButton(labels["guide"],           callback_data="menu_guide")],
         [InlineKeyboardButton(labels["faq"],             callback_data="menu_faq")],
         [InlineKeyboardButton(labels["booking"],         callback_data="menu_booking")],
+        [InlineKeyboardButton(labels["transfer"],        callback_data="menu_transfer")],
         [InlineKeyboardButton(labels["weekend"],         callback_data="menu_weekend")],
         [InlineKeyboardButton(labels["doctor_question"], callback_data="doctor_question")],
     ]
@@ -994,17 +995,16 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             if btype_now == "transfer":
                 fr = booking.get("from", "—")
                 sana = booking.get("sana", "—")
-                kishi = booking.get("kishi", "—")
                 phone_num = booking.get("phone", "—")
                 success = {
-                    "ru": f"🎉 *Заявка принята!*\n\n📍 Откуда: {fr}\n📅 Дата: {sana}\n👥 Человек: {kishi}\n📞 {phone_num}\n\nОператор свяжется с вами.\n📞 {phone}",
-                    "uz": f"🎉 *Ariza qabul qilindi!*\n\n📍 Qayerdan: {fr}\n📅 Sana: {sana}\n👥 Kishi: {kishi}\n📞 {phone_num}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
-                    "kz": f"🎉 *Өтінім қабылданды!*\n\n📍 Қайдан: {fr}\n📅 Күні: {sana}\n👥 Адам: {kishi}\n📞 {phone_num}\n\nОператор байланысады.\n📞 {phone}",
+                    "ru": f"🎉 *Заявка принята!*\n\n📍 Откуда: {fr}\n📅 Дата: {sana}\n📞 {phone_num}\n\nОператор свяжется с вами.\n📞 {phone}",
+                    "uz": f"🎉 *Ariza qabul qilindi!*\n\n📍 Qayerdan: {fr}\n📅 Sana: {sana}\n📞 {phone_num}\n\nOperator siz bilan bog'lanadi.\n📞 {phone}",
+                    "kz": f"🎉 *Өтінім қабылданды!*\n\n📍 Қайдан: {fr}\n📅 Күні: {sana}\n📞 {phone_num}\n\nОператор байланысады.\n📞 {phone}",
                 }[lang]
                 await query.edit_message_text(success, parse_mode="Markdown", reply_markup=back_keyboard(lang))
                 lid = (f"🚗 *TRANSFER LID*\n\n"
                        f"📍 Qayerdan: {fr}\n📅 Sana: {sana}\n"
-                       f"👥 Kishi: {kishi}\n📞 Telefon: {phone_num}\n"
+                       f"📞 Telefon: {phone_num}\n"
                        f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n\n"
                        f"🟢 QO'NG'IROQ QILING!")
                 await send_lid(context, TRANSFER_CHANNEL, lid)
@@ -4570,25 +4570,25 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
     elif data == "menu_transfer":
         title = {
             "ru": (
-                "🚗 *Как добраться до клиники*\n\n"
-                "📍 *Адрес:*\nг. Каттакурган, массив Казак овул\n\n"
-                "Наши надёжные водители встретят вас *во всех регионах Узбекистана* и комфортно доставят в клинику.\n\n"
-                "⚠️ *ВАЖНО:*\nЗаказ трансфера необходимо оформить *за 2–3 дня до приезда*.\n\n"
-                "Выберите действие:"
+                "🚗 *Удобное и безопасное прибытие в клинику*\n\n"
+                "📍 *Наш адрес:* Самаркандская область, город Каттакурган, массив Казак овул.\n\n"
+                "🚘 *Трансфер для вас:* встретим в любой точке Узбекистана и безопасно доставим в клинику.\n\n"
+                "🗓 *Правило заказа:* трансфер нужно забронировать минимум за 2–3 дня до выезда.\n\n"
+                "👇 Выберите нужный раздел:"
             ),
             "uz": (
-                "🚗 *Klinikaga yetib olish*\n\n"
-                "📍 *Manzil:*\nKattaqo'rg'on shahri, Qozoq ovul massivi\n\n"
-                "Bizning ishonchli haydovchilarimiz *O'zbekistonning barcha hududlarida* sizni kutib olib klinikaga olib keladi.\n\n"
-                "⚠️ *MUHIM:*\nTransferni *kelishdan 2–3 kun oldin* buyurtma qilish kerak.\n\n"
-                "Kerakli bo'limni tanlang:"
+                "🚗 *Klinikaga qulay va xavfsiz yetib kelish*\n\n"
+                "📍 *Manzilimiz:* Samarqand viloyati, Kattaqo'rg'on shahri, Qozoq ovul massivi.\n\n"
+                "🚘 *Siz uchun Transfer xizmati:* O'zbekistonning istalgan nuqtasidan kutib oladi va klinikamizga xavfsiz olib keladi.\n\n"
+                "🗓 *Buyurtma berish qoidasi:* Transfer xizmatini yo'lga chiqishingizdan kamida 2–3 kun avval band qilishingiz so'raladi.\n\n"
+                "👇 Kerakli bo'limni tanlang:"
             ),
             "kz": (
-                "🚗 *Клиникаға жету*\n\n"
-                "📍 *Мекенжай:*\nКаттақурғон қаласы, Қазақ овул массиві\n\n"
-                "Біздің сенімді жүргізушілеріміз *Өзбекстанның барлық аймақтарында* сізді қарсы алып клиникаға жеткізеді.\n\n"
-                "⚠️ *МАҢЫЗДЫ:*\nТрансферді *келуден 2–3 күн бұрын* тапсырыс беру керек.\n\n"
-                "Бөлімді таңдаңыз:"
+                "🚗 *Клиникаға ыңғайлы және қауіпсіз жету*\n\n"
+                "📍 *Мекенжайымыз:* Самарқанд облысы, Каттақурғон қаласы, Қазақ овул массиві.\n\n"
+                "🚘 *Сіз үшін трансфер қызметі:* Өзбекстанның кез келген нүктесінен қарсы алады және клиникамызға қауіпсіз жеткізеді.\n\n"
+                "🗓 *Тапсырыс беру ережесі:* трансфер қызметін жолға шығуыңыздан кемінде 2–3 күн бұрын брондау керек.\n\n"
+                "👇 Қажетті бөлімді таңдаңыз:"
             ),
         }[lang]
         book_label = {"ru": "📞 Заказать трансфер", "uz": "📞 Transfer buyurtma qilish", "kz": "📞 Трансфер тапсырыс"}[lang]
@@ -4596,7 +4596,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(book_label, callback_data="transfer_book")],
-            [InlineKeyboardButton(price_label, callback_data="transfer_price")],
+            # VAQTINCHA YASHIRILGAN — qayta yoqish uchun quyidagi qatorni kommentdan chiqaring:
+            # [InlineKeyboardButton(price_label, callback_data="transfer_price")],
             [InlineKeyboardButton(back_label, callback_data="back_main")],
         ])
         await query.edit_message_text(title, parse_mode="Markdown", reply_markup=kb)
@@ -4614,9 +4615,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         context.user_data["booking_type"] = "transfer"
         context.user_data["booking_step"] = "transfer_from"
         ask = {
-            "ru": "🚗 *Заказ трансфера*\n\n📍 Шаг 1/4\nНапишите *откуда вас встретить:*\n_(город, вокзал или аэропорт)_",
-            "uz": "🚗 *Transfer buyurtmasi*\n\n📍 1/4 qadam\n*Qayerdan kutib olinsin:*\n_(shahar, vokzal yoki aeroport)_",
-            "kz": "🚗 *Трансфер тапсырысы*\n\n📍 1/4 қадам\n*Қайдан қарсы алынсын:*\n_(қала, вокзал немесе әуежай)_",
+            "ru": "🚗 *Заказ трансфера*\n\n📍 Шаг 1/3\nНапишите *откуда вас встретить:*\n_(город, вокзал или аэропорт)_",
+            "uz": "🚗 *Transfer buyurtmasi*\n\n📍 1/3 qadam\n*Qayerdan kutib olinsin:*\n_(shahar, vokzal yoki aeroport)_",
+            "kz": "🚗 *Трансфер тапсырысы*\n\n📍 1/3 қадам\n*Қайдан қарсы алынсын:*\n_(қала, вокзал немесе әуежай)_",
         }[lang]
         await query.edit_message_text(ask, parse_mode="Markdown")
 
@@ -5907,18 +5908,12 @@ def faq_keyboard(lang):
     for i, (q, a) in enumerate(faqs):
         cb = a if isinstance(a, str) and a.startswith("q_") else f"faq_{i}"
         buttons.append([InlineKeyboardButton(q, callback_data=cb)])
-    transfer_label = {
-        "ru": "🚗 Добраться до клиники",
-        "uz": "🚗 Klinikaga yetib olish",
-        "kz": "🚗 Клиникаға жету",
-    }[lang]
     operator_label = {
         "ru": "📞 Оператор",
         "uz": "📞 Operator",
         "kz": "📞 Оператор",
     }[lang]
     back = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-    buttons.append([InlineKeyboardButton(transfer_label, callback_data="menu_transfer")])
     buttons.append([InlineKeyboardButton(operator_label, callback_data="menu_operator")])
     buttons.append([InlineKeyboardButton(back, callback_data="back_main")])
     return InlineKeyboardMarkup(buttons)
@@ -8219,31 +8214,20 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data.setdefault("booking", {})["from"] = text
             context.user_data["booking_step"] = "transfer_sana"
             ask = {
-                "ru": f"📍 *Откуда:* {text}\n\n📅 Шаг 2/4\nНапишите *дату приезда:*",
-                "uz": f"📍 *Qayerdan:* {text}\n\n📅 2/4 qadam\n*Kelish sanasini* yozing:",
-                "kz": f"📍 *Қайдан:* {text}\n\n📅 2/4 қадам\n*Келу күнін* жазыңыз:",
+                "ru": f"📍 *Откуда:* {text}\n\n📅 Шаг 2/3\nНапишите *дату приезда:*",
+                "uz": f"📍 *Qayerdan:* {text}\n\n📅 2/3 qadam\n*Kelish sanasini* yozing:",
+                "kz": f"📍 *Қайдан:* {text}\n\n📅 2/3 қадам\n*Келу күнін* жазыңыз:",
             }[lang]
             await update.message.reply_text(ask, parse_mode="Markdown")
             return
 
         if step == "transfer_sana":
             context.user_data.setdefault("booking", {})["sana"] = text
-            context.user_data["booking_step"] = "transfer_kishi"
-            ask = {
-                "ru": f"📅 *Дата:* {text}\n\n👥 Шаг 3/4\nСколько *человек?*",
-                "uz": f"📅 *Sana:* {text}\n\n👥 3/4 qadam\nNecha *kishi?*",
-                "kz": f"📅 *Күні:* {text}\n\n👥 3/4 қадам\nНеше *адам?*",
-            }[lang]
-            await update.message.reply_text(ask, parse_mode="Markdown")
-            return
-
-        if step == "transfer_kishi":
-            context.user_data.setdefault("booking", {})["kishi"] = text
             context.user_data["booking_step"] = "transfer_phone"
             ask = {
-                "ru": f"👥 *{text} чел.*\n\n📞 Шаг 4/4\nНапишите *номер телефона:*",
-                "uz": f"👥 *{text} kishi*\n\n📞 4/4 qadam\n*Telefon raqamingizni* yozing:",
-                "kz": f"👥 *{text} адам*\n\n📞 4/4 қадам\n*Телефон нөміріңізді* жазыңыз:",
+                "ru": f"📅 *Дата:* {text}\n\n📞 Шаг 3/3\nНапишите *номер телефона:*",
+                "uz": f"📅 *Sana:* {text}\n\n📞 3/3 qadam\n*Telefon raqamingizni* yozing:",
+                "kz": f"📅 *Күні:* {text}\n\n📞 3/3 қадам\n*Телефон нөміріңізді* жазыңыз:",
             }[lang]
             await update.message.reply_text(ask, parse_mode="Markdown")
             return
@@ -8256,17 +8240,14 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "ru": (f"📋 *Проверьте данные:*\n\n"
                        f"📍 Откуда: {booking.get('from')}\n"
                        f"📅 Дата: {booking.get('sana')}\n"
-                       f"👥 Человек: {booking.get('kishi')}\n"
                        f"📞 Телефон: {text}\n\nВсё верно?"),
                 "uz": (f"📋 *Ma'lumotlarni tekshiring:*\n\n"
                        f"📍 Qayerdan: {booking.get('from')}\n"
                        f"📅 Sana: {booking.get('sana')}\n"
-                       f"👥 Kishi: {booking.get('kishi')}\n"
                        f"📞 Telefon: {text}\n\nHammasi to'g'rimi?"),
                 "kz": (f"📋 *Деректерді тексеріңіз:*\n\n"
                        f"📍 Қайдан: {booking.get('from')}\n"
                        f"📅 Күні: {booking.get('sana')}\n"
-                       f"👥 Адам: {booking.get('kishi')}\n"
                        f"📞 Телефон: {text}\n\nБәрі дұрыс па?"),
             }[lang]
             await update.message.reply_text(summary, parse_mode="Markdown",
