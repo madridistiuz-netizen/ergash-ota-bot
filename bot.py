@@ -4558,6 +4558,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
         else:
             await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML", reply_markup=kb)
 
+    # ── Haqiqiy geo-pin yuborish (lokatsiya tugmasi bosilganda) ──
+    elif data == "send_geo_location":
+        await context.bot.send_location(
+            chat_id=query.message.chat_id,
+            latitude=CLINIC_LATITUDE,
+            longitude=CLINIC_LONGITUDE,
+        )
+
     # ── Klinikaga yetib olish ──
     elif data == "menu_transfer":
         title = {
@@ -7623,9 +7631,11 @@ def _prefilter_core(t: str, lang: str):
             "kz": "Сәлеметсіз бе! 😊 \"Эргаш Ота\" клиникасына қош келдіңіз.\n\nҚандай сұрақпен көмектесе аламын?",
         }[lang], None)
 
-    # 1) Minnatdorchilik/tasdiqlash — endi IBORA ICHIDA ham topadi (masalan "Хуш рахмат сизга"),
-    #    lekin faqat QISQA xabarlarda (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
-    if len(t) <= 25 and any(w in t for w in _THANKS_WORDS):
+    # 1) Minnatdorchilik/tasdiqlash — SO'Z SIFATIDA (word-boundary) tekshiriladi, ICHKI
+    #    QISM sifatida emas — aks holda "lokatsiya" so'zi "ok" bilan noto'g'ri mos kelib qoladi.
+    #    Faqat qisqa xabarlarda ishlaydi (uzun/murakkab savolda "рахмат" so'zi bo'lsa ham AI ishlashi kerak)
+    _tokens = re.findall(r"[a-zA-Zа-яёіңғқөұүһәЁ']+", t)
+    if len(t) <= 25 and any(tok in _THANKS_WORDS for tok in _tokens):
         return (THANKS_REPLY[lang], None)
 
     # 2) "To'lovga nima kiradi" turkumi
@@ -7913,16 +7923,31 @@ async def ai_administrator_handler(update: Update, context: ContextTypes.DEFAULT
 
     ai_reply, route = _extract_route(ai_reply)
 
-    # LOKATSIYA so'ralganda — matn yubormasdan, FAQAT haqiqiy xaritadagi geo-pin yuboriladi
+    # LOKATSIYA so'ralganda — manzil matni + 2 tugma (Lokatsiyani olish / Taksi buyurtma qilish)
     if route == "menu_location":
-        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": "[lokatsiya yuborildi]"}]
+        history = history + [{"role": "user", "content": text}, {"role": "assistant", "content": "[manzil va lokatsiya tugmalari yuborildi]"}]
         context.user_data["ai_history"] = history[-6:]
-        _log_ai_interaction(update.effective_user, text, "[lokatsiya yuborildi]", route, False, lang)
-        await context.bot.send_location(
-            chat_id=update.effective_chat.id,
-            latitude=CLINIC_LATITUDE,
-            longitude=CLINIC_LONGITUDE,
-        )
+        _log_ai_interaction(update.effective_user, text, "[manzil va lokatsiya tugmalari yuborildi]", route, False, lang)
+
+        d_loc = load_data()
+        c_loc = d_loc.get("contacts", {})
+        address = {
+            "uz": c_loc.get("address_uz", "Kattaqo'rg'on shahri, Qozoq ovul massivi"),
+            "ru": c_loc.get("address_ru", "г. Каттакурган, массив Казак овул"),
+            "kz": c_loc.get("address_kz", "Каттақурғон қ., Қазақ овул массиві"),
+        }[lang]
+        addr_text = {
+            "uz": f"📍 *Klinika manzili:*\n{address}",
+            "ru": f"📍 *Адрес клиники:*\n{address}",
+            "kz": f"📍 *Клиника мекенжайы:*\n{address}",
+        }[lang]
+        loc_btn_label = {"uz": "📍 Lokatsiyani olish", "ru": "📍 Получить локацию", "kz": "📍 Локацияны алу"}[lang]
+        taxi_btn_label = {"uz": "🚕 Taksi buyurtma qilish", "ru": "🚕 Заказать такси", "kz": "🚕 Такси шақыру"}[lang]
+        loc_kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(loc_btn_label, callback_data="send_geo_location")],
+            [InlineKeyboardButton(taxi_btn_label, callback_data="menu_transfer")],
+        ])
+        await update.message.reply_text(addr_text, parse_mode="Markdown", reply_markup=loc_kb)
         return
 
     # Suhbat tarixini yangilaymiz (oxirgi 3 juft — 6 xabar — saqlanadi)
