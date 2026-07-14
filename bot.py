@@ -1005,8 +1005,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 lid = (f"🚗 *TRANSFER LID*\n\n"
                        f"📍 Qayerdan: {fr}\n📅 Sana: {sana}\n"
                        f"📞 Telefon: {phone_num}\n"
-                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n\n"
-                       f"🟢 QO'NG'IROQ QILING!")
+                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n"
+                       f"🆔 uid:{user.id}\n\n"
+                       f"🟢 QO'NG'IROQ QILING!\n_Javob uchun REPLY qiling._")
                 await send_lid(context, TRANSFER_CHANNEL, lid)
 
             elif btype_now == "excursion":
@@ -1023,8 +1024,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
                 lid = (f"🕌 *EKSKURSIYA LID*\n\n"
                        f"🏛 Yo'nalish: {city}\n📅 Sana: {sana}\n"
                        f"👥 Kishi: {kishi}\n📞 Telefon: {phone_num}\n"
-                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n\n"
-                       f"🟢 QO'NG'IROQ QILING!")
+                       f"💬 Telegram: {username}\n🌐 Til: {lang.upper()}\n"
+                       f"🆔 uid:{user.id}\n\n"
+                       f"🟢 QO'NG'IROQ QILING!\n_Javob uchun REPLY qiling._")
                 await send_lid(context, TRANSFER_CHANNEL, lid)
 
             context.user_data["booking"] = {}
@@ -5487,7 +5489,7 @@ async def doctor_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     msg = update.message or update.channel_post
     if not msg or not msg.reply_to_message:
         return
-    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, FEEDBACK_GROUP_ID}
+    allowed = {DOCTORS_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, FEEDBACK_GROUP_ID, TRANSFER_CHANNEL}
     logger.info(f"doctor_reply_handler: chat_id={msg.chat.id}, allowed={allowed}")
     if msg.chat.id not in allowed:
         return
@@ -8615,12 +8617,14 @@ def main():
     app.add_handler(MessageHandler(filters.Chat(DOCTORS_GROUP_ID) & filters.VOICE & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.Chat(TRANSFER_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.Chat(FEEDBACK_GROUP_ID) & filters.REPLY, doctor_reply_handler))
     # Kanal postlari uchun (channel_post)
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(STATSIONAR_CHANNEL) & filters.REPLY, doctor_reply_handler))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(DIAGNOSTIKA_CHANNEL) & filters.REPLY, doctor_reply_handler))
-    app.add_handler(MessageHandler(filters.VOICE & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL]), unknown))
+    app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POSTS & filters.Chat(TRANSFER_CHANNEL) & filters.REPLY, doctor_reply_handler))
+    app.add_handler(MessageHandler(filters.VOICE & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, TRANSFER_CHANNEL]), unknown))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Chat([DOCTORS_GROUP_ID, FEEDBACK_GROUP_ID, STATSIONAR_CHANNEL, DIAGNOSTIKA_CHANNEL, TRANSFER_CHANNEL]), unknown))
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
