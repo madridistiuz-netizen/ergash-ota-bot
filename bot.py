@@ -4878,7 +4878,18 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown"
         )
 
-    elif step == "pdf" and update.message.document:
+    elif step == "pdf":
+        if not update.message.document:
+            await update.message.reply_text(
+                "❌ PDF fayl topilmadi.\n\n"
+                "Iltimos, faylni *\"Hujjat\" (📎 Document / Файл)* sifatida yuboring — "
+                "*rasm (Photo)* sifatida emas, aks holda bot uni PDF deb tanimaydi.\n\n"
+                "Telegram'da fayl biriktirganda \"Файл\"/\"Document\" bo'limini tanlang, "
+                "\"Галерея\"/\"Photo\" emas. Qaytadan urinib ko'ring.",
+                parse_mode="Markdown"
+            )
+            return
+
         doc = update.message.document
         if doc.mime_type != "application/pdf":
             await update.message.reply_text("❌ Faqat PDF fayl qabul qilinadi. Qaytadan yuboring.")
@@ -8587,6 +8598,7 @@ def main():
     app.add_handler(CommandHandler("broadcast", admin_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
+    app.add_handler(MessageHandler(filters.Document.ALL & filters.User([ADMIN_ID] + ALLOWED_STAFF), staff_doc_handler))
     app.add_handler(MessageHandler(filters.PHOTO & filters.User(ADMIN_ID), photo_handler))
     app.add_handler(MessageHandler(filters.VIDEO & filters.User(ADMIN_ID), video_handler))
     app.add_handler(MessageHandler(filters.VIDEO & ~filters.User([ADMIN_ID] + ALLOWED_STAFF), medical_doc_handler))
