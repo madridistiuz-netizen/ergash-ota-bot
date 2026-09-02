@@ -3972,7 +3972,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
         other_label = {"ru": "✏️ Другой срок", "uz": "✏️ Boshqa muddat", "kz": "✏️ Басқа мерзім"}[lang]
         back_label = {"ru": "⬅️ Назад", "uz": "⬅️ Orqaga", "kz": "⬅️ Артқа"}[lang]
-        kb = InlineKeyboardMarkup([
+        ward_view_label = {"ru": "📸 Вид палаты", "uz": "📸 Xona ko'rinishini ko'rish", "kz": "📸 Палата көрінісі"}[lang]
+        kb_rows = [
             [InlineKeyboardButton("10 kun", callback_data=f"calc_days_{cit}_{age}_{idx}_10"),
              InlineKeyboardButton("12 kun", callback_data=f"calc_days_{cit}_{age}_{idx}_12")],
             [InlineKeyboardButton("14 kun", callback_data=f"calc_days_{cit}_{age}_{idx}_14"),
@@ -3980,9 +3981,64 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             [InlineKeyboardButton("21 kun", callback_data=f"calc_days_{cit}_{age}_{idx}_21"),
              InlineKeyboardButton("24 kun", callback_data=f"calc_days_{cit}_{age}_{idx}_24")],
             [InlineKeyboardButton(other_label, callback_data=f"calc_other_{cit}_{age}_{idx}")],
-            [InlineKeyboardButton(back_label, callback_data=f"calc_age_{cit}_{age}")],
-        ])
+        ]
+        # FAQAT shu narx qatoriga aniq korpus/xona bog'langan bo'lsa chiqadi — taxmin qilinmaydi
+        if room.get("korpus_id") and room.get("xona_idx") is not None:
+            kb_rows.append([InlineKeyboardButton(ward_view_label, callback_data=f"calc_ward_{cit}_{age}_{idx}")])
+        kb_rows.append([InlineKeyboardButton(back_label, callback_data=f"calc_age_{cit}_{age}")])
+        kb = InlineKeyboardMarkup(kb_rows)
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+
+    elif data.startswith("calc_ward_"):
+        # Hisoblash ekranidan "Xona ko'rinishini ko'rish" bosilganda — aniq bog'langan
+        # xonaning rasmi/tavsifini ko'rsatadi, Orqaga esa AYNAN shu hisoblash ekraniga qaytaradi
+        parts = data.split("_")
+        cit = parts[2]
+        age = parts[3]
+        idx = int(parts[4])
+        rooms = d["rooms_uz"] if cit == "uz" else d["rooms_foreign"]
+        room = rooms[idx]
+        korpus_id = room.get("korpus_id")
+        xona_idx = room.get("xona_idx")
+        korpuslar = d.get("korpuslar", [])
+        korpus = next((k for k in korpuslar if k["id"] == korpus_id), None)
+
+        back_to_calc_label = {"ru": "⬅️ Назад к расчёту", "uz": "⬅️ Hisoblashga qaytish", "kz": "⬅️ Есептеуге қайту"}[lang]
+        back_kb = InlineKeyboardMarkup([[InlineKeyboardButton(
+            back_to_calc_label, callback_data=f"calc_room_{cit}_{age}_{idx}")]])
+
+        if not korpus or xona_idx is None or xona_idx >= len(korpus.get("xonalar", [])):
+            await query.answer("❌ Bu xona uchun rasm hali bog'lanmagan", show_alert=True)
+            return
+
+        xona = korpus["xonalar"][xona_idx]
+        desc_key = f"description_{lang}"
+        description = xona.get(desc_key) or xona.get("description_uz", "")
+        room_photos = xona.get("photos", [])
+
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+
+        if room_photos:
+            msg = await context.bot.send_photo(
+                chat_id=chat_id, photo=room_photos[0],
+                caption=description or xona.get("nom", ""), parse_mode="Markdown", reply_markup=back_kb
+            )
+            sent_ids = [msg.message_id]
+            for photo_id in room_photos[1:10]:
+                try:
+                    m = await context.bot.send_photo(chat_id=chat_id, photo=photo_id)
+                    sent_ids.append(m.message_id)
+                except Exception:
+                    pass
+            context.user_data["xona_photo_ids"] = sent_ids
+        else:
+            await context.bot.send_message(
+                chat_id=chat_id, text=description or xona.get("nom", "Ma'lumot yo'q"),
+                parse_mode="Markdown", reply_markup=back_kb
+            )
 
     elif data.startswith("calc_other_"):
         # "Boshqa muddat" — foydalanuvchi raqam yozadi
