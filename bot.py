@@ -605,6 +605,45 @@ def save_data(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+# ── PATIENT REGISTRATION (telegram_id <-> telefon+tug'ilgan sana bog'lanishi) ──
+
+def _norm_digits(s: str) -> str:
+    return "".join(c for c in (s or "") if c.isdigit())
+
+
+def register_patient(telegram_id: int, phone: str, dob: str):
+    """Bemorni telefon+tug'ilgan sana bo'yicha telegram_id'ga bog'lab saqlaydi."""
+    d = load_data()
+    regs = d.setdefault("patient_registrations", [])
+    regs[:] = [r for r in regs if r.get("telegram_id") != telegram_id]  # eski yozuvni yangilaydi
+    regs.append({
+        "telegram_id": telegram_id,
+        "phone": phone,
+        "phone_norm": _norm_digits(phone),
+        "dob": dob,
+        "dob_norm": _norm_digits(dob),
+        "registered_at": datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+    })
+    save_data(d)
+
+
+def find_telegram_id_by_phone_dob(phone: str, dob: str):
+    d = load_data()
+    p, b = _norm_digits(phone), _norm_digits(dob)
+    for r in d.get("patient_registrations", []):
+        if r.get("phone_norm") == p and r.get("dob_norm") == b:
+            return r.get("telegram_id")
+    return None
+
+
+def get_registration_by_telegram_id(telegram_id: int):
+    d = load_data()
+    for r in d.get("patient_registrations", []):
+        if r.get("telegram_id") == telegram_id:
+            return r
+    return None
+
+
 def get_lang(context):
     return context.user_data.get("lang", "ru")
 
@@ -4726,6 +4765,19 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
     elif data == "get_results":
         await get_results_start(update, context)
 
+    elif data == "get_results_new":
+        # Ro'yxatdan o'tgan bo'lsa ham, majburan qaytadan telefon so'raladi
+        lang_gr = get_lang(context)
+        context.user_data["results_step"] = "phone"
+        text_gr = {
+            "uz": "📥 *Natijangizni olish*\n\nTelefon raqamingizni kiriting:\n_(+998901234567 formatida)_",
+            "ru": "📥 *Получить результат*\n\nВведите ваш номер телефона:\n_(в формате +998901234567)_",
+            "kz": "📥 *Нәтижені алу*\n\nТелефон нөміріңізді енгізіңіз:\n_(+998901234567 форматында)_",
+        }[lang_gr]
+        back_label_gr = {"uz": "⬅️ Orqaga", "ru": "⬅️ Назад", "kz": "⬅️ Артқа"}[lang_gr]
+        kb_gr = InlineKeyboardMarkup([[InlineKeyboardButton(back_label_gr, callback_data="back_main")]])
+        await query.message.reply_text(text_gr, parse_mode="Markdown", reply_markup=kb_gr)
+
     elif data == "staff_pdf_upload":
         await staff_pdf_start(update, context)
 
@@ -4743,9 +4795,67 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
 
 # ── BEMOR NATIJALARI OLISH FSM ───────────────────────────────────────────────
 
+def results_registered_extra_keyboard(lang):
+    label = {"uz": "🔄 Boshqa raqam bilan qidirish", "ru": "🔄 Искать по другому номеру",
+             "kz": "🔄 Басқа нөмірмен іздеу"}[lang]
+    back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(label, callback_data="get_results_new")],
+        [InlineKeyboardButton(back_label, callback_data="back_main")],
+    ])
+
+
+async def _send_patient_results(update, context, phone, dob, lang, chat_id=None, mark_pushed=False):
+    """Telefon+tug'ilgan sanaga mos natijalarni topib yuboradi. Topilsa True qaytaradi."""
+    d = load_data()
+    p, b = _norm_digits(phone), _norm_digits(dob)
+    found = [r for r in d.get("bemor_natijalari", [])
+             if _norm_digits(r.get("phone", "")) == p and _norm_digits(r.get("dob", "")) == b]
+    if not found:
+        return False
+
+    target_chat = chat_id or update.effective_chat.id
+    for r in found:
+        try:
+            await context.bot.send_document(
+                chat_id=target_chat, document=r["file_id"],
+                filename=r.get("file_name", "natija.pdf"),
+                caption=f"📄 {r.get('file_name', 'natija.pdf')}\n🗓 {r.get('uploaded_at', '')}"
+            )
+            r["pushed"] = True
+        except Exception as e:
+            logger.error(f"Natija yuborishda xato: {e}")
+    if mark_pushed:
+        save_data(d)
+    return True
+
+
 async def get_results_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """QR deep-link yoki callback orqali natija olish bo'limini ochadi"""
     lang = get_lang(context)
+    user_id = update.effective_user.id if update.effective_user else 0
+    reg = get_registration_by_telegram_id(user_id)
+
+    if reg:
+        ok = await _send_patient_results(update, context, reg["phone"], reg["dob"], lang, mark_pushed=True)
+        if ok:
+            intro = {
+                "uz": "✅ *Sizning saqlangan ma'lumotlaringiz bo'yicha natijalar yuborildi.*",
+                "ru": "✅ *Результаты по вашим сохранённым данным отправлены.*",
+                "kz": "✅ *Сақталған деректеріңіз бойынша нәтижелер жіберілді.*",
+            }[lang]
+            kb = results_registered_extra_keyboard(lang)
+            await update.effective_chat.send_message(intro, parse_mode="Markdown", reply_markup=kb)
+            return
+        else:
+            msg = {
+                "uz": "📭 Hozircha saqlangan ma'lumotlaringiz bo'yicha natija yo'q. Tayyor bo'lganda avtomatik yuboriladi.",
+                "ru": "📭 Пока нет результатов по вашим сохранённым данным. Как только будут готовы — отправим автоматически.",
+                "kz": "📭 Әзірге сақталған деректеріңіз бойынша нәтиже жоқ. Дайын болғанда автоматты түрде жіберіледі.",
+            }[lang]
+            await update.effective_chat.send_message(msg)
+            return
+
     context.user_data["results_step"] = "phone"
     text = {
         "uz": "📥 *Natijangizni olish*\n\nTelefon raqamingizni kiriting:\n_(+998901234567 formatida)_",
@@ -4785,6 +4895,9 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
         context.user_data.pop("results_step", None)
         context.user_data.pop("results_phone", None)
 
+        user_id = update.effective_user.id
+        register_patient(user_id, phone, dob)  # ← YANGI: keyingi safar qayta so'ralmasligi va push ishlashi uchun
+
         d = load_data()
         natijalari = d.get("bemor_natijalari", [])
 
@@ -4805,14 +4918,14 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
 
         if not found:
             msg = {
-                "uz": "❌ Afsuski, sizning ma'lumotlaringizga mos natija topilmadi.\n\nTelefon raqam va tug'ilgan sanani tekshirib, qaytadan urinib ko'ring yoki klinika bilan bog'laning.",
-                "ru": "❌ К сожалению, результаты по вашим данным не найдены.\n\nПроверьте номер телефона и дату рождения, попробуйте ещё раз или обратитесь в клинику.",
-                "kz": "❌ Кешіріңіз, деректеріңізге сәйкес нәтиже табылмады.\n\nТелефон нөмірі мен туған күнді тексеріп, қайта көріңіз немесе клиникаға хабарласыңыз.",
+                "uz": "❌ Afsuski, sizning ma'lumotlaringizga mos natija topilmadi.\n\nTelefon raqam va tug'ilgan sanani tekshirib, qaytadan urinib ko'ring yoki klinika bilan bog'laning.\n\nℹ️ Ma'lumotlaringiz saqlandi — natija tayyor bo'lishi bilan avtomatik yuboriladi.",
+                "ru": "❌ К сожалению, результаты по вашим данным не найдены.\n\nПроверьте номер телефона и дату рождения, попробуйте ещё раз или обратитесь в клинику.\n\nℹ️ Ваши данные сохранены — как только результат будет готов, он придёт автоматически.",
+                "kz": "❌ Кешіріңіз, деректеріңізге сәйкес нәтиже табылмады.\n\nТелефон нөмірі мен туған күнді тексеріп, қайта көріңіз немесе клиникаға хабарласыңыз.\n\nℹ️ Деректеріңіз сақталды — нәтиже дайын болғанда автоматты түрде жіберіледі.",
             }[lang]
             retry_label = {"uz": "🔄 Qayta urinish", "ru": "🔄 Попробовать снова", "kz": "🔄 Қайта көру"}[lang]
             back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
             kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton(retry_label, callback_data="get_results")],
+                [InlineKeyboardButton(retry_label, callback_data="get_results_new")],
                 [InlineKeyboardButton(back_label, callback_data="back_main")],
             ])
             await update.message.reply_text(msg, reply_markup=kb)
@@ -4832,8 +4945,10 @@ async def patient_results_handler(update: Update, context: ContextTypes.DEFAULT_
                     filename=r.get("file_name", "natija.pdf"),
                     caption=f"📄 {r.get('file_name', 'natija.pdf')}\n🗓 {r.get('uploaded_at', '')}"
                 )
+                r["pushed"] = True
             except Exception as e:
                 logger.error(f"Natija yuborishda xato: {e}")
+        save_data(d)
         back_label = {"uz": "⬅️ Bosh menyu", "ru": "⬅️ Главное меню", "kz": "⬅️ Бас мәзір"}[lang]
         kb = InlineKeyboardMarkup([[InlineKeyboardButton(back_label, callback_data="back_main")]])
         await update.message.reply_text("✅", reply_markup=kb)
@@ -4914,26 +5029,47 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         uploaded_at = datetime.datetime.now(TASHKENT_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
         d = load_data()
-        d.setdefault("bemor_natijalari", []).append({
+        record = {
             "phone":       phone,
             "dob":         dob,
             "file_id":     file_id,
             "file_name":   file_name,
             "uploaded_by": user_id,
             "uploaded_at": uploaded_at,
-        })
+            "pushed":      False,
+        }
+        d.setdefault("bemor_natijalari", []).append(record)
         save_data(d)
 
         context.user_data.pop("staff_upload_step", None)
         context.user_data.pop("staff_upload_data", None)
+
+        # ── YANGI: agar bemor avval botda ro'yxatdan o'tgan bo'lsa — DARHOL push qilinadi ──
+        target_id = find_telegram_id_by_phone_dob(phone, dob)
+        push_note = ""
+        if target_id:
+            try:
+                await context.bot.send_message(
+                    chat_id=target_id,
+                    text="📄 Sizning diagnostika tahlil natijalaringiz tayyor bo'ldi!"
+                )
+                await context.bot.send_document(chat_id=target_id, document=file_id, filename=file_name)
+                record["pushed"] = True
+                save_data(d)
+                push_note = "\n\n📲 *Bemorga DARHOL yuborildi* (u avval botda ro'yxatdan o'tgan edi)."
+            except Exception as e:
+                logger.error(f"Push xatosi: {e}")
+                push_note = "\n\n⚠️ Bemor ro'yxatdan o'tgan, lekin push qilishda xato bo'ldi (bemor botni bloklagan bo'lishi mumkin)."
+        else:
+            push_note = "\n\n⏳ Bemor hali botda ro'yxatdan o'tmagan — natija saqlandi, u \"📄 Natijalarni olish\" orqali ro'yxatdan o'tganda avtomatik yuboriladi."
 
         await update.message.reply_text(
             f"✅ *PDF muvaffaqiyatli yuklandi va saqlandi!*\n\n"
             f"📞 Telefon: `{phone}`\n"
             f"🎂 Tug'ilgan kun: `{dob}`\n"
             f"📄 Fayl nomi: `{file_name}`\n"
-            f"🕐 Vaqt: `{uploaded_at}`\n\n"
-            f"Bemor endi botdan o'z natijasini olishi mumkin.",
+            f"🕐 Vaqt: `{uploaded_at}`"
+            f"{push_note}",
             parse_mode="Markdown",
             reply_markup=main_menu_keyboard(lang, user_id)
         )
