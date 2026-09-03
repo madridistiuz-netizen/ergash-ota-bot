@@ -3988,7 +3988,23 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, o
             kb_rows.append([InlineKeyboardButton(ward_view_label, callback_data=f"calc_ward_{cit}_{age}_{idx}")])
         kb_rows.append([InlineKeyboardButton(back_label, callback_data=f"calc_age_{cit}_{age}")])
         kb = InlineKeyboardMarkup(kb_rows)
-        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        try:
+            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
+        except Exception:
+            # Joriy xabar matn emas (masalan, rasm) bo'lsa — edit qilib bo'lmaydi,
+            # shuning uchun uni (va unga qo'shilgan boshqa rasmlarni) o'chirib,
+            # yangi matnli xabar yuboramiz
+            extra_photo_ids = context.user_data.pop("xona_photo_ids", [])
+            for mid in extra_photo_ids:
+                try:
+                    await context.bot.delete_message(chat_id=chat_id, message_id=mid)
+                except Exception:
+                    pass
+            try:
+                await query.message.delete()
+            except Exception:
+                pass
+            await context.bot.send_message(chat_id=chat_id, text=text, parse_mode="Markdown", reply_markup=kb)
 
     elif data.startswith("calc_ward_"):
         # Hisoblash ekranidan "Xona ko'rinishini ko'rish" bosilganda — aniq bog'langan
