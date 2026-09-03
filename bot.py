@@ -5189,6 +5189,21 @@ async def ai_logs_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(msg)
 
 
+async def export_json_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Faqat ADMIN_ID uchun: joriy data.json faylini to'g'ridan-to'g'ri Telegram orqali yuboradi."""
+    user_id = update.effective_user.id if update.effective_user else 0
+    if user_id != ADMIN_ID:
+        return
+    try:
+        await update.message.reply_document(
+            document=open(DATA_FILE, "rb"),
+            filename="data.json",
+            caption="📦 Joriy data.json fayli.\n\nBuni tahrirlab, keyin Claude'ga tashlab bering."
+        )
+    except Exception as e:
+        await update.message.reply_text(f"❌ Xato: {e}")
+
+
 async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id != ADMIN_ID:
@@ -8796,6 +8811,7 @@ def main():
     app.add_handler(CommandHandler("admin_video", admin_handler))
     app.add_handler(CommandHandler("stats", admin_handler))
     app.add_handler(CommandHandler("broadcast", admin_handler))
+    app.add_handler(CommandHandler("export_json", export_json_handler))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & filters.User([ADMIN_ID] + ALLOWED_STAFF), staff_doc_handler))
