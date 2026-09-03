@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import time
 import re
 import asyncio
 import datetime
@@ -5131,8 +5132,75 @@ async def staff_pdf_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def import_json_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/import_json — faqat ADMIN_ID uchun: keyingi yuboriladigan JSON faylni data.json sifatida saqlashga tayyorlanadi"""
+    if update.effective_user.id != ADMIN_ID:
+        return
+    context.user_data["awaiting_json_import"] = True
+    await update.message.reply_text(
+        "📥 Yangi *data.json* faylini shu chatga yuboring (hujjat/Document sifatida).\n\n"
+        "⚠️ Eski fayl avtomatik zaxiralanadi, so'ng yangisi bilan almashtiriladi.",
+        parse_mode="Markdown"
+    )
+
+
+async def import_json_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    """
+    Agar admin /import_json dan keyin JSON hujjat yuborsa — uni qabul qilib data.json ni yangilaydi.
+    True qaytarsa — hujjat shu yerda ishlov berilgan (boshqa handlerga o'tmaydi).
+    False qaytarsa — bu JSON import emas, chaqiruvchi odatdagi (PDF) oqimni davom ettirishi kerak.
+    """
+    if update.effective_user.id != ADMIN_ID:
+        return False
+    if not context.user_data.get("awaiting_json_import"):
+        return False
+
+    context.user_data.pop("awaiting_json_import", None)
+    doc = update.message.document
+    if not doc or not (doc.file_name or "").lower().endswith(".json"):
+        await update.message.reply_text("❌ Bu JSON fayl emas. Import bekor qilindi. Qaytadan /import_json bilan boshlang.")
+        return True
+
+    try:
+        tg_file = await context.bot.get_file(doc.file_id)
+        raw_bytes = await tg_file.download_as_bytearray()
+        new_data = json.loads(raw_bytes.decode("utf-8"))
+    except Exception as e:
+        await update.message.reply_text(f"❌ Faylni o'qishda xato (JSON buzilgan bo'lishi mumkin): {e}")
+        return True
+
+    if not isinstance(new_data, dict):
+        await update.message.reply_text("❌ Fayl formati noto'g'ri — JSON obyekt (dict) bo'lishi kerak.")
+        return True
+
+    # Eski faylni zaxiralash
+    try:
+        backup_path = DATA_FILE.replace(".json", f"_backup_{int(time.time())}.json")
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f_old, open(backup_path, "w", encoding="utf-8") as f_bak:
+                f_bak.write(f_old.read())
+    except Exception as e:
+        logger.error(f"Backup xatosi: {e}")
+
+    save_data(new_data)
+    await update.message.reply_text(
+        f"✅ *data.json muvaffaqiyatli yangilandi!*\n\n"
+        f"📦 Hajmi: {len(raw_bytes)} bayt\n"
+        f"🛏 rooms_uz: {len(new_data.get('rooms_uz', []))} ta\n"
+        f"🌍 rooms_foreign: {len(new_data.get('rooms_foreign', []))} ta\n"
+        f"🏢 korpuslar: {len(new_data.get('korpuslar', []))} ta\n\n"
+        f"♻️ Eski fayl zaxiraga saqlandi.",
+        parse_mode="Markdown"
+    )
+    return True
+
+
 async def staff_doc_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Document (PDF) yuborilganda faqat staff/admin uchun — staff_pdf_handler'ga yo'naltiradi"""
+    # Avval JSON import kutilayotganini tekshiramiz — bo'lsa, shu yerda tugatamiz
+    handled = await import_json_doc_handler(update, context)
+    if handled:
+        return
     logger.info(f"STAFF_DOC: user={update.effective_user.id} step={context.user_data.get('staff_upload_step')}")
     await staff_pdf_handler(update, context)
 
@@ -8812,6 +8880,7 @@ def main():
     app.add_handler(CommandHandler("stats", admin_handler))
     app.add_handler(CommandHandler("broadcast", admin_handler))
     app.add_handler(CommandHandler("export_json", export_json_handler))
+    app.add_handler(CommandHandler("import_json", import_json_start))
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.User(ALLOWED_STAFF), staff_pdf_handler))
     app.add_handler(MessageHandler(filters.Document.ALL & filters.User([ADMIN_ID] + ALLOWED_STAFF), staff_doc_handler))
